@@ -1,0 +1,27 @@
+# PurrtechQuest configuration
+
+storage:
+  # SQLITE (single server, default) or MYSQL (for a network of servers sharing player quest progress).
+  type: SQLITE
+  sqlite-file: data.db
+  # Only read when type is MYSQL. Works against MySQL and MariaDB servers.
+  mysql:
+    host: localhost
+    port: 3306
+    database: purrtechquest
+    username: purrtechquest
+    password: ""
+    pool-size: 10
+    use-ssl: false
+
+# Used when a player's client locale has no matching lang/<locale>.yml.
+default-locale: cs
+
+# Directory (relative to the plugin's data folder) where quest definition YAML files live.
+quests-directory: quests
+
+tracking:
+  # How a player's /quest track'd objective is displayed: ACTION_BAR (default, unobtrusive) or BOSS_BAR.
+  display: ACTION_BAR
+
+debug: false
