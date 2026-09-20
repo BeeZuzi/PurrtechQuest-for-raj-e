@@ -4,6 +4,7 @@ import eu.purrtech.purrtechQuest.config.MessagesConfig;
 import eu.purrtech.purrtechQuest.model.ObjectiveType;
 import eu.purrtech.purrtechQuest.model.QuestReward;
 import eu.purrtech.purrtechQuest.model.QuestStatus;
+import eu.purrtech.purrtechQuest.util.LegacyColors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -23,16 +24,29 @@ final class QuestIcons {
      * A quest's raw {@code display-name}, deserialized as MiniMessage so an admin's own styling (custom hex,
      * this server's tiny-caps font, ...) comes through unchanged instead of being forced into one fixed
      * color; {@code colorIfAbsent} keeps a plain display-name with no styling of its own looking exactly as
-     * before ({@code fallbackColor}). Falls back to plain text on a malformed value (e.g. a stray
+     * before ({@code fallbackColor}). Legacy {@code &e}/{@code &#RRGGBB} codes work too (see
+     * {@link LegacyColors}). Falls back to plain text on a malformed value (e.g. a stray
      * {@code <} typed into the name in the quest editor) so a bad display-name degrades to ugly rather than
      * making the quest's icon impossible to render at all.
      */
     static Component displayNameComponent(String rawDisplayName, TextColor fallbackColor) {
         try {
-            return MiniMessage.miniMessage().deserialize(rawDisplayName).colorIfAbsent(fallbackColor);
+            return MiniMessage.miniMessage().deserialize(LegacyColors.toMiniMessage(rawDisplayName)).colorIfAbsent(fallbackColor);
         } catch (ParsingException e) {
             return Component.text(rawDisplayName, fallbackColor);
         }
+    }
+
+    /**
+     * One reward line of a quest's book in the quest list: the reward's name in dark gray after a dark gray
+     * dash. A reward with no name (older quest files) falls back to {@link #rewardLine}'s type/amount text.
+     */
+    static Component questListRewardLine(QuestReward reward, MessagesConfig messages, Player player) {
+        if (reward.name() == null) {
+            return rewardLine(reward, messages, player);
+        }
+        return messages.render("quest.gui-lore-quest-reward-prefix", player, Map.of())
+                .append(displayNameComponent(reward.name(), NamedTextColor.DARK_GRAY));
     }
 
     /** Shared by {@link QuestDetailGui} (full reward list) and {@link QuestLogGui} (compact book lore). */

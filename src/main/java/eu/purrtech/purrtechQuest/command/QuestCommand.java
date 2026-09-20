@@ -13,7 +13,6 @@ import eu.purrtech.purrtechQuest.model.QuestProgress;
 import eu.purrtech.purrtechQuest.player.PlayerQuestDataCache;
 import eu.purrtech.purrtechQuest.service.QuestFeedback;
 import eu.purrtech.purrtechQuest.service.QuestService;
-import eu.purrtech.purrtechQuest.service.QuestStatusText;
 import eu.purrtech.purrtechQuest.service.QuestTrackingService;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -96,7 +95,7 @@ public final class QuestCommand {
         player.sendMessage(messages.render("quest.list-header", player, Map.of()));
         for (Quest quest : questService.allQuests().stream().sorted(Quest.DISPLAY_ORDER).toList()) {
             QuestProgress progress = data == null ? null : data.progress(quest.id());
-            String status = messages.get(QuestStatusText.key(progress), player.locale().getLanguage());
+            String status = messages.get(questService.statusKey(player, quest), player.locale().getLanguage());
             Map<String, String> placeholders = new LinkedHashMap<>();
             placeholders.put("%id%", quest.id());
             placeholders.put("%name%", quest.displayName());
@@ -126,7 +125,7 @@ public final class QuestCommand {
 
         PlayerQuestData data = playerCache.get(player.getUniqueId());
         QuestProgress progress = data == null ? null : data.progress(questId);
-        String status = messages.get(QuestStatusText.key(progress), player.locale().getLanguage());
+        String status = messages.get(questService.statusKey(player, quest), player.locale().getLanguage());
         player.sendMessage(messages.render("quest.info-status", player, Map.of("%status%", status)));
 
         List<QuestObjective> objectives = quest.objectives();

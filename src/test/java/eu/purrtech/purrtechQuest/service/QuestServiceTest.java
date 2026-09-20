@@ -295,6 +295,33 @@ class QuestServiceTest {
     }
 
     @Test
+    void aQuestTheEligiblePlayerHasntStartedReadsAsAvailable() {
+        Quest mineIron = questService.quest("mine_iron").orElseThrow();
+        assertEquals("quest.status-available", questService.statusKey(player, mineIron));
+    }
+
+    @Test
+    void aQuestWithUnmetPrerequisitesReadsAsLockedUntilThePrerequisiteIsTurnedIn() {
+        Quest zombie = questService.quest("kill_zombie").orElseThrow();
+        assertEquals("quest.status-locked", questService.statusKey(player, zombie));
+
+        questService.acceptQuest(player, "mine_iron");
+        questService.updateProgress(player, ObjectiveType.COLLECT_ITEM, "RAW_IRON", 10);
+        assertEquals("quest.status-available", questService.statusKey(player, zombie));
+
+        questService.acceptQuest(player, "kill_zombie");
+        assertEquals("quest.status-in-progress", questService.statusKey(player, zombie));
+    }
+
+    @Test
+    void aPermissionGatedQuestReadsAsLockedWithoutThePermission() {
+        Quest vip = questService.quest("vip_quest").orElseThrow();
+        assertEquals("quest.status-locked", questService.statusKey(player, vip));
+        when(player.hasPermission("purrtechquest.quest.vip")).thenReturn(true);
+        assertEquals("quest.status-available", questService.statusKey(player, vip));
+    }
+
+    @Test
     void acceptingAPermissionGatedQuestFailsWithoutThePermission() {
         assertEquals(QuestService.AcceptResult.MISSING_PERMISSION, questService.acceptQuest(player, "vip_quest"));
         assertNull(playerCache.get(playerId).progress("vip_quest"));

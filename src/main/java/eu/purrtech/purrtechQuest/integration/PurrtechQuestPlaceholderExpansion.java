@@ -8,6 +8,8 @@ import eu.purrtech.purrtechQuest.model.QuestProgress;
 import eu.purrtech.purrtechQuest.model.QuestStatus;
 import eu.purrtech.purrtechQuest.player.PlayerQuestDataCache;
 import eu.purrtech.purrtechQuest.service.QuestService;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import eu.purrtech.purrtechQuest.service.QuestStatusText;
 import eu.purrtech.purrtechQuest.service.QuestTrackingService;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
@@ -120,8 +122,12 @@ public final class PurrtechQuestPlaceholderExpansion extends PlaceholderExpansio
     }
 
     private String statusText(PlayerQuestData data, String questId, Player player) {
+        Quest quest = questService.quest(questId).orElse(null);
         QuestProgress progress = data == null ? null : data.progress(questId);
-        return messages.get(QuestStatusText.key(progress), player.locale().getLanguage());
+        String key = quest == null ? QuestStatusText.key(progress) : questService.statusKey(player, quest);
+        // Status texts carry MiniMessage color tags for the GUI; a placeholder consumer wants plain text.
+        return PlainTextComponentSerializer.plainText().serialize(
+                MiniMessage.miniMessage().deserialize(messages.get(key, player.locale().getLanguage())));
     }
 
     private String trackedProgressText(Player player, PlayerQuestData data) {

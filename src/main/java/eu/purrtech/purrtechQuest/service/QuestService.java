@@ -742,6 +742,26 @@ public final class QuestService {
         };
     }
 
+    /**
+     * The {@code lang} key of the status to show this player for {@code quest}: the usual status of their
+     * progress, except that a quest they haven't started and can't yet (missing required permission or
+     * unmet prerequisites — the same two checks {@link #acceptQuest} refuses on) reads as locked.
+     */
+    public String statusKey(Player player, Quest quest) {
+        PlayerQuestData data = playerCache.get(player.getUniqueId());
+        QuestProgress progress = data == null ? null : data.progress(quest.id());
+        boolean notStarted = progress == null || progress.status() == QuestStatus.NOT_ACCEPTED;
+        if (notStarted) {
+            boolean missingPermission = quest.requiredPermission() != null
+                    && !player.hasPermission(quest.requiredPermission());
+            boolean missingPrerequisites = data != null && !prerequisitesMet(data, quest);
+            if (missingPermission || missingPrerequisites) {
+                return "quest.status-locked";
+            }
+        }
+        return QuestStatusText.key(progress);
+    }
+
     private boolean prerequisitesMet(PlayerQuestData data, Quest quest) {
         for (String requiredId : quest.requiredQuests()) {
             QuestProgress requiredProgress = data.progress(requiredId);

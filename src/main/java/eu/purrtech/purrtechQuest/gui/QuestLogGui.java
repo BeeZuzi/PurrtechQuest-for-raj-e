@@ -7,10 +7,10 @@ import eu.purrtech.purrtechQuest.model.QuestProgress;
 import eu.purrtech.purrtechQuest.model.QuestStatus;
 import eu.purrtech.purrtechQuest.player.PlayerQuestDataCache;
 import eu.purrtech.purrtechQuest.service.QuestService;
-import eu.purrtech.purrtechQuest.service.QuestStatusText;
 import eu.purrtech.purrtechQuest.service.QuestTrackingService;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -31,6 +31,7 @@ import java.util.Map;
  */
 public final class QuestLogGui extends Gui {
 
+    private static final TextColor ACCENT = TextColor.color(0x9863E7);
     private static final int PAGE_SIZE = 45;
     private static final int PREV_SLOT = 45;
     private static final int BACK_SLOT = 47;
@@ -69,7 +70,7 @@ public final class QuestLogGui extends Gui {
         for (int i = from; i < to; i++) {
             Quest quest = quests.get(i);
             QuestProgress progress = data == null ? null : data.progress(quest.id());
-            setItem(i - from, questIcon(quest, progress), event ->
+            setItem(i - from, questIcon(quest, progress, i + 1), event ->
                     new QuestDetailGui(questService, playerCache, trackingService, messages, player, quest.id(),
                             this::reopen).open(player));
         }
@@ -102,20 +103,29 @@ public final class QuestLogGui extends Gui {
         }
     }
 
-    private ItemStack questIcon(Quest quest, QuestProgress progress) {
+    /**
+     * The quest's book in the list. Layout: bold accent-colored name (the quest's own {@code display-name}
+     * styling wins when it has any), its number in the list, status, rewards (one line per reward, by the
+     * reward's own name) and the click hint.
+     */
+    private ItemStack questIcon(Quest quest, QuestProgress progress, int number) {
         QuestStatus status = progress == null ? QuestStatus.NOT_ACCEPTED : progress.status();
         Material material = QuestIcons.materialFor(status);
-        String statusText = messages.get(QuestStatusText.key(progress), player.locale().getLanguage());
+        String statusText = messages.get(questService.statusKey(player, quest), player.locale().getLanguage());
 
-        Component name = QuestIcons.displayNameComponent(quest.displayName(), NamedTextColor.GOLD);
+        Component name = QuestIcons.displayNameComponent(quest.displayName(), ACCENT)
+                .decorationIfAbsent(TextDecoration.BOLD, TextDecoration.State.TRUE);
 
         List<Component> lore = new ArrayList<>();
-        lore.add(Component.text(statusText, NamedTextColor.GRAY));
-        List<Component> rewardLines = quest.rewards().stream().map(r -> QuestIcons.rewardLine(r, messages, player)).toList();
-        if (!rewardLines.isEmpty()) {
+        lore.add(messages.render("quest.gui-lore-quest-number", player, Map.of("%number%", String.valueOf(number))));
+        lore.add(Component.empty());
+        lore.add(messages.render("quest.gui-lore-quest-status", player, Map.of("%status%", statusText)));
+        if (!quest.rewards().isEmpty()) {
             lore.add(Component.empty());
-            lore.add(messages.render("quest.gui-lore-rewards-header", player, Map.of()));
-            lore.addAll(rewardLines);
+            lore.add(messages.render("quest.gui-lore-quest-reward-header", player, Map.of()));
+            for (var reward : quest.rewards()) {
+                lore.add(QuestIcons.questListRewardLine(reward, messages, player));
+            }
         }
         lore.add(Component.empty());
         lore.add(messages.render("quest.gui-lore-quest-hint", player, Map.of()));

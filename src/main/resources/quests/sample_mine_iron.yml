@@ -17,10 +17,10 @@ objectives:
     label: "Vytěž železnou rudu"
 
 rewards:
-  # "name" is what players see for the reward in the quest menu (MiniMessage is allowed).
+  # "name" is what players see for the reward in the quest menu. Colors work: &e, &#FFD700 or MiniMessage.
   - type: MONEY
     amount: 50.0
-    name: "50 mincí"
+    name: "&e50 mincí"
   - type: EXPERIENCE
     amount: 20
-    name: "20 zkušeností"
+    name: "&a20 zkušeností"

@@ -11,7 +11,6 @@ import eu.purrtech.purrtechQuest.model.QuestStatus;
 import eu.purrtech.purrtechQuest.player.PlayerQuestDataCache;
 import eu.purrtech.purrtechQuest.service.QuestFeedback;
 import eu.purrtech.purrtechQuest.service.QuestService;
-import eu.purrtech.purrtechQuest.service.QuestStatusText;
 import eu.purrtech.purrtechQuest.service.QuestTrackingService;
 import eu.purrtech.purrtechQuest.util.DurationFormat;
 import net.kyori.adventure.text.Component;
@@ -174,7 +173,7 @@ public final class QuestDetailGui extends Gui {
             lore.add(Component.text(quest.description(), NamedTextColor.GRAY));
             lore.add(Component.empty());
         }
-        String statusText = messages.get(QuestStatusText.key(progress), player.locale().getLanguage());
+        String statusText = messages.get(questService.statusKey(player, quest), player.locale().getLanguage());
         lore.add(messages.render("quest.gui-lore-status", player, Map.of("%status%", statusText)));
         lore.add(Component.empty());
         lore.add(messages.render("quest.gui-lore-objectives-header", player, Map.of()));
