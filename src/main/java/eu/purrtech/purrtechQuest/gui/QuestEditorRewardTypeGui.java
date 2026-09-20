@@ -84,8 +84,7 @@ public final class QuestEditorRewardTypeGui extends Gui {
                     invalidNumberThenRetry(() -> startWizard(Choice.MONEY));
                     return;
                 }
-                rewards.add(new QuestReward.Money(amount));
-                onBack.run();
+                finish(new QuestReward.Money(amount));
             }, this::reopen);
             case ITEM -> chatInput.prompt(player, "quest.editor-prompt-item-material", raw -> {
                 String normalized = raw.trim();
@@ -104,20 +103,17 @@ public final class QuestEditorRewardTypeGui extends Gui {
             }, this::reopen);
             case ITEM_FROM_HAND -> startItemFromHand();
             case COMMAND -> chatInput.prompt(player, "quest.editor-prompt-command", command -> {
-                rewards.add(new QuestReward.Command(command));
-                onBack.run();
+                finish(new QuestReward.Command(command));
             }, this::reopen);
             case EXPERIENCE -> chatInput.promptInt(player, "quest.editor-prompt-experience-amount", amount -> {
                 if (amount <= 0) {
                     invalidNumberThenRetry(() -> startWizard(Choice.EXPERIENCE));
                     return;
                 }
-                rewards.add(new QuestReward.Experience(amount));
-                onBack.run();
+                finish(new QuestReward.Experience(amount));
             }, this::reopen);
             case PERMISSION -> chatInput.prompt(player, "quest.editor-prompt-permission-node", node -> {
-                rewards.add(new QuestReward.Permission(node, null));
-                onBack.run();
+                finish(new QuestReward.Permission(node, null));
             }, this::reopen);
             case IMPORT -> new QuestEditorRewardImportGui(context, player, draft, rewards, onBack, this::reopen).open(player);
         }
@@ -136,11 +132,10 @@ public final class QuestEditorRewardTypeGui extends Gui {
                 return;
             }
             if (resolved.startsWith("ia:") || resolved.startsWith("oraxen:")) {
-                rewards.add(new QuestReward.Item("AIR", amount, resolved));
+                finish(new QuestReward.Item("AIR", amount, resolved));
             } else {
-                rewards.add(new QuestReward.Item(resolved, amount, null));
+                finish(new QuestReward.Item(resolved, amount, null));
             }
-            onBack.run();
         }, this::reopen);
     }
 
@@ -150,8 +145,7 @@ public final class QuestEditorRewardTypeGui extends Gui {
                 invalidNumberThenRetry(() -> promptItemAmount(material));
                 return;
             }
-            rewards.add(new QuestReward.Item(material.name(), amount, null));
-            onBack.run();
+            finish(new QuestReward.Item(material.name(), amount, null));
         }, this::reopen);
     }
 
@@ -161,7 +155,24 @@ public final class QuestEditorRewardTypeGui extends Gui {
                 invalidNumberThenRetry(() -> promptItemAmountCustom(customId));
                 return;
             }
-            rewards.add(new QuestReward.Item("AIR", amount, customId));
+            finish(new QuestReward.Item("AIR", amount, customId));
+        }, this::reopen);
+    }
+
+    /**
+     * Last step of every wizard: every reward must be given a name (what players see for it in the quest
+     * menu) before it's actually added — a blank answer just asks again, and cancelling discards the whole
+     * half-built reward rather than adding an unnamed one.
+     */
+    private void finish(QuestReward reward) {
+        context.chatInput().prompt(player, "quest.editor-prompt-reward-name", raw -> {
+            String name = raw.trim();
+            if (name.isBlank()) {
+                player.sendMessage(context.messages().render("quest.editor-invalid-reward-name", player, Map.of()));
+                finish(reward);
+                return;
+            }
+            rewards.add(reward.withName(name));
             onBack.run();
         }, this::reopen);
     }

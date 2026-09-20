@@ -79,8 +79,10 @@ class StorageIntegrationTest {
                 "Vytěž 10 kusů železné rudy.",
                 "mining",
                 List.of(new QuestObjective(ObjectiveType.COLLECT_ITEM, "RAW_IRON", 10)),
-                List.of(new QuestReward.Money(50.0), new QuestReward.Experience(20)),
-                List.of(new QuestRewardTier("purrtechquest.rank.vip", "VIP", List.of(new QuestReward.Money(25.0)))),
+                // One named and one unnamed reward: the unnamed one is what an older quest file looks like.
+                List.of(new QuestReward.Money(50.0, "50 mincí"), new QuestReward.Experience(20)),
+                List.of(new QuestRewardTier("purrtechquest.rank.vip", "VIP",
+                        List.of(new QuestReward.Money(25.0, "Bonus 25 mincí")))),
                 List.of(),
                 false,
                 0,
@@ -98,6 +100,8 @@ class StorageIntegrationTest {
         assertEquals(quest.displayName(), roundTripped.displayName());
         assertEquals(quest.objectives(), roundTripped.objectives());
         assertEquals(quest.rewards(), roundTripped.rewards());
+        assertEquals("50 mincí", roundTripped.rewards().get(0).name());
+        assertEquals(null, roundTripped.rewards().get(1).name());
         assertEquals(quest.rewardTiers(), roundTripped.rewardTiers());
         assertEquals(quest.questGiver(), roundTripped.questGiver());
         assertTrue(roundTripped.autoTurnIn());

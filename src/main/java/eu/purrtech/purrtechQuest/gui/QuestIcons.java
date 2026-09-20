@@ -5,6 +5,7 @@ import eu.purrtech.purrtechQuest.model.ObjectiveType;
 import eu.purrtech.purrtechQuest.model.QuestReward;
 import eu.purrtech.purrtechQuest.model.QuestStatus;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.ParsingException;
@@ -36,6 +37,12 @@ final class QuestIcons {
 
     /** Shared by {@link QuestDetailGui} (full reward list) and {@link QuestLogGui} (compact book lore). */
     static Component rewardLine(QuestReward reward, MessagesConfig messages, Player player) {
+        // The admin-chosen name wins; a reward with none (loaded from an older/hand-written quest file)
+        // still falls back to describing itself by type and amount below.
+        if (reward.name() != null) {
+            return messages.render("quest.gui-lore-reward-prefix", player, Map.of())
+                    .append(displayNameComponent(reward.name(), NamedTextColor.GRAY));
+        }
         return switch (reward) {
             case QuestReward.Money money ->
                     messages.render("quest.gui-lore-reward-money", player, Map.of("%amount%", String.valueOf(money.amount())));

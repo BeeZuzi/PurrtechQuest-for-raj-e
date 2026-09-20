@@ -3,6 +3,7 @@ package eu.purrtech.purrtechQuest.gui;
 import eu.purrtech.purrtechQuest.model.QuestReward;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -59,6 +60,8 @@ public final class QuestEditorRewardsGui extends Gui {
                 if (event.isRightClick()) {
                     rewards.remove(index);
                     reopen();
+                } else if (event.isLeftClick()) {
+                    promptRename(index);
                 }
             });
         }
@@ -123,10 +126,31 @@ public final class QuestEditorRewardsGui extends Gui {
             }
         }
 
+        // Escaped: the name is admin-typed free text going into a MiniMessage template, and a stray "<" in it
+        // would otherwise throw while rendering this very icon.
+        String shownName = reward.name() == null
+                ? messages.get("quest.editor-reward-name-none", player.locale().getLanguage())
+                : MiniMessage.miniMessage().escapeTags(reward.name());
         List<Component> lore = List.of(
+                messages.render("quest.editor-reward-line-name", player, Map.of("%name%", shownName)),
                 messages.render(labelKey, player, placeholders),
+                messages.render("quest.editor-rename-hint", player, Map.of()),
                 messages.render("quest.editor-remove-hint", player, Map.of()));
         return GuiItems.icon(material, name, lore);
+    }
+
+    /** Renaming keeps the reward itself untouched — only its player-facing name is replaced. */
+    private void promptRename(int index) {
+        context.chatInput().prompt(player, "quest.editor-prompt-reward-name", raw -> {
+            String value = raw.trim();
+            if (value.isBlank()) {
+                player.sendMessage(context.messages().render("quest.editor-invalid-reward-name", player, Map.of()));
+                promptRename(index);
+                return;
+            }
+            rewards.set(index, rewards.get(index).withName(value));
+            reopen();
+        }, this::reopen);
     }
 
     private Component typeName(String key) {
