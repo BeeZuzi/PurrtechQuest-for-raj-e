@@ -13,6 +13,7 @@ import eu.purrtech.purrtechQuest.service.QuestFeedback;
 import eu.purrtech.purrtechQuest.service.QuestService;
 import eu.purrtech.purrtechQuest.service.QuestTrackingService;
 import eu.purrtech.purrtechQuest.util.DurationFormat;
+import eu.purrtech.purrtechQuest.util.TinyFont;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -166,11 +167,11 @@ public final class QuestDetailGui extends Gui {
 
     private ItemStack infoIcon(Quest quest, QuestProgress progress, QuestStatus status) {
         Material material = QuestIcons.materialFor(status);
-        Component name = Component.text(quest.displayName(), NamedTextColor.GOLD);
+        Component name = QuestIcons.displayNameComponent(quest.displayName(), NamedTextColor.GOLD);
 
         List<Component> lore = new ArrayList<>();
         if (!quest.description().isBlank()) {
-            lore.add(Component.text(quest.description(), NamedTextColor.GRAY));
+            lore.add(Component.text(TinyFont.convert(quest.description()), NamedTextColor.GRAY));
             lore.add(Component.empty());
         }
         String statusText = messages.get(questService.statusKey(player, quest), player.locale().getLanguage());

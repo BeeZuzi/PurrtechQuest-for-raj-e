@@ -5,6 +5,7 @@ import eu.purrtech.purrtechQuest.model.ObjectiveType;
 import eu.purrtech.purrtechQuest.model.QuestReward;
 import eu.purrtech.purrtechQuest.model.QuestStatus;
 import eu.purrtech.purrtechQuest.util.LegacyColors;
+import eu.purrtech.purrtechQuest.util.TinyFont;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -25,15 +26,16 @@ final class QuestIcons {
      * this server's tiny-caps font, ...) comes through unchanged instead of being forced into one fixed
      * color; {@code colorIfAbsent} keeps a plain display-name with no styling of its own looking exactly as
      * before ({@code fallbackColor}). Legacy {@code &e}/{@code &#RRGGBB} codes work too (see
-     * {@link LegacyColors}). Falls back to plain text on a malformed value (e.g. a stray
+     * {@link LegacyColors}) and the text is shown in the tiny font ({@link TinyFont}). Falls back to plain text on a malformed value (e.g. a stray
      * {@code <} typed into the name in the quest editor) so a bad display-name degrades to ugly rather than
      * making the quest's icon impossible to render at all.
      */
     static Component displayNameComponent(String rawDisplayName, TextColor fallbackColor) {
         try {
-            return MiniMessage.miniMessage().deserialize(LegacyColors.toMiniMessage(rawDisplayName)).colorIfAbsent(fallbackColor);
+            return TinyFont.convert(MiniMessage.miniMessage().deserialize(LegacyColors.toMiniMessage(rawDisplayName))
+                    .colorIfAbsent(fallbackColor));
         } catch (ParsingException e) {
-            return Component.text(rawDisplayName, fallbackColor);
+            return TinyFont.convert(Component.text(rawDisplayName, fallbackColor));
         }
     }
 

@@ -8,6 +8,7 @@ import eu.purrtech.purrtechQuest.model.QuestProgress;
 import eu.purrtech.purrtechQuest.model.QuestStatus;
 import eu.purrtech.purrtechQuest.player.PlayerQuestDataCache;
 import eu.purrtech.purrtechQuest.service.QuestService;
+import eu.purrtech.purrtechQuest.util.TinyFont;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import eu.purrtech.purrtechQuest.service.QuestStatusText;
@@ -96,6 +97,7 @@ public final class PurrtechQuestPlaceholderExpansion extends PlaceholderExpansio
             return trackingService.trackedQuestId(player)
                     .flatMap(questService::quest)
                     .map(Quest::displayName)
+                    .map(TinyFont::convert)
                     .orElse("");
         }
         if (params.equalsIgnoreCase("tracked_progress")) {

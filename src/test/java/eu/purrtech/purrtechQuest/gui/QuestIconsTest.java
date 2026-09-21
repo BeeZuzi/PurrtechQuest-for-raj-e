@@ -16,7 +16,7 @@ class QuestIconsTest {
     @Test
     void ampersandColorCodesColorTheName() {
         var component = QuestIcons.displayNameComponent("&e$10,000", NamedTextColor.DARK_GRAY);
-        assertEquals("$10,000", PLAIN.serialize(component));
+        assertEquals("$10,000", PLAIN.serialize(component));  // digits/symbols have no tiny form
         assertEquals(NamedTextColor.YELLOW, colorOfText(component, "$10,000", null));
     }
 
@@ -27,9 +27,14 @@ class QuestIconsTest {
     }
 
     @Test
+    void theNameIsShownInTheTinyFont() {
+        assertEquals("ᴢʟᴀᴛᴏ", PLAIN.serialize(QuestIcons.displayNameComponent("&eZlato", NamedTextColor.DARK_GRAY)));
+    }
+
+    @Test
     void aMalformedNameStillRendersAsPlainText() {
         var component = QuestIcons.displayNameComponent("<nope", NamedTextColor.DARK_GRAY);
-        assertEquals("<nope", PLAIN.serialize(component));
+        assertEquals("<ɴᴏᴘᴇ", PLAIN.serialize(component));
     }
 
     /** The color a text leaf actually renders with: its own, else the nearest ancestor's. */

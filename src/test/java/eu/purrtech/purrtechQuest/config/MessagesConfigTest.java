@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -82,6 +83,20 @@ class MessagesConfigTest {
         Path dataFolder = tempDir.resolve("plugin-data");
         MessagesConfig messages = MessagesConfig.load(mockPlugin(dataFolder), "cs");
         assertEquals("<gray>ᴄíʟᴇ:</gray>", messages.get("quest.gui-lore-objectives-header", "cs"));
+    }
+
+    @Test
+    void adminTypedPlaceholdersAreShownInTheTinyFontAndOthersAreLeftAlone(@TempDir Path tempDir) {
+        Path dataFolder = tempDir.resolve("plugin-data");
+        MessagesConfig messages = MessagesConfig.load(mockPlugin(dataFolder), "cs");
+
+        var plain = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText();
+        // quest.info-header is "<gold>=== %quest% ===</gold>"; %quest% is admin text, so it gets converted.
+        assertEquals("=== sʙěʀ žᴇʟᴇᴢᴀ ===",
+                plain.serialize(messages.render("quest.info-header", "cs", Map.of("%quest%", "Sběr železa"))));
+        // quest.gui-lore-cooldown's %time% is not admin text and must come through exactly as given.
+        assertTrue(plain.serialize(messages.render("quest.gui-lore-cooldown", "cs", Map.of("%time%", "2h 5m")))
+                .contains("2h 5m"));
     }
 
     private static void writeLangFile(Path dataFolder, String locale, String content) throws IOException {

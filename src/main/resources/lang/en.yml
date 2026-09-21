@@ -245,7 +245,7 @@ quest:
   gui-lore-reward-prefix: "<gray> - </gray>"
   editor-prompt-reward-name: "<yellow>Type a name for this reward — players see it in the quest menu. Colors: &e, &#FFD700 (e.g. '&e$10,000'):</yellow>"
   editor-invalid-reward-name: "<red>The reward name must not be empty, try again.</red>"
-  editor-reward-line-name: "<aqua>Name: <white>%name%</white></aqua>"
+  editor-reward-line-name: "<aqua>Name: <white>%value%</white></aqua>"
   editor-reward-name-none: "not set"
   editor-rename-hint: "<dark_gray>Left click = rename</dark_gray>"
   gui-lore-quest-number: "<gray><i>(úᴋᴏʟ č. %number%)</i></gray>"

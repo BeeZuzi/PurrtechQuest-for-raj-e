@@ -1,5 +1,7 @@
 package eu.purrtech.purrtechQuest.config;
 
+import eu.purrtech.purrtechQuest.util.LegacyColors;
+import eu.purrtech.purrtechQuest.util.TinyFont;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -15,6 +17,7 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Loads {@code lang/<locale>.yml} files (extracted from the jar on first run, then editable by admins)
@@ -135,6 +138,14 @@ public final class MessagesConfig {
                     Map.entry("quest.gui-button-track-hint", "<gray>Zapne zobrazení postupu questu na action baru.</gray>"),
                     Map.entry("quest.gui-button-untrack-hint", "<gray>Vypne zobrazení postupu questu na action baru.</gray>"),
                     Map.entry("quest.gui-button-turnin-hint", "<gray>Odevzdá splněný quest a vyzvedne odměny.</gray>")));
+
+    /**
+     * Placeholders that stand for text an admin typed (quest and tier names, descriptions, objective labels):
+     * shown in the tiny font, and their {@code &} color codes work. Everything else (numbers, ids, the
+     * editor's {@code %value%}) is inserted exactly as given.
+     */
+    private static final Set<String> ADMIN_TEXT_PLACEHOLDERS =
+            Set.of("%quest%", "%description%", "%label%", "%name%", "%tier%");
 
     private final Map<String, YamlConfiguration> byLocale = new HashMap<>();
     private final String defaultLocale;
@@ -265,7 +276,11 @@ public final class MessagesConfig {
     public Component render(String key, String locale, Map<String, String> placeholders) {
         String raw = get(key, locale);
         for (Map.Entry<String, String> entry : placeholders.entrySet()) {
-            raw = raw.replace(entry.getKey(), entry.getValue());
+            String value = entry.getValue();
+            if (ADMIN_TEXT_PLACEHOLDERS.contains(entry.getKey())) {
+                value = TinyFont.convert(LegacyColors.toMiniMessage(value));
+            }
+            raw = raw.replace(entry.getKey(), value);
         }
         return MiniMessage.miniMessage().deserialize(raw);
     }

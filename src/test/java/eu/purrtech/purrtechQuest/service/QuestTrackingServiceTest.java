@@ -9,6 +9,7 @@ import eu.purrtech.purrtechQuest.model.QuestProgress;
 import eu.purrtech.purrtechQuest.model.QuestReward;
 import eu.purrtech.purrtechQuest.model.QuestStatus;
 import eu.purrtech.purrtechQuest.player.PlayerQuestDataCache;
+import eu.purrtech.purrtechQuest.util.TinyFont;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.entity.Player;
@@ -85,8 +86,9 @@ class QuestTrackingServiceTest {
         Component line = trackingService.progressLine(quest, progress, player);
         String text = PlainTextComponentSerializer.plainText().serialize(line);
 
-        assertTrue(text.contains("RAW_IRON"), "should point at the mandatory objective that's actually next: " + text);
-        assertFalse(text.contains("STONE"), "must not show the locked-out alternative: " + text);
+        // Objective labels are shown in the tiny font, so compare against the converted form.
+        assertTrue(text.contains(TinyFont.convert("RAW_IRON")), "should point at the mandatory objective that's actually next: " + text);
+        assertFalse(text.contains(TinyFont.convert("STONE")), "must not show the locked-out alternative: " + text);
     }
 
     @Test

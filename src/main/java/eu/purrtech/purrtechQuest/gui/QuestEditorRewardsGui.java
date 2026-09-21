@@ -132,7 +132,7 @@ public final class QuestEditorRewardsGui extends Gui {
                 ? messages.get("quest.editor-reward-name-none", player.locale().getLanguage())
                 : MiniMessage.miniMessage().escapeTags(reward.name());
         List<Component> lore = List.of(
-                messages.render("quest.editor-reward-line-name", player, Map.of("%name%", shownName)),
+                messages.render("quest.editor-reward-line-name", player, Map.of("%value%", shownName)),
                 messages.render(labelKey, player, placeholders),
                 messages.render("quest.editor-rename-hint", player, Map.of()),
                 messages.render("quest.editor-remove-hint", player, Map.of()));
