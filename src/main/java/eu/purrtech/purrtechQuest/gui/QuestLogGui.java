@@ -35,7 +35,7 @@ public final class QuestLogGui extends Gui {
 
     private static final TextColor ACCENT = TextColor.color(0x9863E7);
     private static final int GUIDE_SLOT = 4;
-    private static final int FIRST_SLOT = 10;
+    private static final int FIRST_SLOT = 9;
     private static final int LAST_SLOT = 36;
     private static final int PAGE_SIZE = LAST_SLOT - FIRST_SLOT + 1;
     private static final int PREV_SLOT = 45;
