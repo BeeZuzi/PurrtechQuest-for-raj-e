@@ -2,7 +2,9 @@ package eu.purrtech.purrtechQuest.util;
 
 import net.kyori.adventure.text.Component;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,6 +16,10 @@ import java.util.regex.Pattern;
  * Applied when text is shown to a player, never to what is stored, so an admin's original wording stays
  * readable (and sortable) in the editor and the quest files. Converting is idempotent — text that is already
  * tiny (e.g. pasted from the generator) comes out unchanged.
+ * <p>
+ * The whole thing can be switched off with {@code tiny-font: false} in {@code config.yml} (see
+ * {@link #enabledWhen}): admin text is then shown exactly as typed, and the built-in menu texts — which ship
+ * in the tiny font — are turned back into ordinary lowercase letters by {@link #untiny}.
  */
 public final class TinyFont {
 
@@ -31,7 +37,38 @@ public final class TinyFont {
 
     private static final Pattern ANY_TEXT = Pattern.compile("(?s).+");
 
+    /** Small-caps letter back to the ordinary one; {@code ꜱ} is the variant some older built-in texts use for s. */
+    private static final Map<Character, Character> REVERSE = new HashMap<>();
+
+    static {
+        MAP.forEach((plain, tiny) -> REVERSE.put(tiny, plain));
+        REVERSE.put('ꜱ', 's');
+    }
+
+    private static volatile BooleanSupplier enabled = () -> true;
+
     private TinyFont() {
+    }
+
+    /** Where the on/off setting comes from; asked on every conversion so a config reload takes effect at once. */
+    public static void enabledWhen(BooleanSupplier setting) {
+        enabled = setting;
+    }
+
+    public static boolean enabled() {
+        return enabled.getAsBoolean();
+    }
+
+    /** Turns tiny-font letters back into ordinary lowercase ones; everything else is left as it is. */
+    public static String untiny(String text) {
+        if (text == null || text.isEmpty()) {
+            return text;
+        }
+        StringBuilder out = new StringBuilder(text.length());
+        for (char c : text.toCharArray()) {
+            out.append(REVERSE.getOrDefault(c, c));
+        }
+        return out.toString();
     }
 
     /**
@@ -39,7 +76,7 @@ public final class TinyFont {
      * color codes — those are left alone so they keep working, only the text between them is converted.
      */
     public static String convert(String raw) {
-        if (raw == null || raw.isEmpty()) {
+        if (raw == null || raw.isEmpty() || !enabled()) {
             return raw;
         }
         Matcher matcher = PROTECTED.matcher(raw);
@@ -54,6 +91,9 @@ public final class TinyFont {
 
     /** Converts every piece of text in an already-parsed component, keeping its colors and formatting. */
     public static Component convert(Component component) {
+        if (!enabled()) {
+            return component;
+        }
         return component.replaceText(builder -> builder
                 .match(ANY_TEXT)
                 .replacement((match, text) -> text.content(plain(match.group()))));

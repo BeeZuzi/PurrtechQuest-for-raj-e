@@ -24,15 +24,20 @@ import java.util.Map;
  * curated list an NPC gives ({@code npc.QuestGiverInteraction}, which has no category concept and passes
  * {@code onBack = null} for that reason, same as before categories existed). Sorted by
  * {@link Quest#DISPLAY_ORDER} (admin-assigned number first, alphabetical fallback/tie-break) regardless of
- * whatever order the caller's list happened to be in. 45 to a page, opening {@link QuestDetailGui} on
- * click. Completed ({@code TURNED_IN}) and not-yet-completed quests are listed together rather than split
+ * whatever order the caller's list happened to be in. The quests sit in slots {@value #FIRST_SLOT} to
+ * {@value #LAST_SLOT} — the area the menu's custom background leaves for them — {@value #PAGE_SIZE} to a
+ * page, opening {@link QuestDetailGui} on click. The guide ({@link GuideIcon}) sits in the top-centre slot
+ * {@value #GUIDE_SLOT}, display-only. Completed ({@code TURNED_IN}) and not-yet-completed quests are listed together rather than split
  * behind a tab — the different book material per {@link QuestStatus}
  * ({@link QuestIcons#materialFor(QuestStatus)}) is what tells them apart at a glance.
  */
 public final class QuestLogGui extends Gui {
 
     private static final TextColor ACCENT = TextColor.color(0x9863E7);
-    private static final int PAGE_SIZE = 45;
+    private static final int GUIDE_SLOT = 4;
+    private static final int FIRST_SLOT = 10;
+    private static final int LAST_SLOT = 36;
+    private static final int PAGE_SIZE = LAST_SLOT - FIRST_SLOT + 1;
     private static final int PREV_SLOT = 45;
     private static final int BACK_SLOT = 47;
     private static final int NEXT_SLOT = 53;
@@ -70,10 +75,12 @@ public final class QuestLogGui extends Gui {
         for (int i = from; i < to; i++) {
             Quest quest = quests.get(i);
             QuestProgress progress = data == null ? null : data.progress(quest.id());
-            setItem(i - from, questIcon(quest, progress, i + 1), event ->
+            setItem(FIRST_SLOT + (i - from), questIcon(quest, progress, i + 1), event ->
                     new QuestDetailGui(questService, playerCache, trackingService, messages, player, quest.id(),
                             this::reopen).open(player));
         }
+
+        setItem(GUIDE_SLOT, GuideIcon.build(questService, playerCache, messages, player, false), null);
 
         for (int slot = 45; slot < 54; slot++) {
             setItem(slot, GuiItems.filler(), null);

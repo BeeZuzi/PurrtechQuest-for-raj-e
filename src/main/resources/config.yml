@@ -20,6 +20,13 @@ default-locale: cs
 # Directory (relative to the plugin's data folder) where quest definition YAML files live.
 quests-directory: quests
 
+# Shows quest text in the lowercase small-caps "tiny font" (ᴋʟɪᴋɴɪ ᴘʀᴏ ᴅᴇᴛᴀɪʟʏ ǫᴜᴇsᴛᴜ).
+#   true  - tiny font everywhere: the built-in menu texts and everything an admin types (quest, reward and
+#           tier names, descriptions, objective labels).
+#   false - normal letters: admin text is shown exactly as typed, the built-in menu texts as plain lowercase.
+# Applies on /questadmin reload. A config.yml from before this option existed behaves as true.
+tiny-font: true
+
 tracking:
   # How a player's /quest track'd objective is displayed: ACTION_BAR (default, unobtrusive) or BOSS_BAR.
   display: ACTION_BAR

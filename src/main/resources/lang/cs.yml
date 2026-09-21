@@ -249,7 +249,7 @@ quest:
   editor-reward-name-none: "nezadán"
   editor-rename-hint: "<dark_gray>Levý klik = přejmenovat</dark_gray>"
   gui-lore-quest-number: "<gray><i>(úᴋᴏʟ č. %number%)</i></gray>"
-  gui-lore-quest-status: "<#9863E7><b>●</b></#9863E7> <white>sᴛᴀᴛᴜs:  %status%</white>"
+  gui-lore-quest-status: "<#9863E7><b>●</b></#9863E7> <white>sᴛᴀᴛᴜs: %status%</white>"
   gui-lore-quest-reward-header: "<#9863E7><b>●</b></#9863E7> <white>ᴏᴅᴍěɴᴀ:</white> "
   gui-lore-quest-reward-prefix: "<dark_gray> - </dark_gray>"
   status-locked: "<#DD1717>ᴜᴢᴀᴍčᴇɴᴏ</#DD1717>"

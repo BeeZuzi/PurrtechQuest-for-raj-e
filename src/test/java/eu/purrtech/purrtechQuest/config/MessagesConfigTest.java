@@ -115,6 +115,22 @@ class MessagesConfigTest {
     }
 
     @Test
+    void theStatusLineHasASingleSpaceAfterTheColon(@TempDir Path tempDir) throws IOException {
+        Path dataFolder = tempDir.resolve("plugin-data");
+        // The wording an earlier build shipped, with two spaces.
+        writeLangFile(dataFolder, "cs", """
+                quest:
+                  gui-lore-quest-status: "<#9863E7><b>●</b></#9863E7> <white>sᴛᴀᴛᴜs:  %status%</white>"
+                """);
+
+        MessagesConfig messages = MessagesConfig.load(mockPlugin(dataFolder), "cs");
+
+        var plain = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText();
+        assertEquals("● sᴛᴀᴛᴜs: ᴏᴅᴇᴠᴢᴅáɴᴏ",
+                plain.serialize(messages.render("quest.gui-lore-quest-status", "cs", Map.of("%status%", "ᴏᴅᴇᴠᴢᴅáɴᴏ"))));
+    }
+
+    @Test
     void theStatusWordRendersInItsOwnColor(@TempDir Path tempDir) {
         MessagesConfig messages = MessagesConfig.load(mockPlugin(tempDir.resolve("plugin-data")), "cs");
         assertEquals(0x00D420, colorOfWord(messages, "quest.status-turned-in", "ᴏᴅᴇᴠᴢᴅáɴᴏ"));
@@ -142,6 +158,22 @@ class MessagesConfigTest {
             }
         }
         return null;
+    }
+
+    @Test
+    void switchingTheTinyFontOffShowsTheBuiltInMenuTextsInOrdinaryLetters(@TempDir Path tempDir) {
+        MessagesConfig messages = MessagesConfig.load(mockPlugin(tempDir.resolve("plugin-data")), "cs");
+        try {
+            eu.purrtech.purrtechQuest.util.TinyFont.enabledWhen(() -> false);
+            assertEquals("<gray>cíle:</gray>", messages.get("quest.gui-lore-objectives-header", "cs"));
+            // admin text is inserted exactly as typed
+            var plain = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText();
+            assertEquals("=== Sběr železa ===",
+                    plain.serialize(messages.render("quest.info-header", "cs", Map.of("%quest%", "Sběr železa"))));
+        } finally {
+            eu.purrtech.purrtechQuest.util.TinyFont.enabledWhen(() -> true);
+        }
+        assertEquals("<gray>ᴄíʟᴇ:</gray>", messages.get("quest.gui-lore-objectives-header", "cs"));
     }
 
     private static void writeLangFile(Path dataFolder, String locale, String content) throws IOException {

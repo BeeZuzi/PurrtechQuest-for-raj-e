@@ -26,6 +26,7 @@ import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSele
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
 import java.util.Locale;
@@ -131,6 +132,8 @@ public final class QuestAdminCommand {
     private static int reload(CommandSender sender, QuestService questService,
                                TrackerRegistrationManager trackerRegistrationManager,
                                QuestPermissionRegistrar questPermissionRegistrar, MessagesConfig messages) {
+        // The tiny-font switch is read live from the plugin's config, so re-read config.yml here.
+        JavaPlugin.getProvidingPlugin(QuestAdminCommand.class).reloadConfig();
         questService.reload();
         trackerRegistrationManager.refresh();
         questPermissionRegistrar.refresh();

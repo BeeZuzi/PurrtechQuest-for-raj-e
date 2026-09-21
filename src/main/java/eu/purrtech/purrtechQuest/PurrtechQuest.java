@@ -35,6 +35,7 @@ import eu.purrtech.purrtechQuest.tracking.BossDamageTracker;
 import eu.purrtech.purrtechQuest.tracking.ExcellentShopSpendListener;
 import eu.purrtech.purrtechQuest.tracking.MythicMobsKillListener;
 import eu.purrtech.purrtechQuest.tracking.TrackerRegistrationManager;
+import eu.purrtech.purrtechQuest.util.TinyFont;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -78,6 +79,7 @@ public final class PurrtechQuest extends JavaPlugin {
             return;
         }
         this.pluginConfig = PluginConfig.load(this);
+        TinyFont.enabledWhen(() -> getConfig().getBoolean("tiny-font", true));
         this.messagesConfig = MessagesConfig.load(this, pluginConfig.defaultLocale());
 
         if (pluginConfig.storageType() == StorageType.MYSQL) {
@@ -126,6 +128,7 @@ public final class PurrtechQuest extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        TinyFont.enabledWhen(() -> true);
         if (questTrackingService != null) {
             questTrackingService.clearAll();
         }

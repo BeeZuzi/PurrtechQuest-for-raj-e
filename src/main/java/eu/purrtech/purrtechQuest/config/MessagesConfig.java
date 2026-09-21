@@ -148,12 +148,14 @@ public final class MessagesConfig {
      */
     private static final Map<String, Map<String, List<String>>> INTERMEDIATE_DEFAULTS = Map.of(
             "cs", Map.ofEntries(
+                    Map.entry("quest.gui-lore-quest-status", List.of("<#9863E7><b>●</b></#9863E7> <white>sᴛᴀᴛᴜs:  %status%</white>")),
                     Map.entry("quest.status-turned-in", List.of("ᴏᴅᴇᴠᴢᴅᴀɴý")),
                     Map.entry("quest.status-in-progress", List.of("ʀᴏᴢᴘʀᴀᴄᴏᴠᴀɴý")),
                     Map.entry("quest.gui-lore-quest-hint", List.of("<gray>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴅᴇᴛᴀɪʟ ǫᴜᴇsᴛᴜ.</gray>")),
                     Map.entry("quest.editor-reward-line-name", List.of("<aqua>Název: <white>%name%</white></aqua>")),
                     Map.entry("quest.editor-prompt-reward-name", List.of("<yellow>Napiš název odměny — hráči ho uvidí v menu s questy (např. '50 mincí'):</yellow>"))),
             "en", Map.ofEntries(
+                    Map.entry("quest.gui-lore-quest-status", List.of("<#9863E7><b>●</b></#9863E7> <white>sᴛᴀᴛᴜs:  %status%</white>")),
                     Map.entry("quest.status-turned-in", List.of("ᴏᴅᴇᴠᴢᴅᴀɴý")),
                     Map.entry("quest.status-in-progress", List.of("ʀᴏᴢᴘʀᴀᴄᴏᴠᴀɴý")),
                     Map.entry("quest.gui-lore-quest-hint", List.of("<gray>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴅᴇᴛᴀɪʟ ǫᴜᴇsᴛᴜ.</gray>")),
@@ -278,7 +280,8 @@ public final class MessagesConfig {
         if (config == null) {
             return key;
         }
-        return config.getString(key, key);
+        String text = config.getString(key, key);
+        return TinyFont.enabled() ? text : TinyFont.untiny(text);
     }
 
     /**
