@@ -39,7 +39,10 @@ public final class QuestLogGui extends Gui {
     private static final int LAST_SLOT = 36;
     private static final int PAGE_SIZE = LAST_SLOT - FIRST_SLOT + 1;
     private static final int PREV_SLOT = 45;
-    private static final int BACK_SLOT = 47;
+    private static final int BACK_SLOT = 48;
+    private static final int CLOSE_SLOT = 50;
+    private static final String CLOSE_TEXTURE = "3ed1aba73f639f4bc42bd48196c715197be2712c3b962c97ebf9e9ed8efa025";
+    private static final int CLOSE_MODEL_DATA = 100000;
     private static final int NEXT_SLOT = 53;
 
     private final QuestService questService;
@@ -82,9 +85,6 @@ public final class QuestLogGui extends Gui {
 
         setItem(GUIDE_SLOT, GuideIcon.build(questService, playerCache, messages, player, false), null);
 
-        for (int slot = 45; slot < 54; slot++) {
-            setItem(slot, GuiItems.filler(), null);
-        }
         if (page > 0) {
             setItem(PREV_SLOT, GuiItems.icon(Material.ARROW,
                     messages.render("quest.gui-button-prev-page", player, Map.of()),
@@ -104,10 +104,14 @@ public final class QuestLogGui extends Gui {
                     });
         }
         if (onBack != null) {
-            setItem(BACK_SLOT, GuiItems.icon(Material.ARROW, messages.render("quest.gui-button-back", player, Map.of()),
-                            List.of(messages.render("quest.gui-button-back-hint", player, Map.of()))),
+            setItem(BACK_SLOT, GuiItems.icon(Material.IRON_DOOR, messages.render("quest.gui-nav-back", player, Map.of()),
+                            List.of(messages.render("quest.gui-nav-back-hint", player, Map.of()))),
                     event -> onBack.run());
         }
+        setItem(CLOSE_SLOT, GuiItems.icon(GuiItems.textureHead(CLOSE_TEXTURE, CLOSE_MODEL_DATA),
+                        messages.render("quest.gui-nav-close", player, Map.of()),
+                        List.of(messages.render("quest.gui-nav-close-hint", player, Map.of()))),
+                event -> player.closeInventory());
     }
 
     /**

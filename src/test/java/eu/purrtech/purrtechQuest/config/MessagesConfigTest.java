@@ -131,6 +131,34 @@ class MessagesConfigTest {
     }
 
     @Test
+    void theQuestHintIsShownInTheAccentColorAndUnderlined(@TempDir Path tempDir) {
+        MessagesConfig messages = MessagesConfig.load(mockPlugin(tempDir.resolve("plugin-data")), "cs");
+        var line = messages.render("quest.gui-lore-quest-hint", "cs", Map.of());
+        assertEquals(0x9863E7, colorOfWordIn(line, "ᴋʟɪᴋɴɪ ᴘʀᴏ ᴅᴇᴛᴀɪʟʏ ǫᴜᴇsᴛᴜ"));
+    }
+
+    private static int colorOfWordIn(net.kyori.adventure.text.Component line, String word) {
+        var color = findColor(line, word, null);
+        return color == null ? -1 : color.value();
+    }
+
+    @Test
+    void theGuideLinesHaveASingleSpaceAfterTheBullet(@TempDir Path tempDir) throws IOException {
+        Path dataFolder = tempDir.resolve("plugin-data");
+        writeLangFile(dataFolder, "cs", """
+                quest:
+                  guide-no-active-quest: "<#F69B45><b>●</b></#F69B45>  <gray>žáᴅɴý ᴀᴋᴛɪᴠɴí ǫᴜᴇsᴛ</gray>"
+                  guide-progress-header: "<#F69B45><b>●</b></#F69B45>  <white>ᴘᴏsᴛᴜᴘ úᴋᴏʟᴜ:</white>"
+                """);
+
+        MessagesConfig messages = MessagesConfig.load(mockPlugin(dataFolder), "cs");
+
+        var plain = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText();
+        assertEquals("● žáᴅɴý ᴀᴋᴛɪᴠɴí ǫᴜᴇsᴛ", plain.serialize(messages.render("quest.guide-no-active-quest", "cs", Map.of())));
+        assertEquals("● ᴘᴏsᴛᴜᴘ úᴋᴏʟᴜ:", plain.serialize(messages.render("quest.guide-progress-header", "cs", Map.of())));
+    }
+
+    @Test
     void theStatusWordRendersInItsOwnColor(@TempDir Path tempDir) {
         MessagesConfig messages = MessagesConfig.load(mockPlugin(tempDir.resolve("plugin-data")), "cs");
         assertEquals(0x00D420, colorOfWord(messages, "quest.status-turned-in", "ᴏᴅᴇᴠᴢᴅáɴᴏ"));

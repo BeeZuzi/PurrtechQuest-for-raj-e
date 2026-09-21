@@ -148,17 +148,25 @@ public final class MessagesConfig {
      */
     private static final Map<String, Map<String, List<String>>> INTERMEDIATE_DEFAULTS = Map.of(
             "cs", Map.ofEntries(
+                    Map.entry("quest.guide-current-quest-name", List.of("<#F69B45><b>●</b></#F69B45>  <white>%quest%</white>")),
+                    Map.entry("quest.guide-current-quest-description", List.of("<#F69B45><b>●</b></#F69B45>  <white>%description%</white>")),
+                    Map.entry("quest.guide-no-active-quest", List.of("<#F69B45><b>●</b></#F69B45>  <gray>žáᴅɴý ᴀᴋᴛɪᴠɴí ǫᴜᴇsᴛ</gray>", "<#F69B45><b>●</b></#F69B45>  <gray>Žádný aktivní quest</gray>")),
+                    Map.entry("quest.guide-progress-header", List.of("<#F69B45><b>●</b></#F69B45>  <white>ᴘᴏsᴛᴜᴘ úᴋᴏʟᴜ:</white>")),
                     Map.entry("quest.gui-lore-quest-status", List.of("<#9863E7><b>●</b></#9863E7> <white>sᴛᴀᴛᴜs:  %status%</white>")),
                     Map.entry("quest.status-turned-in", List.of("ᴏᴅᴇᴠᴢᴅᴀɴý")),
                     Map.entry("quest.status-in-progress", List.of("ʀᴏᴢᴘʀᴀᴄᴏᴠᴀɴý")),
-                    Map.entry("quest.gui-lore-quest-hint", List.of("<gray>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴅᴇᴛᴀɪʟ ǫᴜᴇsᴛᴜ.</gray>")),
+                    Map.entry("quest.gui-lore-quest-hint", List.of("<gray>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴅᴇᴛᴀɪʟ ǫᴜᴇsᴛᴜ.</gray>", "<#9863E7><gray><underlined>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴅᴇᴛᴀɪʟʏ ǫᴜᴇsᴛᴜ</underlined></gray>")),
                     Map.entry("quest.editor-reward-line-name", List.of("<aqua>Název: <white>%name%</white></aqua>")),
                     Map.entry("quest.editor-prompt-reward-name", List.of("<yellow>Napiš název odměny — hráči ho uvidí v menu s questy (např. '50 mincí'):</yellow>"))),
             "en", Map.ofEntries(
+                    Map.entry("quest.guide-current-quest-name", List.of("<#F69B45><b>●</b></#F69B45>  <white>%quest%</white>")),
+                    Map.entry("quest.guide-current-quest-description", List.of("<#F69B45><b>●</b></#F69B45>  <white>%description%</white>")),
+                    Map.entry("quest.guide-no-active-quest", List.of("<#F69B45><b>●</b></#F69B45>  <gray>žáᴅɴý ᴀᴋᴛɪᴠɴí ǫᴜᴇsᴛ</gray>", "<#F69B45><b>●</b></#F69B45>  <gray>Žádný aktivní quest</gray>")),
+                    Map.entry("quest.guide-progress-header", List.of("<#F69B45><b>●</b></#F69B45>  <white>ᴘᴏsᴛᴜᴘ úᴋᴏʟᴜ:</white>")),
                     Map.entry("quest.gui-lore-quest-status", List.of("<#9863E7><b>●</b></#9863E7> <white>sᴛᴀᴛᴜs:  %status%</white>")),
                     Map.entry("quest.status-turned-in", List.of("ᴏᴅᴇᴠᴢᴅᴀɴý")),
                     Map.entry("quest.status-in-progress", List.of("ʀᴏᴢᴘʀᴀᴄᴏᴠᴀɴý")),
-                    Map.entry("quest.gui-lore-quest-hint", List.of("<gray>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴅᴇᴛᴀɪʟ ǫᴜᴇsᴛᴜ.</gray>")),
+                    Map.entry("quest.gui-lore-quest-hint", List.of("<gray>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴅᴇᴛᴀɪʟ ǫᴜᴇsᴛᴜ.</gray>", "<#9863E7><gray><underlined>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴅᴇᴛᴀɪʟʏ ǫᴜᴇsᴛᴜ</underlined></gray>")),
                     Map.entry("quest.editor-reward-line-name", List.of("<aqua>Name: <white>%name%</white></aqua>")),
                     Map.entry("quest.editor-prompt-reward-name", List.of("<yellow>Type a name for this reward — players see it in the quest menu (e.g. '50 coins'):</yellow>"))));
 

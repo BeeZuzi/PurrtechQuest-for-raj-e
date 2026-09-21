@@ -77,10 +77,6 @@ public final class QuestDetailGui extends Gui {
         QuestProgress progress = data == null ? null : data.progress(questId);
         QuestStatus status = progress == null ? QuestStatus.NOT_ACCEPTED : progress.status();
 
-        for (int slot = 0; slot < 27; slot++) {
-            setItem(slot, GuiItems.filler(), null);
-        }
-
         setItem(INFO_SLOT, infoIcon(quest, progress, status), null);
         setItem(REWARDS_SLOT, rewardsIcon(quest), null);
         setItem(BACK_SLOT, backButtonIcon(), event -> onBack.run());
