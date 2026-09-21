@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -140,6 +141,26 @@ public final class MessagesConfig {
                     Map.entry("quest.gui-button-turnin-hint", "<gray>Odevzdá splněný quest a vyzvedne odměny.</gray>")));
 
     /**
+     * Same idea as {@link #STALE_DEFAULTS}, for keys whose default changed again after an earlier change had
+     * already shipped: a server that picked up the in-between wording (not the original one recorded above)
+     * would otherwise keep it forever. Each key lists every in-between value that should be upgraded to the
+     * current bundled default.
+     */
+    private static final Map<String, Map<String, List<String>>> INTERMEDIATE_DEFAULTS = Map.of(
+            "cs", Map.ofEntries(
+                    Map.entry("quest.status-turned-in", List.of("ᴏᴅᴇᴠᴢᴅᴀɴý")),
+                    Map.entry("quest.status-in-progress", List.of("ʀᴏᴢᴘʀᴀᴄᴏᴠᴀɴý")),
+                    Map.entry("quest.gui-lore-quest-hint", List.of("<gray>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴅᴇᴛᴀɪʟ ǫᴜᴇsᴛᴜ.</gray>")),
+                    Map.entry("quest.editor-reward-line-name", List.of("<aqua>Název: <white>%name%</white></aqua>")),
+                    Map.entry("quest.editor-prompt-reward-name", List.of("<yellow>Napiš název odměny — hráči ho uvidí v menu s questy (např. '50 mincí'):</yellow>"))),
+            "en", Map.ofEntries(
+                    Map.entry("quest.status-turned-in", List.of("ᴏᴅᴇᴠᴢᴅᴀɴý")),
+                    Map.entry("quest.status-in-progress", List.of("ʀᴏᴢᴘʀᴀᴄᴏᴠᴀɴý")),
+                    Map.entry("quest.gui-lore-quest-hint", List.of("<gray>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴅᴇᴛᴀɪʟ ǫᴜᴇsᴛᴜ.</gray>")),
+                    Map.entry("quest.editor-reward-line-name", List.of("<aqua>Name: <white>%name%</white></aqua>")),
+                    Map.entry("quest.editor-prompt-reward-name", List.of("<yellow>Type a name for this reward — players see it in the quest menu (e.g. '50 coins'):</yellow>"))));
+
+    /**
      * Placeholders that stand for text an admin typed (quest and tier names, descriptions, objective labels):
      * shown in the tiny font, and their {@code &} color codes work. Everything else (numbers, ids, the
      * editor's {@code %value%}) is inserted exactly as given.
@@ -216,8 +237,9 @@ public final class MessagesConfig {
 
     /** See {@link #STALE_DEFAULTS}. Runs after {@link #mergeMissingKeys} on every locale that has known stale keys. */
     private void migrateStaleDefaults(JavaPlugin plugin, String resourcePath, String locale, File file, YamlConfiguration config) {
-        Map<String, String> staleDefaults = STALE_DEFAULTS.get(locale);
-        if (staleDefaults == null) {
+        Map<String, String> staleDefaults = STALE_DEFAULTS.getOrDefault(locale, Map.of());
+        Map<String, List<String>> intermediateDefaults = INTERMEDIATE_DEFAULTS.getOrDefault(locale, Map.of());
+        if (staleDefaults.isEmpty() && intermediateDefaults.isEmpty()) {
             return;
         }
         try (InputStream in = plugin.getResource(resourcePath)) {
@@ -230,6 +252,13 @@ public final class MessagesConfig {
                 String key = entry.getKey();
                 String oldDefault = entry.getValue();
                 if (bundled.isSet(key) && oldDefault.equals(config.getString(key))) {
+                    config.set(key, bundled.get(key));
+                    changed = true;
+                }
+            }
+            for (Map.Entry<String, List<String>> entry : intermediateDefaults.entrySet()) {
+                String key = entry.getKey();
+                if (bundled.isSet(key) && entry.getValue().contains(config.getString(key))) {
                     config.set(key, bundled.get(key));
                     changed = true;
                 }

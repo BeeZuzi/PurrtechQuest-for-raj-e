@@ -99,6 +99,51 @@ class MessagesConfigTest {
                 .contains("2h 5m"));
     }
 
+    @Test
+    void statusesGetTheirColorEvenWhenTheOnDiskFileHasAnEarlierUncoloredWording(@TempDir Path tempDir) throws IOException {
+        Path dataFolder = tempDir.resolve("plugin-data");
+        writeLangFile(dataFolder, "cs", """
+                quest:
+                  status-turned-in: "ᴏᴅᴇᴠᴢᴅᴀɴý"
+                  status-in-progress: "ʀᴏᴢᴘʀᴀᴄᴏᴠᴀɴý"
+                """);
+
+        MessagesConfig messages = MessagesConfig.load(mockPlugin(dataFolder), "cs");
+
+        assertEquals("<#00D420>ᴏᴅᴇᴠᴢᴅáɴᴏ</#00D420>", messages.get("quest.status-turned-in", "cs"));
+        assertEquals("<#FF7200>ʀᴏᴢᴘʀᴀᴄᴏᴠáɴᴏ</#FF7200>", messages.get("quest.status-in-progress", "cs"));
+    }
+
+    @Test
+    void theStatusWordRendersInItsOwnColor(@TempDir Path tempDir) {
+        MessagesConfig messages = MessagesConfig.load(mockPlugin(tempDir.resolve("plugin-data")), "cs");
+        assertEquals(0x00D420, colorOfWord(messages, "quest.status-turned-in", "ᴏᴅᴇᴠᴢᴅáɴᴏ"));
+        assertEquals(0xFF7200, colorOfWord(messages, "quest.status-in-progress", "ʀᴏᴢᴘʀᴀᴄᴏᴠáɴᴏ"));
+        assertEquals(0xDD1717, colorOfWord(messages, "quest.status-locked", "ᴜᴢᴀᴍčᴇɴᴏ"));
+    }
+
+    /** Renders the status inside the quest book's status line and returns the RGB the status word ends up with. */
+    private static int colorOfWord(MessagesConfig messages, String statusKey, String word) {
+        var line = messages.render("quest.gui-lore-quest-status", "cs", Map.of("%status%", messages.get(statusKey, "cs")));
+        var color = findColor(line, word, null);
+        return color == null ? -1 : color.value();
+    }
+
+    private static net.kyori.adventure.text.format.TextColor findColor(
+            net.kyori.adventure.text.Component node, String word, net.kyori.adventure.text.format.TextColor inherited) {
+        var effective = node.color() != null ? node.color() : inherited;
+        if (node instanceof net.kyori.adventure.text.TextComponent text && text.content().equals(word)) {
+            return effective;
+        }
+        for (var child : node.children()) {
+            var found = findColor(child, word, effective);
+            if (found != null) {
+                return found;
+            }
+        }
+        return null;
+    }
+
     private static void writeLangFile(Path dataFolder, String locale, String content) throws IOException {
         Path file = dataFolder.resolve("lang/" + locale + ".yml");
         Files.createDirectories(file.getParent());
