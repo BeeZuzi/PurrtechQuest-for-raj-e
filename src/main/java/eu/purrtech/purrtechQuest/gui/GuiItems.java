@@ -64,6 +64,14 @@ public final class GuiItems {
         return head;
     }
 
+    private static final String CLOSE_TEXTURE = "3ed1aba73f639f4bc42bd48196c715197be2712c3b962c97ebf9e9ed8efa025";
+    private static final int CLOSE_MODEL_DATA = 100000;
+
+    /** The "close menu" button every player-facing menu uses: the custom close head with the given name/lore. */
+    public static ItemStack closeButton(Component name, List<Component> lore) {
+        return icon(textureHead(CLOSE_TEXTURE, CLOSE_MODEL_DATA), name, lore);
+    }
+
     public static ItemStack filler() {
         ItemStack stack = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
         ItemMeta meta = stack.getItemMeta();

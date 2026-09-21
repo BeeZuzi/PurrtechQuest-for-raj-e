@@ -41,8 +41,6 @@ public final class QuestLogGui extends Gui {
     private static final int PREV_SLOT = 45;
     private static final int BACK_SLOT = 48;
     private static final int CLOSE_SLOT = 50;
-    private static final String CLOSE_TEXTURE = "3ed1aba73f639f4bc42bd48196c715197be2712c3b962c97ebf9e9ed8efa025";
-    private static final int CLOSE_MODEL_DATA = 100000;
     private static final int NEXT_SLOT = 53;
 
     private final QuestService questService;
@@ -108,8 +106,7 @@ public final class QuestLogGui extends Gui {
                             List.of(messages.render("quest.gui-nav-back-hint", player, Map.of()))),
                     event -> onBack.run());
         }
-        setItem(CLOSE_SLOT, GuiItems.icon(GuiItems.textureHead(CLOSE_TEXTURE, CLOSE_MODEL_DATA),
-                        messages.render("quest.gui-nav-close", player, Map.of()),
+        setItem(CLOSE_SLOT, GuiItems.closeButton(messages.render("quest.gui-nav-close", player, Map.of()),
                         List.of(messages.render("quest.gui-nav-close-hint", player, Map.of()))),
                 event -> player.closeInventory());
     }

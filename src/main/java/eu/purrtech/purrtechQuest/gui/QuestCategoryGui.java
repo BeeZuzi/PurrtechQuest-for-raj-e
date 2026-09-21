@@ -4,7 +4,6 @@ import eu.purrtech.purrtechQuest.config.MessagesConfig;
 import eu.purrtech.purrtechQuest.player.PlayerQuestDataCache;
 import eu.purrtech.purrtechQuest.service.QuestService;
 import eu.purrtech.purrtechQuest.service.QuestTrackingService;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -44,8 +43,8 @@ public final class QuestCategoryGui extends Gui {
         setItem(GUIDE_SLOT, GuideIcon.build(questService, playerCache, messages, player, true), event ->
                 new QuestLogGui(questService, playerCache, trackingService, messages, player,
                         List.copyOf(questService.allQuests()), this::reopen).open(player));
-        setItem(CLOSE_SLOT, GuiItems.icon(Material.BARRIER, messages.render("quest.gui-button-close", player, Map.of()),
-                        List.of(messages.render("quest.gui-button-close-hint", player, Map.of()))),
+        setItem(CLOSE_SLOT, GuiItems.closeButton(messages.render("quest.gui-nav-close", player, Map.of()),
+                        List.of(messages.render("quest.gui-nav-close-hint", player, Map.of()))),
                 event -> player.closeInventory());
     }
 
