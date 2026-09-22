@@ -257,3 +257,5 @@ quest:
   gui-nav-back-hint: "<red> </red><gray><underlined>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴢᴀᴠřᴇɴí ᴍᴇɴᴜ</underlined></gray>"
   gui-nav-close: "<#FF1F1F><b>ᴢᴀᴠříᴛ ᴍᴇɴᴜ</b></#FF1F1F>"
   gui-nav-close-hint: "<#FF1F1F> </#FF1F1F><gray><underlined>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴢᴀᴠřᴇɴí ᴍᴇɴᴜ</underlined></gray>"
+  gui-button-track-unavailable-hint: "<gray>sʟᴇᴅᴏᴠᴀᴛ ʟᴢᴇ ᴊᴇɴ ʀᴏᴢᴘʀᴀᴄᴏᴠᴀɴý ǫᴜᴇsᴛ.</gray>"
+  track-requires-in-progress: "<red>Sledovat můžeš jen rozpracovaný quest.</red>"

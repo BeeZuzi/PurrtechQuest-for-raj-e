@@ -28,18 +28,21 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A single quest's detail view: description, objectives with live progress, rewards, and whichever
- * action buttons make sense for the player's current status (accept/abandon/turn in/track).
+ * A single quest's detail view, laid out as a ring around the middle row: the quest's book (name,
+ * description, status, objectives) at the top-centre, rewards on the left, the primary action (accept,
+ * abandon, turn in, or re-accept once its cooldown ends) in the centre, tracking on the right, and back/close
+ * at the bottom. The primary action always lives in {@value #PRIMARY_ACTION_SLOT} regardless of which one it
+ * currently is, since only one of them ever applies to a given status.
  */
 public final class QuestDetailGui extends Gui {
 
-    private static final int INFO_SLOT = 11;
-    private static final int REWARDS_SLOT = 15;
-    private static final int BACK_SLOT = 18;
-    private static final int PRIMARY_ACTION_SLOT = 20;
-    private static final int TURN_IN_SLOT = 22;
+    private static final int SIZE = 45;
+    private static final int INFO_SLOT = 4;
+    private static final int REWARDS_SLOT = 20;
+    private static final int PRIMARY_ACTION_SLOT = 22;
     private static final int TRACK_SLOT = 24;
-    private static final int CLOSE_SLOT = 26;
+    private static final int BACK_SLOT = 39;
+    private static final int CLOSE_SLOT = 41;
 
     private final QuestService questService;
     private final PlayerQuestDataCache playerCache;
@@ -54,7 +57,7 @@ public final class QuestDetailGui extends Gui {
                            Player player, String questId, Runnable onBack) {
         super(messages.render("quest.gui-detail-title", player,
                         Map.of("%quest%", questService.quest(questId).map(Quest::displayName).orElse(questId))),
-                27);
+                SIZE);
         this.questService = questService;
         this.playerCache = playerCache;
         this.trackingService = trackingService;
@@ -79,10 +82,10 @@ public final class QuestDetailGui extends Gui {
 
         setItem(INFO_SLOT, infoIcon(quest, progress, status), null);
         setItem(REWARDS_SLOT, rewardsIcon(quest), null);
+        setItem(TRACK_SLOT, trackIcon(status), event -> onTrackClick(status));
         setItem(BACK_SLOT, backButtonIcon(), event -> onBack.run());
-        setItem(CLOSE_SLOT,
-                GuiItems.icon(Material.BARRIER, messages.render("quest.gui-button-close", player, Map.of()),
-                        List.of(messages.render("quest.gui-button-close-hint", player, Map.of()))),
+        setItem(CLOSE_SLOT, GuiItems.closeButton(messages.render("quest.gui-nav-close", player, Map.of()),
+                        List.of(messages.render("quest.gui-nav-close-hint", player, Map.of()))),
                 event -> player.closeInventory());
 
         renderActions(quest, progress, status);
@@ -98,30 +101,15 @@ public final class QuestDetailGui extends Gui {
                         QuestFeedback.report(player, result, questId, questService, messages);
                         render();
                     });
-            case IN_PROGRESS -> {
-                setItem(PRIMARY_ACTION_SLOT,
-                        GuiItems.icon(Material.RED_DYE, messages.render("quest.gui-button-abandon", player, Map.of()),
-                                List.of(messages.render("quest.gui-button-abandon-hint", player, Map.of()))),
-                        event -> {
-                            QuestService.AbandonResult result = questService.abandonQuest(player, questId);
-                            QuestFeedback.report(player, result, messages);
-                            render();
-                        });
-                boolean tracking = trackingService.isTracking(player, questId);
-                String trackKey = tracking ? "quest.gui-button-untrack" : "quest.gui-button-track";
-                String trackHintKey = tracking ? "quest.gui-button-untrack-hint" : "quest.gui-button-track-hint";
-                setItem(TRACK_SLOT, GuiItems.icon(Material.COMPASS, messages.render(trackKey, player, Map.of()),
-                                List.of(messages.render(trackHintKey, player, Map.of()))),
-                        event -> {
-                            if (tracking) {
-                                trackingService.untrack(player);
-                            } else {
-                                trackingService.track(player, questId);
-                            }
-                            render();
-                        });
-            }
-            case COMPLETED -> setItem(TURN_IN_SLOT,
+            case IN_PROGRESS -> setItem(PRIMARY_ACTION_SLOT,
+                    GuiItems.icon(Material.RED_DYE, messages.render("quest.gui-button-abandon", player, Map.of()),
+                            List.of(messages.render("quest.gui-button-abandon-hint", player, Map.of()))),
+                    event -> {
+                        QuestService.AbandonResult result = questService.abandonQuest(player, questId);
+                        QuestFeedback.report(player, result, messages);
+                        render();
+                    });
+            case COMPLETED -> setItem(PRIMARY_ACTION_SLOT,
                     GuiItems.icon(Material.GOLD_INGOT, messages.render("quest.gui-button-turnin", player, Map.of()),
                             List.of(messages.render("quest.gui-button-turnin-hint", player, Map.of()))),
                     event -> {
@@ -156,9 +144,39 @@ public final class QuestDetailGui extends Gui {
         }
     }
 
+    /**
+     * The compass sits in every status, not just {@code IN_PROGRESS} — {@link #onTrackClick} is what actually
+     * enforces that only a rozpracovaný (in-progress) quest can be tracked, with a chat message explaining why
+     * a click did nothing for any other status.
+     */
+    private ItemStack trackIcon(QuestStatus status) {
+        if (status != QuestStatus.IN_PROGRESS) {
+            return GuiItems.icon(Material.COMPASS, messages.render("quest.gui-button-track", player, Map.of()),
+                    List.of(messages.render("quest.gui-button-track-unavailable-hint", player, Map.of())));
+        }
+        boolean tracking = trackingService.isTracking(player, questId);
+        String trackKey = tracking ? "quest.gui-button-untrack" : "quest.gui-button-track";
+        String trackHintKey = tracking ? "quest.gui-button-untrack-hint" : "quest.gui-button-track-hint";
+        return GuiItems.icon(Material.COMPASS, messages.render(trackKey, player, Map.of()),
+                List.of(messages.render(trackHintKey, player, Map.of())));
+    }
+
+    private void onTrackClick(QuestStatus status) {
+        if (status != QuestStatus.IN_PROGRESS) {
+            player.sendMessage(messages.render("quest.track-requires-in-progress", player, Map.of()));
+            return;
+        }
+        if (trackingService.isTracking(player, questId)) {
+            trackingService.untrack(player);
+        } else {
+            trackingService.track(player, questId);
+        }
+        render();
+    }
+
     private ItemStack backButtonIcon() {
-        return GuiItems.icon(Material.ARROW, messages.render("quest.gui-button-back", player, Map.of()),
-                List.of(messages.render("quest.gui-button-back-hint", player, Map.of())));
+        return GuiItems.icon(Material.IRON_DOOR, messages.render("quest.gui-nav-back", player, Map.of()),
+                List.of(messages.render("quest.gui-nav-back-hint", player, Map.of())));
     }
 
     private ItemStack infoIcon(Quest quest, QuestProgress progress, QuestStatus status) {
