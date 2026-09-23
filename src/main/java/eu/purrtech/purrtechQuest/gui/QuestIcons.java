@@ -18,6 +18,9 @@ import java.util.Map;
 
 final class QuestIcons {
 
+    /** The server's purple accent, used across every player-facing quest menu. */
+    static final TextColor ACCENT = TextColor.color(0x9863E7);
+
     private QuestIcons() {
     }
 

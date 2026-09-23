@@ -82,7 +82,7 @@ class MessagesConfigTest {
     void newlyExtractedFileMatchesBundledDefaultVerbatim(@TempDir Path tempDir) {
         Path dataFolder = tempDir.resolve("plugin-data");
         MessagesConfig messages = MessagesConfig.load(mockPlugin(dataFolder), "cs");
-        assertEquals("<gray>ᴄíʟᴇ:</gray>", messages.get("quest.gui-lore-objectives-header", "cs"));
+        assertEquals("<#9863E7><b>●</b></#9863E7> <white>ᴄíʟᴇ:</white>", messages.get("quest.gui-lore-objectives-header", "cs"));
     }
 
     @Test
@@ -193,7 +193,7 @@ class MessagesConfigTest {
         MessagesConfig messages = MessagesConfig.load(mockPlugin(tempDir.resolve("plugin-data")), "cs");
         try {
             eu.purrtech.purrtechQuest.util.TinyFont.enabledWhen(() -> false);
-            assertEquals("<gray>cíle:</gray>", messages.get("quest.gui-lore-objectives-header", "cs"));
+            assertEquals("<#9863E7><b>●</b></#9863E7> <white>cíle:</white>", messages.get("quest.gui-lore-objectives-header", "cs"));
             // admin text is inserted exactly as typed
             var plain = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText();
             assertEquals("=== Sběr železa ===",
@@ -201,7 +201,7 @@ class MessagesConfigTest {
         } finally {
             eu.purrtech.purrtechQuest.util.TinyFont.enabledWhen(() -> true);
         }
-        assertEquals("<gray>ᴄíʟᴇ:</gray>", messages.get("quest.gui-lore-objectives-header", "cs"));
+        assertEquals("<#9863E7><b>●</b></#9863E7> <white>ᴄíʟᴇ:</white>", messages.get("quest.gui-lore-objectives-header", "cs"));
     }
 
     private static void writeLangFile(Path dataFolder, String locale, String content) throws IOException {

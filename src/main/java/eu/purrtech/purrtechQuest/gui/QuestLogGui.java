@@ -9,7 +9,6 @@ import eu.purrtech.purrtechQuest.player.PlayerQuestDataCache;
 import eu.purrtech.purrtechQuest.service.QuestService;
 import eu.purrtech.purrtechQuest.service.QuestTrackingService;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -33,7 +32,6 @@ import java.util.Map;
  */
 public final class QuestLogGui extends Gui {
 
-    private static final TextColor ACCENT = TextColor.color(0x9863E7);
     private static final int GUIDE_SLOT = 4;
     private static final int FIRST_SLOT = 9;
     private static final int LAST_SLOT = 36;
@@ -121,7 +119,7 @@ public final class QuestLogGui extends Gui {
         Material material = QuestIcons.materialFor(status);
         String statusText = messages.get(questService.statusKey(player, quest), player.locale().getLanguage());
 
-        Component name = QuestIcons.displayNameComponent(quest.displayName(), ACCENT)
+        Component name = QuestIcons.displayNameComponent(quest.displayName(), QuestIcons.ACCENT)
                 .decorationIfAbsent(TextDecoration.BOLD, TextDecoration.State.TRUE);
 
         List<Component> lore = new ArrayList<>();

@@ -16,6 +16,7 @@ import eu.purrtech.purrtechQuest.util.DurationFormat;
 import eu.purrtech.purrtechQuest.util.TinyFont;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -181,7 +182,8 @@ public final class QuestDetailGui extends Gui {
 
     private ItemStack infoIcon(Quest quest, QuestProgress progress, QuestStatus status) {
         Material material = QuestIcons.materialFor(status);
-        Component name = QuestIcons.displayNameComponent(quest.displayName(), NamedTextColor.GOLD);
+        Component name = QuestIcons.displayNameComponent(quest.displayName(), QuestIcons.ACCENT)
+                .decorationIfAbsent(TextDecoration.BOLD, TextDecoration.State.TRUE);
 
         List<Component> lore = new ArrayList<>();
         if (!quest.description().isBlank()) {
@@ -218,38 +220,29 @@ public final class QuestDetailGui extends Gui {
     }
 
     /**
-     * Base rewards are always listed under their own header; each rank tier the player currently holds the
-     * permission for gets its own header (using that tier's admin-set {@code displayName}, not the raw
-     * permission node) plus its actual reward lines — a tier the player doesn't qualify for isn't shown at
-     * all, so this never spoils rewards they can't get.
+     * Every reward the player currently qualifies for — the quest's base rewards plus whichever rank tiers
+     * they hold the permission for (a tier they don't qualify for is skipped entirely, so this never spoils
+     * a reward they can't get) — listed by name under one "odměna" header, no base/tier distinction shown.
      */
     private ItemStack rewardsIcon(Quest quest) {
-        Component name = messages.render("quest.gui-lore-rewards-header", player, Map.of());
+        Component name = messages.render("quest.gui-lore-reward-title", player, Map.of());
         List<Component> lore = new ArrayList<>();
+        lore.add(Component.empty());
+        lore.add(messages.render("quest.gui-lore-rewards-header", player, Map.of()));
 
-        List<Component> baseLines = quest.rewards().stream().map(r -> QuestIcons.rewardLine(r, messages, player)).toList();
-        if (!baseLines.isEmpty()) {
-            lore.add(messages.render("quest.gui-lore-reward-section-base", player, Map.of()));
-            lore.addAll(baseLines);
-        }
-
+        List<Component> lines = new ArrayList<>();
+        quest.rewards().forEach(reward -> lines.add(QuestIcons.questListRewardLine(reward, messages, player)));
         for (QuestRewardTier tier : quest.rewardTiers()) {
             if (!player.hasPermission(tier.permission())) {
                 continue;
             }
-            List<Component> tierLines = tier.rewards().stream().map(r -> QuestIcons.rewardLine(r, messages, player)).toList();
-            if (tierLines.isEmpty()) {
-                continue;
-            }
-            if (!lore.isEmpty()) {
-                lore.add(Component.empty());
-            }
-            lore.add(messages.render("quest.gui-lore-reward-section-tier", player, Map.of("%tier%", tier.displayName())));
-            lore.addAll(tierLines);
+            tier.rewards().forEach(reward -> lines.add(QuestIcons.questListRewardLine(reward, messages, player)));
         }
 
-        if (lore.isEmpty()) {
+        if (lines.isEmpty()) {
             lore.add(messages.render("quest.gui-lore-reward-bonus", player, Map.of()));
+        } else {
+            lore.addAll(lines);
         }
         return GuiItems.icon(Material.CHEST, name, lore);
     }

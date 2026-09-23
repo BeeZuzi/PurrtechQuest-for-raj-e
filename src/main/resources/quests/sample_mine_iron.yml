@@ -19,8 +19,30 @@ objectives:
 rewards:
   # "name" is what players see for the reward in the quest menu. Colors work: &e, &#FFD700 or MiniMessage.
   - type: MONEY
-    amount: 50.0
-    name: "&e50 mincí"
+    amount: 500.0
+    name: "&#FFF78B$500"
   - type: EXPERIENCE
-    amount: 20
-    name: "&a20 zkušeností"
+    amount: 5
+    name: "&#AD3EF15 duší"
+  # Placeholder command — swap for whatever your server actually uses to give rajčecoins.
+  # %player% is replaced with the player's name when the command runs.
+  - type: COMMAND
+    command: "rajcecoin give %player% 5"
+    name: "&#e44e4e5 rajčecoinů"
+  - type: COMMAND
+    command: "si give endsoul 1 %player%"
+    name: "&#CD12121x ᴅᴜšᴇ ꜱᴘáʟᴇɴýᴄʜ ᴘᴇᴋʟᴇᴍ"
+  # Not a PERMISSION reward: this plugin can save one, but never actually grants it (see RewardService) -
+  # nothing happens for the player at turn-in. A COMMAND that calls your permissions plugin does work.
+  # Placeholder LuckPerms command — swap for your server's actual command/node.
+  - type: COMMAND
+    command: "lp user %player% permission set arwenie.access true"
+    name: "&#E934DCᴘřísᴛᴜᴘ ᴋ ᴘʀɪɴᴄᴇᴢɴě ᴀʀᴡᴇɴɪɪ"
+  - type: COMMAND
+    command: "si give n1 1 %player%"
+    name: "&#C212FFᴅᴜšᴇ ʜᴠěᴢᴅɴé ᴘʀáᴢᴅɴᴏᴛʏ ɴᴇᴋᴏɴᴇčɴᴀ"
+  # Same guess as "přístup k princezně Arwenii" above — a LuckPerms permission command. Correct me if this
+  # one is actually a different access mechanism (a warp, a "si" key item, ...).
+  - type: COMMAND
+    command: "lp user %player% permission set propadliste.access true"
+    name: "&#861616ᴠsᴛᴜᴘ ᴅᴏ ᴘʀᴏᴘᴀᴅʟɪšᴛě ᴋʀᴠᴀᴠýᴄʜ ᴘᴇᴋᴇʟ"

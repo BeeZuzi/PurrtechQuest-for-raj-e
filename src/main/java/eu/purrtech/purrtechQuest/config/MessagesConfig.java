@@ -148,6 +148,11 @@ public final class MessagesConfig {
      */
     private static final Map<String, Map<String, List<String>>> INTERMEDIATE_DEFAULTS = Map.of(
             "cs", Map.ofEntries(
+                    Map.entry("quest.gui-lore-rewards-header", List.of("<gray>ᴏᴅᴍěɴʏ:</gray>", "<#9863E7><b>ᴏᴅᴍěɴʏ</b></#9863E7>")),
+                    Map.entry("quest.gui-lore-status", List.of("<gray>sᴛᴀᴠ: %status%</gray>")),
+                    Map.entry("quest.gui-lore-objectives-header", List.of("<gray>ᴄíʟᴇ:</gray>")),
+                    Map.entry("quest.gui-lore-reward-section-base", List.of("<gold>ᴢáᴋʟᴀᴅɴí ᴏᴅᴍěɴʏ:</gold>")),
+                    Map.entry("quest.gui-lore-reward-section-tier", List.of("<light_purple>ʙᴏɴᴜs (%tier%):</light_purple>")),
                     Map.entry("quest.gui-detail-title", List.of("%quest%")),
                     Map.entry("quest.guide-current-quest-name", List.of("<#F69B45><b>●</b></#F69B45>  <white>%quest%</white>")),
                     Map.entry("quest.guide-current-quest-description", List.of("<#F69B45><b>●</b></#F69B45>  <white>%description%</white>")),
@@ -160,6 +165,11 @@ public final class MessagesConfig {
                     Map.entry("quest.editor-reward-line-name", List.of("<aqua>Název: <white>%name%</white></aqua>")),
                     Map.entry("quest.editor-prompt-reward-name", List.of("<yellow>Napiš název odměny — hráči ho uvidí v menu s questy (např. '50 mincí'):</yellow>"))),
             "en", Map.ofEntries(
+                    Map.entry("quest.gui-lore-rewards-header", List.of("<gray>ᴏᴅᴍěɴʏ:</gray>", "<#9863E7><b>ᴏᴅᴍěɴʏ</b></#9863E7>")),
+                    Map.entry("quest.gui-lore-status", List.of("<gray>sᴛᴀᴠ: %status%</gray>")),
+                    Map.entry("quest.gui-lore-objectives-header", List.of("<gray>ᴄíʟᴇ:</gray>")),
+                    Map.entry("quest.gui-lore-reward-section-base", List.of("<gold>ᴢáᴋʟᴀᴅɴí ᴏᴅᴍěɴʏ:</gold>")),
+                    Map.entry("quest.gui-lore-reward-section-tier", List.of("<light_purple>ʙᴏɴᴜs (%tier%):</light_purple>")),
                     Map.entry("quest.gui-detail-title", List.of("%quest%")),
                     Map.entry("quest.guide-current-quest-name", List.of("<#F69B45><b>●</b></#F69B45>  <white>%quest%</white>")),
                     Map.entry("quest.guide-current-quest-description", List.of("<#F69B45><b>●</b></#F69B45>  <white>%description%</white>")),
