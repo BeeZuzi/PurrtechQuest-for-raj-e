@@ -148,6 +148,7 @@ public final class MessagesConfig {
      */
     private static final Map<String, Map<String, List<String>>> INTERMEDIATE_DEFAULTS = Map.of(
             "cs", Map.ofEntries(
+                    Map.entry("quest.gui-detail-title", List.of("%quest%")),
                     Map.entry("quest.guide-current-quest-name", List.of("<#F69B45><b>●</b></#F69B45>  <white>%quest%</white>")),
                     Map.entry("quest.guide-current-quest-description", List.of("<#F69B45><b>●</b></#F69B45>  <white>%description%</white>")),
                     Map.entry("quest.guide-no-active-quest", List.of("<#F69B45><b>●</b></#F69B45>  <gray>žáᴅɴý ᴀᴋᴛɪᴠɴí ǫᴜᴇsᴛ</gray>", "<#F69B45><b>●</b></#F69B45>  <gray>Žádný aktivní quest</gray>")),
@@ -159,6 +160,7 @@ public final class MessagesConfig {
                     Map.entry("quest.editor-reward-line-name", List.of("<aqua>Název: <white>%name%</white></aqua>")),
                     Map.entry("quest.editor-prompt-reward-name", List.of("<yellow>Napiš název odměny — hráči ho uvidí v menu s questy (např. '50 mincí'):</yellow>"))),
             "en", Map.ofEntries(
+                    Map.entry("quest.gui-detail-title", List.of("%quest%")),
                     Map.entry("quest.guide-current-quest-name", List.of("<#F69B45><b>●</b></#F69B45>  <white>%quest%</white>")),
                     Map.entry("quest.guide-current-quest-description", List.of("<#F69B45><b>●</b></#F69B45>  <white>%description%</white>")),
                     Map.entry("quest.guide-no-active-quest", List.of("<#F69B45><b>●</b></#F69B45>  <gray>žáᴅɴý ᴀᴋᴛɪᴠɴí ǫᴜᴇsᴛ</gray>", "<#F69B45><b>●</b></#F69B45>  <gray>Žádný aktivní quest</gray>")),

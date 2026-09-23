@@ -37,7 +37,7 @@ quest:
   tracking-line: "<yellow>» %quest%: %label% %progress%/%amount%</yellow>"
   tracking-ready: "<green>» %quest%: done, go turn it in!</green>"
   gui-log-title: "<white>:offset_-8::ukolymenu:</white>"
-  gui-detail-title: "%quest%"
+  gui-detail-title: "<white>:offset_-8::ukolyinfo:</white>"
   gui-category-title: "<white>:offset_-8::ukoly:</white>"
   gui-button-accept: "<green>ᴘřɪᴊᴍᴏᴜᴛ ǫᴜᴇsᴛ</green>"
   gui-button-abandon: "<red>ᴢʀᴜšɪᴛ ǫᴜᴇsᴛ</red>"
