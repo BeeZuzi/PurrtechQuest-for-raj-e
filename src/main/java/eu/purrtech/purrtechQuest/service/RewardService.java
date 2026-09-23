@@ -6,11 +6,15 @@ import eu.purrtech.purrtechQuest.integration.VaultEconomyHook;
 import eu.purrtech.purrtechQuest.model.Quest;
 import eu.purrtech.purrtechQuest.model.QuestReward;
 import eu.purrtech.purrtechQuest.model.QuestRewardTier;
+import eu.purrtech.purrtechQuest.util.DisplayText;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.List;
 import java.util.Map;
@@ -93,10 +97,24 @@ public final class RewardService {
                     + "), skipping for " + player.getName());
             return;
         }
+        if (item.name() != null) {
+            applyDisplayName(stack, item.name());
+        }
         Map<Integer, ItemStack> overflow = player.getInventory().addItem(stack);
         for (ItemStack leftover : overflow.values()) {
             player.getWorld().dropItemNaturally(player.getLocation(), leftover);
         }
+    }
+
+    /**
+     * Renames the actual granted item to the reward's admin-chosen {@code name} — the same text players
+     * already see for it in the quest menu (see {@link DisplayText}) — instead of it showing up in their
+     * inventory under its raw material/custom-item name.
+     */
+    private static void applyDisplayName(ItemStack stack, String name) {
+        ItemMeta meta = stack.getItemMeta();
+        meta.displayName(DisplayText.component(name, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
+        stack.setItemMeta(meta);
     }
 
     private static ItemStack vanillaItem(QuestReward.Item item) {

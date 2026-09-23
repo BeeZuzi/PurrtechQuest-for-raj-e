@@ -4,13 +4,10 @@ import eu.purrtech.purrtechQuest.config.MessagesConfig;
 import eu.purrtech.purrtechQuest.model.ObjectiveType;
 import eu.purrtech.purrtechQuest.model.QuestReward;
 import eu.purrtech.purrtechQuest.model.QuestStatus;
-import eu.purrtech.purrtechQuest.util.LegacyColors;
-import eu.purrtech.purrtechQuest.util.TinyFont;
+import eu.purrtech.purrtechQuest.util.DisplayText;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.ParsingException;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -24,22 +21,9 @@ final class QuestIcons {
     private QuestIcons() {
     }
 
-    /**
-     * A quest's raw {@code display-name}, deserialized as MiniMessage so an admin's own styling (custom hex,
-     * this server's tiny-caps font, ...) comes through unchanged instead of being forced into one fixed
-     * color; {@code colorIfAbsent} keeps a plain display-name with no styling of its own looking exactly as
-     * before ({@code fallbackColor}). Legacy {@code &e}/{@code &#RRGGBB} codes work too (see
-     * {@link LegacyColors}) and the text is shown in the tiny font ({@link TinyFont}). Falls back to plain text on a malformed value (e.g. a stray
-     * {@code <} typed into the name in the quest editor) so a bad display-name degrades to ugly rather than
-     * making the quest's icon impossible to render at all.
-     */
+    /** A quest's raw {@code display-name}, as the component players actually see. See {@link DisplayText}. */
     static Component displayNameComponent(String rawDisplayName, TextColor fallbackColor) {
-        try {
-            return TinyFont.convert(MiniMessage.miniMessage().deserialize(LegacyColors.toMiniMessage(rawDisplayName))
-                    .colorIfAbsent(fallbackColor));
-        } catch (ParsingException e) {
-            return TinyFont.convert(Component.text(rawDisplayName, fallbackColor));
-        }
+        return DisplayText.component(rawDisplayName, fallbackColor);
     }
 
     /**
@@ -51,7 +35,7 @@ final class QuestIcons {
             return rewardLine(reward, messages, player);
         }
         return messages.render("quest.gui-lore-quest-reward-prefix", player, Map.of())
-                .append(displayNameComponent(reward.name(), NamedTextColor.DARK_GRAY));
+                .append(DisplayText.component(reward.name(), NamedTextColor.DARK_GRAY));
     }
 
     /** Shared by {@link QuestDetailGui} (full reward list) and {@link QuestLogGui} (compact book lore). */
@@ -60,7 +44,7 @@ final class QuestIcons {
         // still falls back to describing itself by type and amount below.
         if (reward.name() != null) {
             return messages.render("quest.gui-lore-reward-prefix", player, Map.of())
-                    .append(displayNameComponent(reward.name(), NamedTextColor.GRAY));
+                    .append(DisplayText.component(reward.name(), NamedTextColor.GRAY));
         }
         return switch (reward) {
             case QuestReward.Money money ->
