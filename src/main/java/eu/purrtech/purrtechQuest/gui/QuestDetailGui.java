@@ -13,9 +13,7 @@ import eu.purrtech.purrtechQuest.service.QuestFeedback;
 import eu.purrtech.purrtechQuest.service.QuestService;
 import eu.purrtech.purrtechQuest.service.QuestTrackingService;
 import eu.purrtech.purrtechQuest.util.DurationFormat;
-import eu.purrtech.purrtechQuest.util.TinyFont;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -152,19 +150,19 @@ public final class QuestDetailGui extends Gui {
      */
     private ItemStack trackIcon(QuestStatus status) {
         if (status != QuestStatus.IN_PROGRESS) {
-            return GuiItems.icon(Material.COMPASS, messages.render("quest.gui-button-track", player, Map.of()),
-                    List.of(messages.render("quest.gui-button-track-unavailable-hint", player, Map.of())));
+            return GuiItems.icon(Material.COMPASS, messages.render("quest.gui-button-track-unavailable", player, Map.of()),
+                    messages.renderLines("quest.gui-button-track-unavailable-hint", player, Map.of()));
         }
         boolean tracking = trackingService.isTracking(player, questId);
         String trackKey = tracking ? "quest.gui-button-untrack" : "quest.gui-button-track";
         String trackHintKey = tracking ? "quest.gui-button-untrack-hint" : "quest.gui-button-track-hint";
         return GuiItems.icon(Material.COMPASS, messages.render(trackKey, player, Map.of()),
-                List.of(messages.render(trackHintKey, player, Map.of())));
+                messages.renderLines(trackHintKey, player, Map.of()));
     }
 
     private void onTrackClick(QuestStatus status) {
         if (status != QuestStatus.IN_PROGRESS) {
-            player.sendMessage(messages.render("quest.track-requires-in-progress", player, Map.of()));
+            player.sendMessage(messages.chat("quest.track-requires-in-progress", player, Map.of()));
             return;
         }
         if (trackingService.isTracking(player, questId)) {
@@ -188,7 +186,7 @@ public final class QuestDetailGui extends Gui {
         List<Component> lore = new ArrayList<>();
         if (!quest.description().isBlank()) {
             for (String line : quest.descriptionLines()) {
-                lore.add(Component.text(TinyFont.convert(line), NamedTextColor.GRAY));
+                lore.add(messages.render("quest.gui-lore-detail-description", player, Map.of("%description%", line)));
             }
             lore.add(Component.empty());
         }

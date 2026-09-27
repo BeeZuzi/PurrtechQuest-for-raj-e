@@ -92,7 +92,7 @@ public final class QuestCommand {
             return 0;
         }
         PlayerQuestData data = playerCache.get(player.getUniqueId());
-        player.sendMessage(messages.render("quest.list-header", player, Map.of()));
+        player.sendMessage(messages.chat("quest.list-header", player, Map.of()));
         for (Quest quest : questService.allQuests().stream().sorted(Quest.DISPLAY_ORDER).toList()) {
             QuestProgress progress = data == null ? null : data.progress(quest.id());
             String status = messages.get(questService.statusKey(player, quest), player.locale().getLanguage());
@@ -113,11 +113,11 @@ public final class QuestCommand {
         }
         Quest quest = questService.quest(questId).orElse(null);
         if (quest == null) {
-            player.sendMessage(messages.render("quest.not-found", player, Map.of("%quest%", questId)));
+            player.sendMessage(messages.chat("quest.not-found", player, Map.of("%quest%", questId)));
             return 0;
         }
 
-        player.sendMessage(messages.render("quest.info-header", player, Map.of("%quest%", quest.displayName())));
+        player.sendMessage(messages.chat("quest.info-header", player, Map.of("%quest%", quest.displayName())));
         for (String line : quest.descriptionLines()) {
             player.sendMessage(messages.render("quest.info-description", player, Map.of("%description%", line)));
         }
@@ -206,7 +206,7 @@ public final class QuestCommand {
         if (sender instanceof Player player) {
             return player;
         }
-        sender.sendMessage(messages.render("quest.console-only", Map.of()));
+        sender.sendMessage(messages.chat("quest.console-only", Map.of()));
         return null;
     }
 }

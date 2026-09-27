@@ -156,13 +156,22 @@ public final class MessagesConfig {
                     Map.entry("quest.gui-lore-reward-section-tier", List.of("<light_purple>ʙᴏɴᴜs (%tier%):</light_purple>")),
                     Map.entry("quest.gui-detail-title", List.of("%quest%")),
                     Map.entry("quest.guide-current-quest-name", List.of("<#F69B45><b>●</b></#F69B45>  <white>%quest%</white>")),
-                    Map.entry("quest.guide-current-quest-description", List.of("<#F69B45><b>●</b></#F69B45>  <white>%description%</white>")),
+                    Map.entry("quest.guide-current-quest-description", List.of("<#F69B45><b>●</b></#F69B45>  <white>%description%</white>", "<#F69B45><b>●</b></#F69B45> <white>%description%</white>")),
                     Map.entry("quest.guide-no-active-quest", List.of("<#F69B45><b>●</b></#F69B45>  <gray>žáᴅɴý ᴀᴋᴛɪᴠɴí ǫᴜᴇsᴛ</gray>", "<#F69B45><b>●</b></#F69B45>  <gray>Žádný aktivní quest</gray>")),
-                    Map.entry("quest.guide-progress-header", List.of("<#F69B45><b>●</b></#F69B45>  <white>ᴘᴏsᴛᴜᴘ úᴋᴏʟᴜ:</white>")),
+                    Map.entry("quest.guide-progress-header", List.of("<#F69B45><b>●</b></#F69B45>  <white>ᴘᴏsᴛᴜᴘ úᴋᴏʟᴜ:</white>", "<#F69B45><b>●</b></#F69B45> <white>ᴘᴏsᴛᴜᴘ úᴋᴏʟᴜ:</white>")),
                     Map.entry("quest.gui-lore-quest-status", List.of("<#9863E7><b>●</b></#9863E7> <white>sᴛᴀᴛᴜs:  %status%</white>")),
                     Map.entry("quest.status-turned-in", List.of("ᴏᴅᴇᴠᴢᴅᴀɴý")),
                     Map.entry("quest.status-in-progress", List.of("ʀᴏᴢᴘʀᴀᴄᴏᴠᴀɴý")),
                     Map.entry("quest.gui-lore-quest-hint", List.of("<gray>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴅᴇᴛᴀɪʟ ǫᴜᴇsᴛᴜ.</gray>", "<#9863E7><gray><underlined>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴅᴇᴛᴀɪʟʏ ǫᴜᴇsᴛᴜ</underlined></gray>")),
+                    Map.entry("quest.gui-lore-objective-line", List.of("<gray> - %label%: %progress%/%amount%</gray>")),
+                    Map.entry("quest.gui-lore-objective-choice-line", List.of("<yellow> - (ᴠᴏʟʙᴀ) %label%: %progress%/%amount%</yellow>")),
+                    Map.entry("quest.guide-progress-line", List.of("<dark_gray> -</dark_gray>  <white>%label%</white> <#F8AF69>%progress%</#F8AF69><dark_gray>/</dark_gray><#F69B45>%amount%</#F69B45>")),
+                    Map.entry("quest.tracking-line", List.of("<yellow>» %quest%: %label% %progress%/%amount%</yellow>")),
+                    Map.entry("quest.gui-button-track", List.of("<yellow>sʟᴇᴅᴏᴠᴀᴛ ǫᴜᴇsᴛ</yellow>")),
+                    Map.entry("quest.gui-button-track-hint", List.of("<gray>ᴢᴀᴘɴᴇ ᴢᴏʙʀᴀᴢᴇɴí ᴘᴏsᴛᴜᴘᴜ ǫᴜᴇsᴛᴜ ɴᴀ ᴀᴄᴛɪᴏɴ ʙᴀʀᴜ.</gray>")),
+                    Map.entry("quest.gui-button-untrack", List.of("<yellow>ᴘřᴇsᴛᴀᴛ sʟᴇᴅᴏᴠᴀᴛ</yellow>")),
+                    Map.entry("quest.gui-button-untrack-hint", List.of("<gray>ᴠʏᴘɴᴇ ᴢᴏʙʀᴀᴢᴇɴí ᴘᴏsᴛᴜᴘᴜ ǫᴜᴇsᴛᴜ ɴᴀ ᴀᴄᴛɪᴏɴ ʙᴀʀᴜ.</gray>")),
+                    Map.entry("quest.gui-button-track-unavailable-hint", List.of("<gray>sʟᴇᴅᴏᴠᴀᴛ ʟᴢᴇ ᴊᴇɴ ʀᴏᴢᴘʀᴀᴄᴏᴠᴀɴý ǫᴜᴇsᴛ.</gray>")),
                     Map.entry("quest.gui-button-accept", List.of("<green>ᴘřɪᴊᴍᴏᴜᴛ ǫᴜᴇsᴛ</green>")),
                     Map.entry("quest.gui-button-accept-hint", List.of("<gray>ᴘřɪᴊᴍᴇ ᴛᴇɴᴛᴏ ǫᴜᴇsᴛ ᴀ ᴢᴀčɴᴇ sʟᴇᴅᴏᴠᴀᴛ ᴊᴇʜᴏ ᴘᴏsᴛᴜᴘ.</gray>")),
                     Map.entry("quest.gui-button-abandon", List.of("<red>ᴢʀᴜšɪᴛ ǫᴜᴇsᴛ</red>")),
@@ -179,13 +188,22 @@ public final class MessagesConfig {
                     Map.entry("quest.gui-lore-reward-section-tier", List.of("<light_purple>ʙᴏɴᴜs (%tier%):</light_purple>")),
                     Map.entry("quest.gui-detail-title", List.of("%quest%")),
                     Map.entry("quest.guide-current-quest-name", List.of("<#F69B45><b>●</b></#F69B45>  <white>%quest%</white>")),
-                    Map.entry("quest.guide-current-quest-description", List.of("<#F69B45><b>●</b></#F69B45>  <white>%description%</white>")),
+                    Map.entry("quest.guide-current-quest-description", List.of("<#F69B45><b>●</b></#F69B45>  <white>%description%</white>", "<#F69B45><b>●</b></#F69B45> <white>%description%</white>")),
                     Map.entry("quest.guide-no-active-quest", List.of("<#F69B45><b>●</b></#F69B45>  <gray>žáᴅɴý ᴀᴋᴛɪᴠɴí ǫᴜᴇsᴛ</gray>", "<#F69B45><b>●</b></#F69B45>  <gray>Žádný aktivní quest</gray>")),
-                    Map.entry("quest.guide-progress-header", List.of("<#F69B45><b>●</b></#F69B45>  <white>ᴘᴏsᴛᴜᴘ úᴋᴏʟᴜ:</white>")),
+                    Map.entry("quest.guide-progress-header", List.of("<#F69B45><b>●</b></#F69B45>  <white>ᴘᴏsᴛᴜᴘ úᴋᴏʟᴜ:</white>", "<#F69B45><b>●</b></#F69B45> <white>ᴘᴏsᴛᴜᴘ úᴋᴏʟᴜ:</white>")),
                     Map.entry("quest.gui-lore-quest-status", List.of("<#9863E7><b>●</b></#9863E7> <white>sᴛᴀᴛᴜs:  %status%</white>")),
                     Map.entry("quest.status-turned-in", List.of("ᴏᴅᴇᴠᴢᴅᴀɴý")),
                     Map.entry("quest.status-in-progress", List.of("ʀᴏᴢᴘʀᴀᴄᴏᴠᴀɴý")),
                     Map.entry("quest.gui-lore-quest-hint", List.of("<gray>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴅᴇᴛᴀɪʟ ǫᴜᴇsᴛᴜ.</gray>", "<#9863E7><gray><underlined>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴅᴇᴛᴀɪʟʏ ǫᴜᴇsᴛᴜ</underlined></gray>")),
+                    Map.entry("quest.gui-lore-objective-line", List.of("<gray> - %label%: %progress%/%amount%</gray>")),
+                    Map.entry("quest.gui-lore-objective-choice-line", List.of("<yellow> - (ᴠᴏʟʙᴀ) %label%: %progress%/%amount%</yellow>")),
+                    Map.entry("quest.guide-progress-line", List.of("<dark_gray> -</dark_gray>  <white>%label%</white> <#F8AF69>%progress%</#F8AF69><dark_gray>/</dark_gray><#F69B45>%amount%</#F69B45>")),
+                    Map.entry("quest.tracking-line", List.of("<yellow>» %quest%: %label% %progress%/%amount%</yellow>")),
+                    Map.entry("quest.gui-button-track", List.of("<yellow>sʟᴇᴅᴏᴠᴀᴛ ǫᴜᴇsᴛ</yellow>")),
+                    Map.entry("quest.gui-button-track-hint", List.of("<gray>ᴢᴀᴘɴᴇ ᴢᴏʙʀᴀᴢᴇɴí ᴘᴏsᴛᴜᴘᴜ ǫᴜᴇsᴛᴜ ɴᴀ ᴀᴄᴛɪᴏɴ ʙᴀʀᴜ.</gray>")),
+                    Map.entry("quest.gui-button-untrack", List.of("<yellow>ᴘřᴇsᴛᴀᴛ sʟᴇᴅᴏᴠᴀᴛ</yellow>")),
+                    Map.entry("quest.gui-button-untrack-hint", List.of("<gray>ᴠʏᴘɴᴇ ᴢᴏʙʀᴀᴢᴇɴí ᴘᴏsᴛᴜᴘᴜ ǫᴜᴇsᴛᴜ ɴᴀ ᴀᴄᴛɪᴏɴ ʙᴀʀᴜ.</gray>")),
+                    Map.entry("quest.gui-button-track-unavailable-hint", List.of("<gray>sʟᴇᴅᴏᴠᴀᴛ ʟᴢᴇ ᴊᴇɴ ʀᴏᴢᴘʀᴀᴄᴏᴠᴀɴý ǫᴜᴇsᴛ.</gray>")),
                     Map.entry("quest.gui-button-accept", List.of("<green>ᴘřɪᴊᴍᴏᴜᴛ ǫᴜᴇsᴛ</green>")),
                     Map.entry("quest.gui-button-accept-hint", List.of("<gray>ᴘřɪᴊᴍᴇ ᴛᴇɴᴛᴏ ǫᴜᴇsᴛ ᴀ ᴢᴀčɴᴇ sʟᴇᴅᴏᴠᴀᴛ ᴊᴇʜᴏ ᴘᴏsᴛᴜᴘ.</gray>")),
                     Map.entry("quest.gui-button-abandon", List.of("<red>ᴢʀᴜšɪᴛ ǫᴜᴇsᴛ</red>")),
@@ -358,6 +376,31 @@ public final class MessagesConfig {
      */
     public Component render(String key, String locale, Map<String, String> placeholders) {
         return renderRaw(get(key, locale), placeholders);
+    }
+
+    /**
+     * {@link #render(String, Player, Map)} with the {@code quest.chat-prefix} in front — for the first (or
+     * only) line of anything sent to chat. Continuation lines of a multi-line block (list entries, objective
+     * lines) use plain {@code render} so the prefix shows once per message, not on every line.
+     */
+    public Component chat(String key, Player player, Map<String, String> placeholders) {
+        return withPrefix(render(key, player, placeholders), player.locale().getLanguage());
+    }
+
+    /** Same as {@link #chat(String, Player, Map)} for callers with no player (console senders). */
+    public Component chat(String key, Map<String, String> placeholders) {
+        return withPrefix(render(key, placeholders), null);
+    }
+
+    /**
+     * The prefix and the message are siblings rather than one appended to the other, so the prefix's colors
+     * never bleed into the message (the same as {@code &r} after it). A blank prefix turns it off.
+     */
+    public Component withPrefix(Component message, String locale) {
+        if (get("quest.chat-prefix", locale).isBlank()) {
+            return message;
+        }
+        return Component.empty().append(render("quest.chat-prefix", locale, Map.of())).append(message);
     }
 
     private static Component renderRaw(String raw, Map<String, String> placeholders) {

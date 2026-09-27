@@ -104,7 +104,7 @@ public final class QuestCategoryEditorGui extends Gui {
     private void save() {
         context.categoryConfigRepository().save(
                 new QuestCategoryConfig(categoryId, description, showActiveQuest, showProgress, showDescription));
-        player.sendMessage(context.messages().render("quest.category-editor-saved", player, Map.of("%category%", categoryId)));
+        player.sendMessage(context.messages().chat("quest.category-editor-saved", player, Map.of("%category%", categoryId)));
         player.closeInventory();
     }
 

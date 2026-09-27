@@ -95,7 +95,7 @@ public final class QuestEditorRewardTypeGui extends Gui {
                 }
                 Material material = Material.matchMaterial(normalized);
                 if (material == null) {
-                    player.sendMessage(context.messages().render("quest.editor-invalid-material", player, Map.of()));
+                    player.sendMessage(context.messages().chat("quest.editor-invalid-material", player, Map.of()));
                     startWizard(Choice.ITEM);
                     return;
                 }
@@ -122,7 +122,7 @@ public final class QuestEditorRewardTypeGui extends Gui {
     private void startItemFromHand() {
         ItemStack hand = player.getInventory().getItemInMainHand();
         if (hand.getType() == Material.AIR) {
-            player.sendMessage(context.messages().render("quest.editor-invalid-hand-item", player, Map.of()));
+            player.sendMessage(context.messages().chat("quest.editor-invalid-hand-item", player, Map.of()));
             return;
         }
         String resolved = ItemMatcher.resolveTarget(hand.clone());
@@ -168,7 +168,7 @@ public final class QuestEditorRewardTypeGui extends Gui {
         context.chatInput().prompt(player, "quest.editor-prompt-reward-name", raw -> {
             String name = raw.trim();
             if (name.isBlank()) {
-                player.sendMessage(context.messages().render("quest.editor-invalid-reward-name", player, Map.of()));
+                player.sendMessage(context.messages().chat("quest.editor-invalid-reward-name", player, Map.of()));
                 finish(reward);
                 return;
             }
@@ -178,7 +178,7 @@ public final class QuestEditorRewardTypeGui extends Gui {
     }
 
     private void invalidNumberThenRetry(Runnable retry) {
-        player.sendMessage(context.messages().render("quest.editor-invalid-number", player, Map.of()));
+        player.sendMessage(context.messages().chat("quest.editor-invalid-number", player, Map.of()));
         retry.run();
     }
 

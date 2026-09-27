@@ -244,7 +244,7 @@ public final class QuestService {
 
         startFreshProgress(player, data, quest, timesCompleted);
         Component message = messages.render("quest.accepted", player, Map.of("%quest%", quest.displayName()));
-        player.sendMessage(message);
+        player.sendMessage(messages.withPrefix(message, player.locale().getLanguage()));
         sendObjectiveLines(player, quest, data.progress(questId), "quest.accepted-objectives-header",
                 "quest.accepted-objective", "quest.accepted-objective-choice");
         notify(player, message, SOUND_ACCEPTED);
@@ -341,7 +341,7 @@ public final class QuestService {
                 new int[progress.objectiveProgress().length], null, null, progress.timesCompleted()));
         Quest quest = questsById.get(questId);
         String displayName = quest != null ? quest.displayName() : questId;
-        player.sendMessage(messages.render("quest.abandoned", player, Map.of("%quest%", displayName)));
+        player.sendMessage(messages.chat("quest.abandoned", player, Map.of("%quest%", displayName)));
         if (quest != null) {
             eventPublisher.publish(new QuestAbandonEvent(player, quest));
         }
@@ -381,7 +381,7 @@ public final class QuestService {
             progress.completedAt(Instant.now());
         }
         data.markDirty();
-        player.sendMessage(messages.render("quest.turned-in", player, Map.of("%quest%", quest.displayName())));
+        player.sendMessage(messages.chat("quest.turned-in", player, Map.of("%quest%", quest.displayName())));
         player.playSound(player.getLocation(), SOUND_TURNED_IN, 1f, 1f);
 
         // Turning this quest in may have just satisfied another quest's required-quests prerequisite — if
@@ -670,7 +670,7 @@ public final class QuestService {
         if (active.isEmpty()) {
             return;
         }
-        sendIfSet(player, "quest.join-active-header", Map.of());
+        sendIfSet(player, "quest.join-active-header", Map.of(), true);
         for (Quest quest : active) {
             sendObjectiveLines(player, quest, data.progress(quest.id()), "quest.join-active-quest",
                     "quest.join-active-objective", "quest.join-active-objective-choice");
@@ -683,7 +683,7 @@ public final class QuestService {
      */
     private void sendObjectiveLines(Player player, Quest quest, QuestProgress progress, String headerKey,
                                     String objectiveKey, String choiceKey) {
-        sendIfSet(player, headerKey, Map.of("%quest%", quest.displayName()));
+        sendIfSet(player, headerKey, Map.of("%quest%", quest.displayName()), false);
         List<QuestObjective> objectives = quest.objectives();
         Set<String> satisfiedGroups = ChoiceGroups.satisfiedGroups(quest, progress);
         for (int i = 0; i < objectives.size(); i++) {
@@ -698,16 +698,19 @@ public final class QuestService {
             placeholders.put("%label%", objective.label());
             placeholders.put("%progress%", String.valueOf(current));
             placeholders.put("%amount%", String.valueOf(objective.amount()));
-            sendIfSet(player, objective.choiceGroup() != null ? choiceKey : objectiveKey, placeholders);
+            sendIfSet(player, objective.choiceGroup() != null ? choiceKey : objectiveKey, placeholders, false);
         }
     }
 
-    /** An admin blanking a lang line ({@code ""}) turns just that line off instead of sending an empty one. */
-    private void sendIfSet(Player player, String key, Map<String, String> placeholders) {
+    /**
+     * An admin blanking a lang line ({@code ""}) turns just that line off instead of sending an empty one.
+     * {@code prefixed} is for the first line of a block; the lines under it go without the chat prefix.
+     */
+    private void sendIfSet(Player player, String key, Map<String, String> placeholders, boolean prefixed) {
         if (messages.get(key, player.locale().getLanguage()).isBlank()) {
             return;
         }
-        player.sendMessage(messages.render(key, player, placeholders));
+        player.sendMessage(prefixed ? messages.chat(key, player, placeholders) : messages.render(key, player, placeholders));
     }
 
     private boolean applyProgress(Player player, QuestProgress progress, Quest quest, ObjectiveType type, String target, int amount) {
@@ -749,7 +752,7 @@ public final class QuestService {
         progress.status(QuestStatus.COMPLETED);
         progress.completedAt(Instant.now());
         Component message = messages.render("quest.completed", player, Map.of("%quest%", quest.displayName()));
-        player.sendMessage(message);
+        player.sendMessage(messages.withPrefix(message, player.locale().getLanguage()));
         notify(player, message, SOUND_COMPLETED);
         eventPublisher.publish(new QuestCompleteEvent(player, quest));
         if (quest.autoTurnIn()) {

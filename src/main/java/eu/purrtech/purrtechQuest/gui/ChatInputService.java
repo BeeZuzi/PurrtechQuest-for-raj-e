@@ -50,7 +50,7 @@ public final class ChatInputService implements Listener {
 
     public void prompt(Player player, String promptMessageKey, Consumer<String> onInput, Runnable onCancel) {
         player.closeInventory();
-        player.sendMessage(messages.render(promptMessageKey, player, Map.of()));
+        player.sendMessage(messages.chat(promptMessageKey, player, Map.of()));
         player.sendMessage(messages.render("quest.editor-cancel-hint", player, Map.of()));
         pending.put(player.getUniqueId(), new PendingPrompt(onInput, onCancel));
     }
@@ -60,7 +60,7 @@ public final class ChatInputService implements Listener {
             try {
                 onValid.accept(Integer.parseInt(raw.trim()));
             } catch (NumberFormatException e) {
-                player.sendMessage(messages.render("quest.editor-invalid-number", player, Map.of()));
+                player.sendMessage(messages.chat("quest.editor-invalid-number", player, Map.of()));
                 promptInt(player, promptMessageKey, onValid, onCancel);
             }
         }, onCancel);
@@ -71,7 +71,7 @@ public final class ChatInputService implements Listener {
             try {
                 onValid.accept(Double.parseDouble(raw.trim()));
             } catch (NumberFormatException e) {
-                player.sendMessage(messages.render("quest.editor-invalid-number", player, Map.of()));
+                player.sendMessage(messages.chat("quest.editor-invalid-number", player, Map.of()));
                 promptDouble(player, promptMessageKey, onValid, onCancel);
             }
         }, onCancel);
@@ -102,7 +102,7 @@ public final class ChatInputService implements Listener {
 
         Bukkit.getScheduler().runTask(plugin, () -> {
             if (text.equalsIgnoreCase("cancel")) {
-                player.sendMessage(messages.render("quest.editor-cancelled", player, Map.of()));
+                player.sendMessage(messages.chat("quest.editor-cancelled", player, Map.of()));
                 prompt.onCancel().run();
                 return;
             }

@@ -71,7 +71,7 @@ public final class QuestEditorRewardTiersGui extends Gui {
         context.chatInput().prompt(player, "quest.editor-prompt-reward-tier-permission", raw -> {
             String suffix = raw.trim();
             if (suffix.isBlank()) {
-                player.sendMessage(context.messages().render("quest.editor-invalid-permission-node", player, Map.of()));
+                player.sendMessage(context.messages().chat("quest.editor-invalid-permission-node", player, Map.of()));
                 promptNewTier();
                 return;
             }

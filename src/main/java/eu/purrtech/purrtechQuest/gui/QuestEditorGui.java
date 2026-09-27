@@ -97,7 +97,7 @@ public final class QuestEditorGui extends Gui {
                     try {
                         draft.sortOrder(Integer.parseInt(typed));
                     } catch (NumberFormatException e) {
-                        player.sendMessage(messages.render("quest.editor-invalid-number", player, Map.of()));
+                        player.sendMessage(messages.chat("quest.editor-invalid-number", player, Map.of()));
                     }
                     reopen();
                 }, this::reopen));
@@ -150,7 +150,7 @@ public final class QuestEditorGui extends Gui {
         setItem(NPC_SLOT, GuiItems.icon(Material.VILLAGER_SPAWN_EGG,
                         messages.render("quest.editor-button-npc", player, Map.of("%value%", npcValue())),
                         List.of(messages.render("quest.editor-npc-hint", player, Map.of()))),
-                event -> player.sendMessage(messages.render("quest.editor-npc-hint", player, Map.of())));
+                event -> player.sendMessage(messages.chat("quest.editor-npc-hint", player, Map.of())));
 
         setItem(PERMISSION_SLOT, GuiItems.icon(Material.TRIPWIRE_HOOK,
                         messages.render("quest.editor-button-permission", player, Map.of("%value%", permissionValue())),
@@ -204,14 +204,14 @@ public final class QuestEditorGui extends Gui {
         try {
             quest = draft.toQuest();
         } catch (IllegalArgumentException e) {
-            player.sendMessage(messages.render("quest.editor-save-failed", player, Map.of("%reason%", String.valueOf(e.getMessage()))));
+            player.sendMessage(messages.chat("quest.editor-save-failed", player, Map.of("%reason%", String.valueOf(e.getMessage()))));
             return;
         }
         context.questRepository().save(quest);
         context.questService().reload();
         context.trackerRegistrationManager().refresh();
         context.questPermissionRegistrar().refresh();
-        player.sendMessage(messages.render("quest.editor-saved", player, Map.of("%quest%", quest.displayName())));
+        player.sendMessage(messages.chat("quest.editor-saved", player, Map.of("%quest%", quest.displayName())));
         player.closeInventory();
     }
 
