@@ -148,7 +148,8 @@ public final class MessagesConfig {
      */
     private static final Map<String, Map<String, List<String>>> INTERMEDIATE_DEFAULTS = Map.of(
             "cs", Map.ofEntries(
-                    Map.entry("quest.gui-lore-rewards-header", List.of("<gray>ᴏᴅᴍěɴʏ:</gray>", "<#9863E7><b>ᴏᴅᴍěɴʏ</b></#9863E7>")),
+                    Map.entry("quest.gui-lore-rewards-header", List.of("<gray>ᴏᴅᴍěɴʏ:</gray>", "<#9863E7><b>ᴏᴅᴍěɴʏ</b></#9863E7>", "<#fcd303><b>●</b></#fcd303> <white>ᴏᴅᴍěɴᴀ:</white>")),
+                    Map.entry("quest.gui-lore-reward-title", List.of("<#fcd303><b>ᴘᴏ sᴘʟɴěɴí ǫᴜᴇsᴛᴜ</b></#fcd303>")),
                     Map.entry("quest.gui-lore-status", List.of("<gray>sᴛᴀᴠ: %status%</gray>")),
                     Map.entry("quest.gui-lore-objectives-header", List.of("<gray>ᴄíʟᴇ:</gray>")),
                     Map.entry("quest.gui-lore-reward-section-base", List.of("<gold>ᴢáᴋʟᴀᴅɴí ᴏᴅᴍěɴʏ:</gold>")),
@@ -162,11 +163,16 @@ public final class MessagesConfig {
                     Map.entry("quest.status-turned-in", List.of("ᴏᴅᴇᴠᴢᴅᴀɴý")),
                     Map.entry("quest.status-in-progress", List.of("ʀᴏᴢᴘʀᴀᴄᴏᴠᴀɴý")),
                     Map.entry("quest.gui-lore-quest-hint", List.of("<gray>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴅᴇᴛᴀɪʟ ǫᴜᴇsᴛᴜ.</gray>", "<#9863E7><gray><underlined>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴅᴇᴛᴀɪʟʏ ǫᴜᴇsᴛᴜ</underlined></gray>")),
+                    Map.entry("quest.gui-button-accept", List.of("<green>ᴘřɪᴊᴍᴏᴜᴛ ǫᴜᴇsᴛ</green>")),
+                    Map.entry("quest.gui-button-accept-hint", List.of("<gray>ᴘřɪᴊᴍᴇ ᴛᴇɴᴛᴏ ǫᴜᴇsᴛ ᴀ ᴢᴀčɴᴇ sʟᴇᴅᴏᴠᴀᴛ ᴊᴇʜᴏ ᴘᴏsᴛᴜᴘ.</gray>")),
+                    Map.entry("quest.gui-button-abandon", List.of("<red>ᴢʀᴜšɪᴛ ǫᴜᴇsᴛ</red>")),
+                    Map.entry("quest.gui-button-abandon-hint", List.of("<gray>ᴢʀᴜší ʀᴏᴢᴘʀᴀᴄᴏᴠᴀɴý ǫᴜᴇsᴛ ᴀ ᴠʏᴍᴀžᴇ ᴘᴏsᴛᴜᴘ.</gray>")),
                     Map.entry("quest.editor-reward-line-name", List.of("<aqua>Název: <white>%name%</white></aqua>")),
                     Map.entry("quest.editor-prompt-reward-name", List.of("<yellow>Napiš název odměny — hráči ho uvidí v menu s questy (např. '50 mincí'):</yellow>")),
                     Map.entry("quest.editor-prompt-description", List.of("<yellow>Napiš nový popis questu do chatu:</yellow>"))),
             "en", Map.ofEntries(
-                    Map.entry("quest.gui-lore-rewards-header", List.of("<gray>ᴏᴅᴍěɴʏ:</gray>", "<#9863E7><b>ᴏᴅᴍěɴʏ</b></#9863E7>")),
+                    Map.entry("quest.gui-lore-rewards-header", List.of("<gray>ᴏᴅᴍěɴʏ:</gray>", "<#9863E7><b>ᴏᴅᴍěɴʏ</b></#9863E7>", "<#fcd303><b>●</b></#fcd303> <white>ᴏᴅᴍěɴᴀ:</white>")),
+                    Map.entry("quest.gui-lore-reward-title", List.of("<#fcd303><b>ᴘᴏ sᴘʟɴěɴí ǫᴜᴇsᴛᴜ</b></#fcd303>")),
                     Map.entry("quest.gui-lore-status", List.of("<gray>sᴛᴀᴠ: %status%</gray>")),
                     Map.entry("quest.gui-lore-objectives-header", List.of("<gray>ᴄíʟᴇ:</gray>")),
                     Map.entry("quest.gui-lore-reward-section-base", List.of("<gold>ᴢáᴋʟᴀᴅɴí ᴏᴅᴍěɴʏ:</gold>")),
@@ -180,6 +186,10 @@ public final class MessagesConfig {
                     Map.entry("quest.status-turned-in", List.of("ᴏᴅᴇᴠᴢᴅᴀɴý")),
                     Map.entry("quest.status-in-progress", List.of("ʀᴏᴢᴘʀᴀᴄᴏᴠᴀɴý")),
                     Map.entry("quest.gui-lore-quest-hint", List.of("<gray>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴅᴇᴛᴀɪʟ ǫᴜᴇsᴛᴜ.</gray>", "<#9863E7><gray><underlined>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴅᴇᴛᴀɪʟʏ ǫᴜᴇsᴛᴜ</underlined></gray>")),
+                    Map.entry("quest.gui-button-accept", List.of("<green>ᴘřɪᴊᴍᴏᴜᴛ ǫᴜᴇsᴛ</green>")),
+                    Map.entry("quest.gui-button-accept-hint", List.of("<gray>ᴘřɪᴊᴍᴇ ᴛᴇɴᴛᴏ ǫᴜᴇsᴛ ᴀ ᴢᴀčɴᴇ sʟᴇᴅᴏᴠᴀᴛ ᴊᴇʜᴏ ᴘᴏsᴛᴜᴘ.</gray>")),
+                    Map.entry("quest.gui-button-abandon", List.of("<red>ᴢʀᴜšɪᴛ ǫᴜᴇsᴛ</red>")),
+                    Map.entry("quest.gui-button-abandon-hint", List.of("<gray>ᴢʀᴜší ʀᴏᴢᴘʀᴀᴄᴏᴠᴀɴý ǫᴜᴇsᴛ ᴀ ᴠʏᴍᴀžᴇ ᴘᴏsᴛᴜᴘ.</gray>")),
                     Map.entry("quest.editor-reward-line-name", List.of("<aqua>Name: <white>%name%</white></aqua>")),
                     Map.entry("quest.editor-prompt-reward-name", List.of("<yellow>Type a name for this reward — players see it in the quest menu (e.g. '50 coins'):</yellow>")),
                     Map.entry("quest.editor-prompt-description", List.of("<yellow>Type the new quest description in chat:</yellow>"))));
@@ -297,13 +307,32 @@ public final class MessagesConfig {
     }
 
     public String get(String key, String locale) {
-        String normalized = locale == null ? defaultLocale : locale.toLowerCase(Locale.ROOT);
-        YamlConfiguration config = byLocale.getOrDefault(normalized, byLocale.get(defaultLocale));
+        YamlConfiguration config = configFor(locale);
         if (config == null) {
             return key;
         }
         String text = config.getString(key, key);
         return TinyFont.enabled() ? text : TinyFont.untiny(text);
+    }
+
+    private YamlConfiguration configFor(String locale) {
+        String normalized = locale == null ? defaultLocale : locale.toLowerCase(Locale.ROOT);
+        return byLocale.getOrDefault(normalized, byLocale.get(defaultLocale));
+    }
+
+    /**
+     * Same as {@link #render(String, Player, Map)} for a key that may hold several lines — a YAML list, one
+     * lore line per entry (an empty string is a blank line). A plain string key still works and gives one line.
+     */
+    public List<Component> renderLines(String key, Player player, Map<String, String> placeholders) {
+        String locale = player.locale().getLanguage();
+        YamlConfiguration config = configFor(locale);
+        if (config == null || !config.isList(key)) {
+            return List.of(render(key, locale, placeholders));
+        }
+        return config.getStringList(key).stream()
+                .map(line -> renderRaw(TinyFont.enabled() ? line : TinyFont.untiny(line), placeholders))
+                .toList();
     }
 
     /**
@@ -328,7 +357,10 @@ public final class MessagesConfig {
      * (console senders) — uses the configured default locale.
      */
     public Component render(String key, String locale, Map<String, String> placeholders) {
-        String raw = get(key, locale);
+        return renderRaw(get(key, locale), placeholders);
+    }
+
+    private static Component renderRaw(String raw, Map<String, String> placeholders) {
         for (Map.Entry<String, String> entry : placeholders.entrySet()) {
             String value = entry.getValue();
             if (ADMIN_TEXT_PLACEHOLDERS.contains(entry.getKey())) {

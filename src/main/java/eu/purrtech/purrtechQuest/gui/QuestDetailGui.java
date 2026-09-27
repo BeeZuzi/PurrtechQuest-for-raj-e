@@ -96,7 +96,7 @@ public final class QuestDetailGui extends Gui {
         switch (status) {
             case NOT_ACCEPTED -> setItem(PRIMARY_ACTION_SLOT,
                     GuiItems.icon(Material.LIME_DYE, messages.render("quest.gui-button-accept", player, Map.of()),
-                            List.of(messages.render("quest.gui-button-accept-hint", player, Map.of()))),
+                            messages.renderLines("quest.gui-button-accept-hint", player, Map.of())),
                     event -> {
                         QuestService.AcceptResult result = questService.acceptQuest(player, questId);
                         QuestFeedback.report(player, result, questId, questService, messages);
@@ -104,7 +104,7 @@ public final class QuestDetailGui extends Gui {
                     });
             case IN_PROGRESS -> setItem(PRIMARY_ACTION_SLOT,
                     GuiItems.icon(Material.RED_DYE, messages.render("quest.gui-button-abandon", player, Map.of()),
-                            List.of(messages.render("quest.gui-button-abandon-hint", player, Map.of()))),
+                            messages.renderLines("quest.gui-button-abandon-hint", player, Map.of())),
                     event -> {
                         QuestService.AbandonResult result = questService.abandonQuest(player, questId);
                         QuestFeedback.report(player, result, messages);
@@ -130,7 +130,7 @@ public final class QuestDetailGui extends Gui {
         if (readyAt == null || !Instant.now().isBefore(readyAt)) {
             setItem(PRIMARY_ACTION_SLOT,
                     GuiItems.icon(Material.LIME_DYE, messages.render("quest.gui-button-accept", player, Map.of()),
-                            List.of(messages.render("quest.gui-button-accept-hint", player, Map.of()))),
+                            messages.renderLines("quest.gui-button-accept-hint", player, Map.of())),
                     event -> {
                         QuestService.AcceptResult result = questService.acceptQuest(player, questId);
                         QuestFeedback.report(player, result, questId, questService, messages);
@@ -228,8 +228,7 @@ public final class QuestDetailGui extends Gui {
      */
     private ItemStack rewardsIcon(Quest quest) {
         Component name = messages.render("quest.gui-lore-reward-title", player, Map.of());
-        List<Component> lore = new ArrayList<>();
-        lore.add(Component.empty());
+        List<Component> lore = new ArrayList<>(messages.renderLines("quest.gui-lore-rewards-intro", player, Map.of()));
         lore.add(messages.render("quest.gui-lore-rewards-header", player, Map.of()));
 
         List<Component> lines = new ArrayList<>();
