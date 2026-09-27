@@ -31,4 +31,14 @@ tracking:
   # How a player's /quest track'd objective is displayed: ACTION_BAR (default, unobtrusive) or BOSS_BAR.
   display: ACTION_BAR
 
+# On join, lists the quests the player currently has in progress (accepted, not yet finished) in chat,
+# with each objective's progress. Nothing is sent if they have none. The message text lives in
+# lang/<locale>.yml under the quest.join-active-* keys; set a single line to "" to hide just that line.
+# Applies on /questadmin reload.
+join-summary:
+  enabled: true
+  # Wait this many ticks (20 = 1 second) after the player's data loads, so the message isn't buried
+  # under other plugins' join messages.
+  delay-ticks: 40
+
 debug: false

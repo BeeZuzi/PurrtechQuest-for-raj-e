@@ -1,8 +1,10 @@
 package eu.purrtech.purrtechQuest.model;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 /**
  * Static, immutable definition of a quest. Never mutated per-player — a player's progress through it lives
@@ -64,6 +66,28 @@ public record Quest(
             throw new IllegalArgumentException("cooldownSeconds must not be negative");
         }
         requiredPermission = (requiredPermission == null || requiredPermission.isBlank()) ? null : requiredPermission;
+    }
+
+    /** Separator an admin types into a description to start a new line (chat input is single-line). */
+    public static final String DESCRIPTION_LINE_SEPARATOR = "|";
+
+    /** {@link #description} split into display lines; empty for a blank description. */
+    public List<String> descriptionLines() {
+        return descriptionLines(description);
+    }
+
+    /**
+     * Splits on {@link #DESCRIPTION_LINE_SEPARATOR}, trimming the spaces around it so {@code "a | b"} reads the
+     * same as {@code "a|b"}. {@code "a||b"} keeps the empty line in between, for a deliberate blank line.
+     * Static so the editor can preview a draft that isn't a {@link Quest} yet.
+     */
+    public static List<String> descriptionLines(String description) {
+        if (description == null || description.isBlank()) {
+            return List.of();
+        }
+        return Arrays.stream(description.split(Pattern.quote(DESCRIPTION_LINE_SEPARATOR), -1))
+                .map(String::strip)
+                .toList();
     }
 
     /** Convenience constructor for callers that predate {@code requiredPermission}/{@code sortOrder} — both default to unset. */

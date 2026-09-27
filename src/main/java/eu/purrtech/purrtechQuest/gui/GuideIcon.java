@@ -48,9 +48,9 @@ final class GuideIcon {
             lore.add(messages.render("quest.guide-no-active-quest", player, Map.of()));
         } else {
             lore.add(messages.render("quest.guide-current-quest-name", player, Map.of("%quest%", active.displayName())));
-            if (!active.description().isBlank()) {
+            for (String line : active.descriptionLines()) {
                 lore.add(messages.render("quest.guide-current-quest-description", player,
-                        Map.of("%description%", active.description())));
+                        Map.of("%description%", line)));
             }
             lore.add(Component.empty());
             lore.add(messages.render("quest.guide-progress-header", player, Map.of()));

@@ -219,7 +219,8 @@ public final class QuestEditorObjectiveTypeGui extends Gui {
     /**
      * PLACEHOLDER_CHECK's target is the placeholder itself, not an amount-countable thing — so instead of
      * the usual target-then-amount flow, this collects placeholder, comparison operator, and comparison
-     * value, then saves with a fixed {@code amount} of 1 (satisfied/not-satisfied, like REACH_LOCATION).
+     * value, then saves with an {@code amount} of 1 (satisfied/not-satisfied, like REACH_LOCATION) — unless
+     * it's a {@code >=}/{@code >} number, where {@link QuestObjective} turns that number into the amount.
      */
     private void startPlaceholderWizard() {
         context.chatInput().prompt(player, "quest.editor-prompt-placeholder", raw -> {

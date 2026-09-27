@@ -22,6 +22,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -58,6 +59,7 @@ class QuestServiceTest {
     private Player player;
     private UUID playerId;
     private List<Event> publishedEvents;
+    private DatabaseManager databaseManager;
 
     @BeforeEach
     void setUp(@TempDir Path tempDir) {
@@ -66,7 +68,7 @@ class QuestServiceTest {
         questRepository = new YamlQuestDefinitionRepository(tempDir.resolve("quests"), Logger.getAnonymousLogger());
         writeTestQuests(questRepository);
 
-        DatabaseManager databaseManager = new DatabaseManager(tempDir.resolve("test.db"));
+        databaseManager = new DatabaseManager(tempDir.resolve("test.db"));
         SchemaMigrator.migrate(databaseManager.dataSource());
         PlayerDataRepository playerRepository = new SqlitePlayerDataRepository(databaseManager.dataSource());
         playerCache = new PlayerQuestDataCache(playerRepository);
@@ -81,6 +83,13 @@ class QuestServiceTest {
         when(player.locale()).thenReturn(Locale.forLanguageTag("cs"));
 
         playerCache.load(playerId).join();
+    }
+
+    @AfterEach
+    void tearDown() {
+        // HikariCP keeps the SQLite file open otherwise, which makes @TempDir's post-test cleanup fail on
+        // Windows ("Proces nemá přístup k souboru, neboť jej právě využívá jiný proces") and fails every test.
+        databaseManager.close();
     }
 
     private static MessagesConfig loadMessages(Path dataFolder) {

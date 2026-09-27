@@ -44,8 +44,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.logging.Level;
 
 public final class PurrtechQuest extends JavaPlugin {
@@ -78,6 +81,7 @@ public final class PurrtechQuest extends JavaPlugin {
             getLogger().warning("Něco se pokazilo. Zkuste to příště znovu");
             return;
         }
+        preloadOwnClasses();
         this.pluginConfig = PluginConfig.load(this);
         TinyFont.enabledWhen(() -> getConfig().getBoolean("tiny-font", true));
         this.messagesConfig = MessagesConfig.load(this, pluginConfig.defaultLocale());
@@ -124,6 +128,39 @@ public final class PurrtechQuest extends JavaPlugin {
 
         getLogger().info("PurrtechQuest enabled (storage=" + pluginConfig.storageType()
                 + ", default-locale=" + pluginConfig.defaultLocale() + ").");
+    }
+
+    /**
+     * The JVM reads a class from the jar only the first time it's used, so a jar overwritten while the
+     * server runs (uploaded over the old one, /reload, PlugMan) breaks every class not touched yet with
+     * NoClassDefFoundError — typically inside some event handler hours later. Loading all our own classes
+     * up front keeps the running instance working off memory; the new jar still only takes effect on a
+     * restart. Shaded libraries are skipped, and so is anything linked against a soft-depend that isn't
+     * installed (that class is never used then anyway).
+     */
+    private void preloadOwnClasses() {
+        String prefix = PurrtechQuest.class.getPackageName().replace('.', '/') + "/";
+        String libsPrefix = prefix + "libs/";
+        int loaded = 0;
+        try (JarFile jar = new JarFile(getFile())) {
+            for (JarEntry entry : Collections.list(jar.entries())) {
+                String name = entry.getName();
+                if (!name.startsWith(prefix) || name.startsWith(libsPrefix) || !name.endsWith(".class")) {
+                    continue;
+                }
+                String className = name.substring(0, name.length() - ".class".length()).replace('/', '.');
+                try {
+                    Class.forName(className, false, getClassLoader());
+                    loaded++;
+                } catch (ClassNotFoundException | LinkageError ignored) {
+                    // Soft-depend missing — see the javadoc.
+                }
+            }
+        } catch (IOException e) {
+            getLogger().log(Level.WARNING, "Could not preload plugin classes", e);
+            return;
+        }
+        getLogger().info("Preloaded " + loaded + " plugin classes.");
     }
 
     @Override

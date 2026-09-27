@@ -35,12 +35,20 @@ public final class PlayerSessionListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+        // Read live (not via PluginConfig) so /questadmin reload applies it, same as tiny-font.
+        boolean summary = plugin.getConfig().getBoolean("join-summary.enabled", true);
+        long delay = summary ? Math.max(0, plugin.getConfig().getLong("join-summary.delay-ticks", 40)) : 0;
         cache.load(player.getUniqueId())
-                .thenRun(() -> Bukkit.getScheduler().runTask(plugin, () -> {
-                    if (player.isOnline()) {
-                        questService.autoStartEligibleQuests(player);
+                .thenRun(() -> Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    if (!player.isOnline()) {
+                        return;
                     }
-                }))
+                    // Summary first: quests auto-started below announce themselves through the accept message.
+                    if (summary) {
+                        questService.sendActiveQuestsSummary(player);
+                    }
+                    questService.autoStartEligibleQuests(player);
+                }, delay))
                 .exceptionally(ex -> {
                     plugin.getLogger().log(Level.WARNING, "Could not load quest data for " + player.getName(), ex);
                     return null;

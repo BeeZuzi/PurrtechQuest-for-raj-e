@@ -118,9 +118,8 @@ public final class QuestCommand {
         }
 
         player.sendMessage(messages.render("quest.info-header", player, Map.of("%quest%", quest.displayName())));
-        if (!quest.description().isBlank()) {
-            player.sendMessage(messages.render("quest.info-description", player,
-                    Map.of("%description%", quest.description())));
+        for (String line : quest.descriptionLines()) {
+            player.sendMessage(messages.render("quest.info-description", player, Map.of("%description%", line)));
         }
 
         PlayerQuestData data = playerCache.get(player.getUniqueId());

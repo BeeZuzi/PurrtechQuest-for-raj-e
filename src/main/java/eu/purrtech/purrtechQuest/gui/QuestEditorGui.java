@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -62,10 +63,14 @@ public final class QuestEditorGui extends Gui {
                     reopen();
                 }, this::reopen));
 
+        List<Component> descriptionLore = new ArrayList<>();
+        for (String line : Quest.descriptionLines(draft.description())) {
+            descriptionLore.add(Component.text(line, NamedTextColor.GRAY));
+        }
+        descriptionLore.add(messages.render("quest.editor-button-description-hint", player, Map.of()));
         setItem(DESCRIPTION_SLOT, GuiItems.icon(Material.WRITTEN_BOOK,
                         messages.render("quest.editor-button-description", player, Map.of()),
-                        List.of(Component.text(draft.description(), NamedTextColor.GRAY),
-                                messages.render("quest.editor-button-description-hint", player, Map.of()))),
+                        descriptionLore),
                 event -> chatInput.prompt(player, "quest.editor-prompt-description", value -> {
                     draft.description(value);
                     reopen();

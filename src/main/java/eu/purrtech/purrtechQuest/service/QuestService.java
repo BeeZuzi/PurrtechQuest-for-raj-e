@@ -245,6 +245,8 @@ public final class QuestService {
         startFreshProgress(player, data, quest, timesCompleted);
         Component message = messages.render("quest.accepted", player, Map.of("%quest%", quest.displayName()));
         player.sendMessage(message);
+        sendObjectiveLines(player, quest, data.progress(questId), "quest.accepted-objectives-header",
+                "quest.accepted-objective", "quest.accepted-objective-choice");
         notify(player, message, SOUND_ACCEPTED);
         return AcceptResult.ACCEPTED;
     }
@@ -495,12 +497,24 @@ public final class QuestService {
                 if (isChoiceLockedOut(quest, progress, i)) {
                     continue;
                 }
-                if (PlaceholderMatcher.matches(objective, player)) {
-                    int previous = progress.objectiveProgress(i);
-                    progress.incrementObjective(i, objective.amount() - previous);
+                int previous = progress.objectiveProgress(i);
+                int current;
+                if (QuestObjective.placeholderCountTarget(objective.meta()) != null) {
+                    // Counting objective: mirror the placeholder's live number (can also go down, e.g. a balance).
+                    Integer count = PlaceholderMatcher.countProgress(objective, player);
+                    if (count == null) {
+                        continue;
+                    }
+                    current = count;
+                } else if (PlaceholderMatcher.matches(objective, player)) {
+                    current = objective.amount();
+                } else {
+                    continue;
+                }
+                if (current != previous) {
+                    progress.incrementObjective(i, current - previous);
                     changed = true;
-                    eventPublisher.publish(
-                            new QuestObjectiveProgressEvent(player, quest, i, previous, progress.objectiveProgress(i)));
+                    eventPublisher.publish(new QuestObjectiveProgressEvent(player, quest, i, previous, current));
                 }
             }
             if (changed) {
@@ -636,6 +650,64 @@ public final class QuestService {
             }
             acceptQuest(player, quest.id());
         }
+    }
+
+    /**
+     * Chat overview of every quest the player currently has {@code IN_PROGRESS}, with each objective's
+     * progress — sent on join when {@code join-summary.enabled} is on. Sends nothing if there are none.
+     */
+    public void sendActiveQuestsSummary(Player player) {
+        PlayerQuestData data = playerCache.get(player.getUniqueId());
+        if (data == null) {
+            return;
+        }
+        List<Quest> active = questsById.values().stream()
+                .filter(quest -> {
+                    QuestProgress progress = data.progress(quest.id());
+                    return progress != null && progress.status() == QuestStatus.IN_PROGRESS;
+                })
+                .toList();
+        if (active.isEmpty()) {
+            return;
+        }
+        sendIfSet(player, "quest.join-active-header", Map.of());
+        for (Quest quest : active) {
+            sendObjectiveLines(player, quest, data.progress(quest.id()), "quest.join-active-quest",
+                    "quest.join-active-objective", "quest.join-active-objective-choice");
+        }
+    }
+
+    /**
+     * A header line followed by one line per objective, skipping choice alternatives already locked out
+     * (same rule as {@code /quest info}). Shared by the accept message and the join summary.
+     */
+    private void sendObjectiveLines(Player player, Quest quest, QuestProgress progress, String headerKey,
+                                    String objectiveKey, String choiceKey) {
+        sendIfSet(player, headerKey, Map.of("%quest%", quest.displayName()));
+        List<QuestObjective> objectives = quest.objectives();
+        Set<String> satisfiedGroups = ChoiceGroups.satisfiedGroups(quest, progress);
+        for (int i = 0; i < objectives.size(); i++) {
+            QuestObjective objective = objectives.get(i);
+            int current = progress.objectiveProgress(i);
+            if (objective.choiceGroup() != null && current < objective.amount()
+                    && satisfiedGroups.contains(objective.choiceGroup())) {
+                continue;
+            }
+            Map<String, String> placeholders = new LinkedHashMap<>();
+            placeholders.put("%quest%", quest.displayName());
+            placeholders.put("%label%", objective.label());
+            placeholders.put("%progress%", String.valueOf(current));
+            placeholders.put("%amount%", String.valueOf(objective.amount()));
+            sendIfSet(player, objective.choiceGroup() != null ? choiceKey : objectiveKey, placeholders);
+        }
+    }
+
+    /** An admin blanking a lang line ({@code ""}) turns just that line off instead of sending an empty one. */
+    private void sendIfSet(Player player, String key, Map<String, String> placeholders) {
+        if (messages.get(key, player.locale().getLanguage()).isBlank()) {
+            return;
+        }
+        player.sendMessage(messages.render(key, player, placeholders));
     }
 
     private boolean applyProgress(Player player, QuestProgress progress, Quest quest, ObjectiveType type, String target, int amount) {

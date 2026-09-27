@@ -187,7 +187,9 @@ public final class QuestDetailGui extends Gui {
 
         List<Component> lore = new ArrayList<>();
         if (!quest.description().isBlank()) {
-            lore.add(Component.text(TinyFont.convert(quest.description()), NamedTextColor.GRAY));
+            for (String line : quest.descriptionLines()) {
+                lore.add(Component.text(TinyFont.convert(line), NamedTextColor.GRAY));
+            }
             lore.add(Component.empty());
         }
         String statusText = messages.get(questService.statusKey(player, quest), player.locale().getLanguage());

@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
+
 plugins {
     id("java-library")
     id("com.gradleup.shadow") version "9.6.1"
