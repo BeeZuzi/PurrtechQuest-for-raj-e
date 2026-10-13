@@ -1,5 +1,6 @@
 package eu.purrtech.purrtechQuest.config;
 
+import eu.purrtech.purrtechQuest.model.QuestObjective;
 import eu.purrtech.purrtechQuest.util.LegacyColors;
 import eu.purrtech.purrtechQuest.util.TinyFont;
 import net.kyori.adventure.text.Component;
@@ -148,8 +149,8 @@ public final class MessagesConfig {
      */
     private static final Map<String, Map<String, List<String>>> INTERMEDIATE_DEFAULTS = Map.of(
             "cs", Map.ofEntries(
-                    Map.entry("quest.gui-lore-rewards-header", List.of("<gray>ᴏᴅᴍěɴʏ:</gray>", "<#9863E7><b>ᴏᴅᴍěɴʏ</b></#9863E7>", "<#fcd303><b>●</b></#fcd303> <white>ᴏᴅᴍěɴᴀ:</white>")),
-                    Map.entry("quest.gui-lore-reward-title", List.of("<#fcd303><b>ᴘᴏ sᴘʟɴěɴí ǫᴜᴇsᴛᴜ</b></#fcd303>")),
+                    Map.entry("quest.gui-lore-rewards-header", List.of("<gray>ᴏᴅᴍěɴʏ:</gray>", "<#9863E7><b>ᴏᴅᴍěɴʏ</b></#9863E7>", "<#fcd303><b>●</b></#fcd303> <white>ᴏᴅᴍěɴᴀ:</white>", "<#fcd303><b>●</b></#fcd303> <white>ᴏᴅᴍěɴʏ:</white>")),
+                    Map.entry("quest.gui-lore-reward-title", List.of("<#fcd303><b>ᴘᴏ sᴘʟɴěɴí ǫᴜᴇsᴛᴜ</b></#fcd303>", "<#fcd303><b>ᴏᴅᴍěɴʏ úᴋᴏʟᴜ</b></#fcd303>")),
                     Map.entry("quest.gui-lore-status", List.of("<gray>sᴛᴀᴠ: %status%</gray>")),
                     Map.entry("quest.gui-lore-objectives-header", List.of("<gray>ᴄíʟᴇ:</gray>")),
                     Map.entry("quest.gui-lore-reward-section-base", List.of("<gold>ᴢáᴋʟᴀᴅɴí ᴏᴅᴍěɴʏ:</gold>")),
@@ -158,11 +159,15 @@ public final class MessagesConfig {
                     Map.entry("quest.guide-current-quest-name", List.of("<#F69B45><b>●</b></#F69B45>  <white>%quest%</white>")),
                     Map.entry("quest.guide-current-quest-description", List.of("<#F69B45><b>●</b></#F69B45>  <white>%description%</white>", "<#F69B45><b>●</b></#F69B45> <white>%description%</white>")),
                     Map.entry("quest.guide-no-active-quest", List.of("<#F69B45><b>●</b></#F69B45>  <gray>žáᴅɴý ᴀᴋᴛɪᴠɴí ǫᴜᴇsᴛ</gray>", "<#F69B45><b>●</b></#F69B45>  <gray>Žádný aktivní quest</gray>")),
-                    Map.entry("quest.guide-progress-header", List.of("<#F69B45><b>●</b></#F69B45>  <white>ᴘᴏsᴛᴜᴘ úᴋᴏʟᴜ:</white>", "<#F69B45><b>●</b></#F69B45> <white>ᴘᴏsᴛᴜᴘ úᴋᴏʟᴜ:</white>")),
+                    Map.entry("quest.guide-progress-header", List.of("<#F69B45><b>●</b></#F69B45>  <white>ᴘᴏsᴛᴜᴘ úᴋᴏʟᴜ:</white>", "<#F69B45><b>●</b></#F69B45> <white>ᴘᴏsᴛᴜᴘ úᴋᴏʟᴜ:</white>", "<#F69B45><b>● ᴘᴏsᴛᴜᴘ úᴋᴏʟᴜ:</b></#F69B45>")),
                     Map.entry("quest.gui-lore-quest-status", List.of("<#9863E7><b>●</b></#9863E7> <white>sᴛᴀᴛᴜs:  %status%</white>")),
                     Map.entry("quest.status-turned-in", List.of("ᴏᴅᴇᴠᴢᴅᴀɴý")),
                     Map.entry("quest.status-in-progress", List.of("ʀᴏᴢᴘʀᴀᴄᴏᴠᴀɴý")),
                     Map.entry("quest.gui-lore-quest-hint", List.of("<gray>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴅᴇᴛᴀɪʟ ǫᴜᴇsᴛᴜ.</gray>", "<#9863E7><gray><underlined>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴅᴇᴛᴀɪʟʏ ǫᴜᴇsᴛᴜ</underlined></gray>")),
+                    Map.entry("quest.join-active-header", List.of("<gold>Tvoje rozpracované questy:</gold>", "<gold>Rozpracované questy:</gold>")),
+                    Map.entry("quest.join-active-quest", List.of("<white>» %quest%</white>")),
+                    Map.entry("quest.join-active-objective", List.of("<gray>   - %label%: %progress%/%amount%</gray>")),
+                    Map.entry("quest.join-active-objective-choice", List.of("<yellow>   - (volba) %label%: %progress%/%amount%</yellow>")),
                     Map.entry("quest.gui-lore-objective-line", List.of("<gray> - %label%: %progress%/%amount%</gray>")),
                     Map.entry("quest.gui-lore-objective-choice-line", List.of("<yellow> - (ᴠᴏʟʙᴀ) %label%: %progress%/%amount%</yellow>")),
                     Map.entry("quest.guide-progress-line", List.of("<dark_gray> -</dark_gray>  <white>%label%</white> <#F8AF69>%progress%</#F8AF69><dark_gray>/</dark_gray><#F69B45>%amount%</#F69B45>")),
@@ -180,8 +185,8 @@ public final class MessagesConfig {
                     Map.entry("quest.editor-prompt-reward-name", List.of("<yellow>Napiš název odměny — hráči ho uvidí v menu s questy (např. '50 mincí'):</yellow>")),
                     Map.entry("quest.editor-prompt-description", List.of("<yellow>Napiš nový popis questu do chatu:</yellow>"))),
             "en", Map.ofEntries(
-                    Map.entry("quest.gui-lore-rewards-header", List.of("<gray>ᴏᴅᴍěɴʏ:</gray>", "<#9863E7><b>ᴏᴅᴍěɴʏ</b></#9863E7>", "<#fcd303><b>●</b></#fcd303> <white>ᴏᴅᴍěɴᴀ:</white>")),
-                    Map.entry("quest.gui-lore-reward-title", List.of("<#fcd303><b>ᴘᴏ sᴘʟɴěɴí ǫᴜᴇsᴛᴜ</b></#fcd303>")),
+                    Map.entry("quest.gui-lore-rewards-header", List.of("<gray>ᴏᴅᴍěɴʏ:</gray>", "<#9863E7><b>ᴏᴅᴍěɴʏ</b></#9863E7>", "<#fcd303><b>●</b></#fcd303> <white>ᴏᴅᴍěɴᴀ:</white>", "<#fcd303><b>●</b></#fcd303> <white>ᴏᴅᴍěɴʏ:</white>")),
+                    Map.entry("quest.gui-lore-reward-title", List.of("<#fcd303><b>ᴘᴏ sᴘʟɴěɴí ǫᴜᴇsᴛᴜ</b></#fcd303>", "<#fcd303><b>ᴏᴅᴍěɴʏ úᴋᴏʟᴜ</b></#fcd303>")),
                     Map.entry("quest.gui-lore-status", List.of("<gray>sᴛᴀᴠ: %status%</gray>")),
                     Map.entry("quest.gui-lore-objectives-header", List.of("<gray>ᴄíʟᴇ:</gray>")),
                     Map.entry("quest.gui-lore-reward-section-base", List.of("<gold>ᴢáᴋʟᴀᴅɴí ᴏᴅᴍěɴʏ:</gold>")),
@@ -190,11 +195,15 @@ public final class MessagesConfig {
                     Map.entry("quest.guide-current-quest-name", List.of("<#F69B45><b>●</b></#F69B45>  <white>%quest%</white>")),
                     Map.entry("quest.guide-current-quest-description", List.of("<#F69B45><b>●</b></#F69B45>  <white>%description%</white>", "<#F69B45><b>●</b></#F69B45> <white>%description%</white>")),
                     Map.entry("quest.guide-no-active-quest", List.of("<#F69B45><b>●</b></#F69B45>  <gray>žáᴅɴý ᴀᴋᴛɪᴠɴí ǫᴜᴇsᴛ</gray>", "<#F69B45><b>●</b></#F69B45>  <gray>Žádný aktivní quest</gray>")),
-                    Map.entry("quest.guide-progress-header", List.of("<#F69B45><b>●</b></#F69B45>  <white>ᴘᴏsᴛᴜᴘ úᴋᴏʟᴜ:</white>", "<#F69B45><b>●</b></#F69B45> <white>ᴘᴏsᴛᴜᴘ úᴋᴏʟᴜ:</white>")),
+                    Map.entry("quest.guide-progress-header", List.of("<#F69B45><b>●</b></#F69B45>  <white>ᴘᴏsᴛᴜᴘ úᴋᴏʟᴜ:</white>", "<#F69B45><b>●</b></#F69B45> <white>ᴘᴏsᴛᴜᴘ úᴋᴏʟᴜ:</white>", "<#F69B45><b>● ᴘᴏsᴛᴜᴘ úᴋᴏʟᴜ:</b></#F69B45>")),
                     Map.entry("quest.gui-lore-quest-status", List.of("<#9863E7><b>●</b></#9863E7> <white>sᴛᴀᴛᴜs:  %status%</white>")),
                     Map.entry("quest.status-turned-in", List.of("ᴏᴅᴇᴠᴢᴅᴀɴý")),
                     Map.entry("quest.status-in-progress", List.of("ʀᴏᴢᴘʀᴀᴄᴏᴠᴀɴý")),
                     Map.entry("quest.gui-lore-quest-hint", List.of("<gray>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴅᴇᴛᴀɪʟ ǫᴜᴇsᴛᴜ.</gray>", "<#9863E7><gray><underlined>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴅᴇᴛᴀɪʟʏ ǫᴜᴇsᴛᴜ</underlined></gray>")),
+                    Map.entry("quest.join-active-header", List.of("<gold>Your quests in progress:</gold>", "<gold>Rozpracované questy:</gold>")),
+                    Map.entry("quest.join-active-quest", List.of("<white>» %quest%</white>")),
+                    Map.entry("quest.join-active-objective", List.of("<gray>   - %label%: %progress%/%amount%</gray>")),
+                    Map.entry("quest.join-active-objective-choice", List.of("<yellow>   - (choice) %label%: %progress%/%amount%</yellow>", "<yellow>   - (volba) %label%: %progress%/%amount%</yellow>")),
                     Map.entry("quest.gui-lore-objective-line", List.of("<gray> - %label%: %progress%/%amount%</gray>")),
                     Map.entry("quest.gui-lore-objective-choice-line", List.of("<yellow> - (ᴠᴏʟʙᴀ) %label%: %progress%/%amount%</yellow>")),
                     Map.entry("quest.guide-progress-line", List.of("<dark_gray> -</dark_gray>  <white>%label%</white> <#F8AF69>%progress%</#F8AF69><dark_gray>/</dark_gray><#F69B45>%amount%</#F69B45>")),
@@ -222,13 +231,23 @@ public final class MessagesConfig {
 
     private final Map<String, YamlConfiguration> byLocale = new HashMap<>();
     private final String defaultLocale;
+    private final boolean perPlayerLocale;
 
-    private MessagesConfig(String defaultLocale) {
+    private MessagesConfig(String defaultLocale, boolean perPlayerLocale) {
         this.defaultLocale = defaultLocale;
+        this.perPlayerLocale = perPlayerLocale;
     }
 
     public static MessagesConfig load(JavaPlugin plugin, String defaultLocale) {
-        MessagesConfig messages = new MessagesConfig(defaultLocale);
+        return load(plugin, defaultLocale, true);
+    }
+
+    /**
+     * {@code perPlayerLocale} false sends every player the {@code defaultLocale} texts, whatever language
+     * their Minecraft client is set to — for a server that speaks one language.
+     */
+    public static MessagesConfig load(JavaPlugin plugin, String defaultLocale, boolean perPlayerLocale) {
+        MessagesConfig messages = new MessagesConfig(defaultLocale, perPlayerLocale);
         for (String locale : BUNDLED_LOCALES) {
             messages.loadLocale(plugin, locale);
         }
@@ -334,7 +353,7 @@ public final class MessagesConfig {
     }
 
     private YamlConfiguration configFor(String locale) {
-        String normalized = locale == null ? defaultLocale : locale.toLowerCase(Locale.ROOT);
+        String normalized = locale == null || !perPlayerLocale ? defaultLocale : locale.toLowerCase(Locale.ROOT);
         return byLocale.getOrDefault(normalized, byLocale.get(defaultLocale));
     }
 
@@ -376,6 +395,16 @@ public final class MessagesConfig {
      */
     public Component render(String key, String locale, Map<String, String> placeholders) {
         return renderRaw(get(key, locale), placeholders);
+    }
+
+    /**
+     * The objective's name as players see it: its label, or — for a placeholder check nobody gave a label —
+     * the generic {@code quest.objective-placeholder-label} instead of the raw placeholder expression.
+     */
+    public String objectiveLabel(QuestObjective objective, Player player) {
+        return objective.labelIsRawPlaceholder()
+                ? get("quest.objective-placeholder-label", player.locale().getLanguage())
+                : objective.label();
     }
 
     /**

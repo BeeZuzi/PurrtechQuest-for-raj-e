@@ -671,9 +671,11 @@ public final class QuestService {
             return;
         }
         sendIfSet(player, "quest.join-active-header", Map.of(), true);
+        player.sendMessage(Component.empty());
         for (Quest quest : active) {
             sendObjectiveLines(player, quest, data.progress(quest.id()), "quest.join-active-quest",
                     "quest.join-active-objective", "quest.join-active-objective-choice");
+            player.sendMessage(Component.empty());
         }
     }
 
@@ -695,7 +697,7 @@ public final class QuestService {
             }
             Map<String, String> placeholders = new LinkedHashMap<>();
             placeholders.put("%quest%", quest.displayName());
-            placeholders.put("%label%", objective.label());
+            placeholders.put("%label%", messages.objectiveLabel(objective, player));
             placeholders.put("%progress%", String.valueOf(current));
             placeholders.put("%amount%", String.valueOf(objective.amount()));
             sendIfSet(player, objective.choiceGroup() != null ? choiceKey : objectiveKey, placeholders, false);

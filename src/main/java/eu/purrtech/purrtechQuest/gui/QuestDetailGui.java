@@ -203,11 +203,11 @@ public final class QuestDetailGui extends Gui {
             boolean satisfied = current >= objective.amount();
             if (objective.choiceGroup() != null && !satisfied && satisfiedGroups.contains(objective.choiceGroup())) {
                 lore.add(messages.render("quest.gui-lore-objective-locked", player, Map.of(
-                        "%label%", objective.label())));
+                        "%label%", messages.objectiveLabel(objective, player))));
                 continue;
             }
             Map<String, String> placeholders = Map.of(
-                    "%label%", objective.label(),
+                    "%label%", messages.objectiveLabel(objective, player),
                     "%progress%", String.valueOf(current),
                     "%amount%", String.valueOf(objective.amount()));
             String lineKey = objective.choiceGroup() != null

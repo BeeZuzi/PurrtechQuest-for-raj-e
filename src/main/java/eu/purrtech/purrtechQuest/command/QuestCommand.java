@@ -135,11 +135,11 @@ public final class QuestCommand {
             boolean satisfied = current >= objective.amount();
             if (objective.choiceGroup() != null && !satisfied && satisfiedGroups.contains(objective.choiceGroup())) {
                 player.sendMessage(messages.render("quest.info-objective-locked", player, Map.of(
-                        "%label%", objective.label())));
+                        "%label%", messages.objectiveLabel(objective, player))));
                 continue;
             }
             Map<String, String> placeholders = new LinkedHashMap<>();
-            placeholders.put("%label%", objective.label());
+            placeholders.put("%label%", messages.objectiveLabel(objective, player));
             placeholders.put("%progress%", String.valueOf(current));
             placeholders.put("%amount%", String.valueOf(objective.amount()));
             String key = objective.choiceGroup() != null ? "quest.info-objective-choice" : "quest.info-objective";

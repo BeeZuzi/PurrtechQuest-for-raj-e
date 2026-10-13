@@ -45,6 +45,14 @@ public record QuestObjective(ObjectiveType type, String target, int amount, Map<
     }
 
     /**
+     * True when a PLACEHOLDER_CHECK has no label of its own, so {@code label} is just the raw placeholder
+     * expression ({@code %some_plugin_value%}) — something a player should never see as an objective name.
+     */
+    public boolean labelIsRawPlaceholder() {
+        return type == ObjectiveType.PLACEHOLDER_CHECK && label.equals(target);
+    }
+
+    /**
      * For a PLACEHOLDER_CHECK that counts up to a number ({@code %fish_caught% >= 50}), that number — the
      * objective then shows real {@code 23/50} progress instead of {@code 0/1}. {@code null} for anything that
      * can only be satisfied/not-satisfied: other operators, non-numeric values, or a target below 2.
