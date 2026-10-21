@@ -144,7 +144,7 @@ public final class QuestEditorRewardsGui extends Gui {
         context.chatInput().prompt(player, "quest.editor-prompt-reward-name", raw -> {
             String value = raw.trim();
             if (value.isBlank()) {
-                player.sendMessage(context.messages().render("quest.editor-invalid-reward-name", player, Map.of()));
+                player.sendMessage(context.messages().chat("quest.editor-invalid-reward-name", player, Map.of()));
                 promptRename(index);
                 return;
             }

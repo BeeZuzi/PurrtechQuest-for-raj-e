@@ -193,7 +193,7 @@ public final class QuestEditorObjectiveTypeGui extends Gui {
         chatInput.prompt(player, "quest.editor-prompt-target", target -> {
             String normalized = target.toUpperCase(Locale.ROOT);
             if (!validTarget(type, normalized)) {
-                player.sendMessage(messages.render(
+                player.sendMessage(messages.chat(
                         type == ObjectiveType.KILL_ENTITY ? "quest.editor-invalid-entity" : "quest.editor-invalid-material",
                         player, Map.of()));
                 startWizard(type);
@@ -207,7 +207,7 @@ public final class QuestEditorObjectiveTypeGui extends Gui {
         var messages = context.messages();
         context.chatInput().prompt(player, "quest.editor-prompt-target", subTarget -> {
             if (!handler.isValidTarget(subTarget)) {
-                player.sendMessage(messages.render("quest.editor-invalid-custom-target", player,
+                player.sendMessage(messages.chat("quest.editor-invalid-custom-target", player,
                         Map.of("%handler%", handler.displayName())));
                 startCustomWizard(handler);
                 return;
@@ -239,7 +239,7 @@ public final class QuestEditorObjectiveTypeGui extends Gui {
         context.chatInput().prompt(player, "quest.editor-prompt-placeholder-operator", raw -> {
             String operator = raw.trim().replace("==", "=");
             if (!VALID_OPERATORS.contains(operator)) {
-                player.sendMessage(context.messages().render("quest.editor-invalid-operator", player, Map.of()));
+                player.sendMessage(context.messages().chat("quest.editor-invalid-operator", player, Map.of()));
                 promptPlaceholderOperator(placeholder);
                 return;
             }
@@ -264,7 +264,7 @@ public final class QuestEditorObjectiveTypeGui extends Gui {
      */
     private void startTalkToNpcWizard() {
         player.closeInventory();
-        player.sendMessage(context.messages().render("quest.editor-prompt-npc-click", player, Map.of()));
+        player.sendMessage(context.messages().chat("quest.editor-prompt-npc-click", player, Map.of()));
         context.npcLinkService().requestPick(player, ref ->
                 promptAmount(ObjectiveType.TALK_TO_NPC, NpcMatcher.targetFor(ref)));
     }
@@ -285,7 +285,7 @@ public final class QuestEditorObjectiveTypeGui extends Gui {
     private void promptBossMinDamage(String target) {
         context.chatInput().promptDouble(player, "quest.editor-prompt-boss-min-damage", minDamage -> {
             if (minDamage < 0) {
-                player.sendMessage(context.messages().render("quest.editor-invalid-number", player, Map.of()));
+                player.sendMessage(context.messages().chat("quest.editor-invalid-number", player, Map.of()));
                 promptBossMinDamage(target);
                 return;
             }
@@ -296,7 +296,7 @@ public final class QuestEditorObjectiveTypeGui extends Gui {
     private void promptBossWindow(String target, double minDamage) {
         context.chatInput().promptDouble(player, "quest.editor-prompt-boss-window-hours", windowHours -> {
             if (windowHours <= 0) {
-                player.sendMessage(context.messages().render("quest.editor-invalid-number", player, Map.of()));
+                player.sendMessage(context.messages().chat("quest.editor-invalid-number", player, Map.of()));
                 promptBossWindow(target, minDamage);
                 return;
             }
@@ -307,7 +307,7 @@ public final class QuestEditorObjectiveTypeGui extends Gui {
     private void promptBossAmount(String target, double minDamage, double windowHours) {
         context.chatInput().promptInt(player, "quest.editor-prompt-amount", amount -> {
             if (amount <= 0) {
-                player.sendMessage(context.messages().render("quest.editor-invalid-number", player, Map.of()));
+                player.sendMessage(context.messages().chat("quest.editor-invalid-number", player, Map.of()));
                 promptBossAmount(target, minDamage, windowHours);
                 return;
             }
@@ -322,7 +322,7 @@ public final class QuestEditorObjectiveTypeGui extends Gui {
         var messages = context.messages();
         context.chatInput().promptInt(player, "quest.editor-prompt-amount", amount -> {
             if (amount <= 0) {
-                player.sendMessage(messages.render("quest.editor-invalid-number", player, Map.of()));
+                player.sendMessage(messages.chat("quest.editor-invalid-number", player, Map.of()));
                 promptAmount(type, target);
                 return;
             }
@@ -349,7 +349,7 @@ public final class QuestEditorObjectiveTypeGui extends Gui {
         context.chatInput().prompt(player, "quest.editor-prompt-objective-label", raw -> {
             String label = raw.trim();
             if (label.isEmpty()) {
-                player.sendMessage(context.messages().render("quest.editor-invalid-label", player, Map.of()));
+                player.sendMessage(context.messages().chat("quest.editor-invalid-label", player, Map.of()));
                 promptLabel(type, target, amount, meta);
                 return;
             }

@@ -84,7 +84,8 @@ public final class PurrtechQuest extends JavaPlugin {
         preloadOwnClasses();
         this.pluginConfig = PluginConfig.load(this);
         TinyFont.enabledWhen(() -> getConfig().getBoolean("tiny-font", true));
-        this.messagesConfig = MessagesConfig.load(this, pluginConfig.defaultLocale());
+        this.messagesConfig = MessagesConfig.load(this, pluginConfig.defaultLocale(),
+                getConfig().getBoolean("per-player-locale", false));
 
         if (pluginConfig.storageType() == StorageType.MYSQL) {
             this.mySqlDatabaseManager = new MySqlDatabaseManager(pluginConfig.mysql());

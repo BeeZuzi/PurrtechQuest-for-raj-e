@@ -109,7 +109,7 @@ public final class QuestAdminCommand {
     private static int category(CommandContext<CommandSourceStack> ctx, QuestEditorContext context, MessagesConfig messages) {
         CommandSender sender = ctx.getSource().getSender();
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(messages.render("quest.console-only", Map.of()));
+            sender.sendMessage(messages.chat("quest.console-only", Map.of()));
             return 0;
         }
         String categoryId = StringArgumentType.getString(ctx, "category");
@@ -138,7 +138,7 @@ public final class QuestAdminCommand {
         questService.reload();
         trackerRegistrationManager.refresh();
         questPermissionRegistrar.refresh();
-        sender.sendMessage(messages.render("quest.reloaded",
+        sender.sendMessage(messages.chat("quest.reloaded",
                 Map.of("%count%", String.valueOf(questService.allQuests().size()))));
         return 1;
     }
@@ -148,12 +148,12 @@ public final class QuestAdminCommand {
         String questId = StringArgumentType.getString(ctx, "quest");
         Player target = resolveSinglePlayer(ctx);
         if (target == null) {
-            sender.sendMessage(messages.render("quest.admin-give-failure", Map.of()));
+            sender.sendMessage(messages.chat("quest.admin-give-failure", Map.of()));
             return 0;
         }
         boolean success = questService.adminForceAccept(target, questId);
         String key = success ? "quest.admin-give-success" : "quest.admin-give-failure";
-        sender.sendMessage(messages.render(key, Map.of("%player%", target.getName(), "%quest%", questId)));
+        sender.sendMessage(messages.chat(key, Map.of("%player%", target.getName(), "%quest%", questId)));
         return success ? 1 : 0;
     }
 
@@ -162,12 +162,12 @@ public final class QuestAdminCommand {
         String questId = StringArgumentType.getString(ctx, "quest");
         Player target = resolveSinglePlayer(ctx);
         if (target == null) {
-            sender.sendMessage(messages.render("quest.admin-reset-failure", Map.of()));
+            sender.sendMessage(messages.chat("quest.admin-reset-failure", Map.of()));
             return 0;
         }
         boolean success = questService.adminResetProgress(target, questId);
         String key = success ? "quest.admin-reset-success" : "quest.admin-reset-failure";
-        sender.sendMessage(messages.render(key, Map.of("%player%", target.getName(), "%quest%", questId)));
+        sender.sendMessage(messages.chat(key, Map.of("%player%", target.getName(), "%quest%", questId)));
         return success ? 1 : 0;
     }
 
@@ -175,12 +175,12 @@ public final class QuestAdminCommand {
                                QuestEditorContext context, MessagesConfig messages) {
         CommandSender sender = ctx.getSource().getSender();
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(messages.render("quest.console-only", Map.of()));
+            sender.sendMessage(messages.chat("quest.console-only", Map.of()));
             return 0;
         }
         String questId = StringArgumentType.getString(ctx, "quest");
         if (questService.quest(questId).isPresent()) {
-            player.sendMessage(messages.render("quest.editor-id-taken", player, Map.of("%id%", questId)));
+            player.sendMessage(messages.chat("quest.editor-id-taken", player, Map.of("%id%", questId)));
             return 0;
         }
         QuestDraft draft = QuestDraft.blank(questId);
@@ -193,13 +193,13 @@ public final class QuestAdminCommand {
                              QuestEditorContext context, MessagesConfig messages) {
         CommandSender sender = ctx.getSource().getSender();
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(messages.render("quest.console-only", Map.of()));
+            sender.sendMessage(messages.chat("quest.console-only", Map.of()));
             return 0;
         }
         String questId = StringArgumentType.getString(ctx, "quest");
         Quest quest = questService.quest(questId).orElse(null);
         if (quest == null) {
-            player.sendMessage(messages.render("quest.editor-not-found", player, Map.of("%id%", questId)));
+            player.sendMessage(messages.chat("quest.editor-not-found", player, Map.of("%id%", questId)));
             return 0;
         }
         new QuestEditorGui(context, player, QuestDraft.from(quest)).open(player);
@@ -213,14 +213,14 @@ public final class QuestAdminCommand {
         CommandSender sender = ctx.getSource().getSender();
         String questId = StringArgumentType.getString(ctx, "quest");
         if (questService.quest(questId).isEmpty()) {
-            sender.sendMessage(messages.render("quest.editor-delete-failed", Map.of("%id%", questId)));
+            sender.sendMessage(messages.chat("quest.editor-delete-failed", Map.of("%id%", questId)));
             return 0;
         }
         questRepository.delete(questId);
         questService.reload();
         trackerRegistrationManager.refresh();
         questPermissionRegistrar.refresh();
-        sender.sendMessage(messages.render("quest.editor-deleted", Map.of("%id%", questId)));
+        sender.sendMessage(messages.chat("quest.editor-deleted", Map.of("%id%", questId)));
         return 1;
     }
 
@@ -229,24 +229,24 @@ public final class QuestAdminCommand {
                                 QuestPermissionRegistrar questPermissionRegistrar, MessagesConfig messages) {
         CommandSender sender = ctx.getSource().getSender();
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(messages.render("quest.console-only", Map.of()));
+            sender.sendMessage(messages.chat("quest.console-only", Map.of()));
             return 0;
         }
         String questId = StringArgumentType.getString(ctx, "quest");
         if (questService.quest(questId).isEmpty()) {
-            player.sendMessage(messages.render("quest.editor-not-found", player, Map.of("%id%", questId)));
+            player.sendMessage(messages.chat("quest.editor-not-found", player, Map.of("%id%", questId)));
             return 0;
         }
         boolean citizens = Bukkit.getPluginManager().isPluginEnabled("Citizens");
         boolean fancyNpcs = Bukkit.getPluginManager().isPluginEnabled("FancyNpcs");
         if (!citizens && !fancyNpcs) {
-            player.sendMessage(messages.render("quest.npc-no-provider", player, Map.of()));
+            player.sendMessage(messages.chat("quest.npc-no-provider", player, Map.of()));
             return 0;
         }
         npcLinkService.requestPick(player, ref -> {
             Quest quest = questService.quest(questId).orElse(null);
             if (quest == null) {
-                player.sendMessage(messages.render("quest.editor-not-found", player, Map.of("%id%", questId)));
+                player.sendMessage(messages.chat("quest.editor-not-found", player, Map.of("%id%", questId)));
                 return;
             }
             Quest updated = new Quest(quest.id(), quest.displayName(), quest.description(), quest.category(),
@@ -256,10 +256,10 @@ public final class QuestAdminCommand {
             questRepository.save(updated);
             questService.reload();
             questPermissionRegistrar.refresh();
-            player.sendMessage(messages.render("quest.npc-linked", player, Map.of(
+            player.sendMessage(messages.chat("quest.npc-linked", player, Map.of(
                     "%quest%", quest.displayName(), "%provider%", ref.provider().name(), "%npcid%", ref.npcId())));
         });
-        player.sendMessage(messages.render("quest.npc-link-prompt", player, Map.of("%quest%", questId)));
+        player.sendMessage(messages.chat("quest.npc-link-prompt", player, Map.of("%quest%", questId)));
         return 1;
     }
 
@@ -271,7 +271,7 @@ public final class QuestAdminCommand {
         String questId = StringArgumentType.getString(ctx, "quest");
         Quest quest = questService.quest(questId).orElse(null);
         if (quest == null) {
-            sender.sendMessage(messages.render("quest.editor-not-found", Map.of("%id%", questId)));
+            sender.sendMessage(messages.chat("quest.editor-not-found", Map.of("%id%", questId)));
             return 0;
         }
         if (sender instanceof Player player) {
@@ -285,7 +285,7 @@ public final class QuestAdminCommand {
         questService.reload();
         trackerRegistrationManager.refresh();
         questPermissionRegistrar.refresh();
-        sender.sendMessage(messages.render("quest.npc-unlinked", Map.of("%quest%", quest.displayName())));
+        sender.sendMessage(messages.chat("quest.npc-unlinked", Map.of("%quest%", quest.displayName())));
         return 1;
     }
 

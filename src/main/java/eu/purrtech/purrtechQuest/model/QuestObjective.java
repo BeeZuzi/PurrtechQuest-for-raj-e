@@ -58,6 +58,9 @@ public record QuestObjective(ObjectiveType type, String target, int amount, Map<
         return type == ObjectiveType.PLACEHOLDER_CHECK && isRelative(meta);
     }
 
+    public boolean labelIsRawPlaceholder() {
+        return type == ObjectiveType.PLACEHOLDER_CHECK && label.equals(target);
+    }
     /**
      * For a PLACEHOLDER_CHECK that counts up to a number ({@code %fish_caught% >= 50}), that number — the
      * objective then shows real {@code 23/50} progress instead of {@code 0/1}. {@code null} for anything that

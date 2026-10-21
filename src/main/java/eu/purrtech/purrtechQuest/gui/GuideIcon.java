@@ -91,7 +91,7 @@ final class GuideIcon {
                 continue;
             }
             lines.add(messages.render("quest.guide-progress-line", player, Map.of(
-                    "%label%", objective.label(),
+                    "%label%", messages.objectiveLabel(objective, player),
                     "%progress%", String.valueOf(current),
                     "%amount%", String.valueOf(objective.amount()))));
         }

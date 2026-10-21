@@ -59,7 +59,7 @@ public final class QuestFeedback {
     }
 
     private static boolean fail(Player player, MessagesConfig messages, String key, Map<String, String> placeholders) {
-        player.sendMessage(messages.render(key, player, placeholders));
+        player.sendMessage(messages.chat(key, player, placeholders));
         return false;
     }
 }

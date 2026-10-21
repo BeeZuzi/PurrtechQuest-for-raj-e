@@ -160,7 +160,7 @@ public final class QuestTrackingService {
             }
             return messages.render("quest.tracking-line", player, Map.of(
                     "%quest%", quest.displayName(),
-                    "%label%", objective.label(),
+                    "%label%", messages.objectiveLabel(objective, player),
                     "%progress%", String.valueOf(progress.objectiveProgress(i)),
                     "%amount%", String.valueOf(objective.amount())));
         }

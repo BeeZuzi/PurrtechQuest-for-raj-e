@@ -14,8 +14,14 @@ storage:
     pool-size: 10
     use-ssl: false
 
-# Used when a player's client locale has no matching lang/<locale>.yml.
+# The language of every quest text (lang/<locale>.yml).
 default-locale: cs
+
+# false (default) - every player gets the default-locale texts above, whatever language their Minecraft
+#                   client is set to.
+# true            - each player gets the lang/<locale>.yml matching their client's language, falling back
+#                   to default-locale when there is none.
+per-player-locale: false
 
 # Directory (relative to the plugin's data folder) where quest definition YAML files live.
 quests-directory: quests
