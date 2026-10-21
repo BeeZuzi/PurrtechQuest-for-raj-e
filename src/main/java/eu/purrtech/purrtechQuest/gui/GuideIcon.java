@@ -1,6 +1,10 @@
 package eu.purrtech.purrtechQuest.gui;
 
+import eu.purrtech.purrtechQuest.config.CategoriesConfig;
+import eu.purrtech.purrtechQuest.config.GuideConfig;
 import eu.purrtech.purrtechQuest.config.MessagesConfig;
+import eu.purrtech.purrtechQuest.util.DisplayText;
+import net.kyori.adventure.text.format.NamedTextColor;
 import eu.purrtech.purrtechQuest.model.ChoiceGroups;
 import eu.purrtech.purrtechQuest.model.PlayerQuestData;
 import eu.purrtech.purrtechQuest.model.Quest;
@@ -33,17 +37,21 @@ final class GuideIcon {
     /** {@code clickable} adds the "click to see every quest" hint line; leave it off where clicking does nothing. */
     static ItemStack build(QuestService questService, PlayerQuestDataCache playerCache, MessagesConfig messages,
                            Player player, boolean clickable) {
-        Component name = messages.render("quest.guide-name", player, Map.of());
+        GuideConfig guide = GuideConfig.load();
+        Component name = guide.name() == null
+                ? messages.render("quest.guide-name", player, Map.of())
+                : DisplayText.component(guide.name(), NamedTextColor.WHITE);
         List<Component> lore = new ArrayList<>();
         lore.add(messages.render("quest.guide-intro", player, Map.of()));
 
-        QuestService.OverallSummary overall = questService.overallSummary(player);
+        List<Quest> covered = guide.quests(CategoriesConfig.load(), questService.allQuests());
+        QuestService.OverallSummary overall = questService.overallSummary(player, covered);
         lore.add(messages.render("quest.guide-completed", player, Map.of(
                 "%done%", String.valueOf(overall.turnedIn()), "%total%", String.valueOf(overall.total()))));
         lore.add(Component.empty());
         lore.add(messages.render("quest.guide-current-quest-header", player, Map.of()));
 
-        Quest active = questService.currentActiveQuest(player).orElse(null);
+        Quest active = questService.currentActiveQuest(player, covered).orElse(null);
         if (active == null) {
             lore.add(messages.render("quest.guide-no-active-quest", player, Map.of()));
         } else {
@@ -61,7 +69,8 @@ final class GuideIcon {
             lore.add(messages.render("quest.gui-lore-guide-hint", player, Map.of()));
         }
 
-        return GuiItems.icon(Material.SPYGLASS, name, lore);
+        return GuiItems.icon(CategoryMenu.baseStack(guide.material(), guide.customModelData(), guide.glow(),
+                guide.texture()), name, lore);
     }
 
     private static List<Component> objectiveProgressLines(PlayerQuestDataCache playerCache, MessagesConfig messages,

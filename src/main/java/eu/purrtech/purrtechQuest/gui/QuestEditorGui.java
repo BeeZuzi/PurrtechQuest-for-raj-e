@@ -79,10 +79,10 @@ public final class QuestEditorGui extends Gui {
         setItem(CATEGORY_SLOT, GuiItems.icon(Material.ITEM_FRAME,
                         messages.render("quest.editor-button-category", player, Map.of("%value%", draft.category())),
                         List.of(messages.render("quest.editor-button-category-hint", player, Map.of()))),
-                event -> chatInput.prompt(player, "quest.editor-prompt-category", value -> {
-                    draft.category(value);
+                event -> new CategoryPickerGui(messages, player, id -> {
+                    draft.category(id);
                     reopen();
-                }, this::reopen));
+                }, this::reopen).open(player));
 
         setItem(SORT_ORDER_SLOT, GuiItems.icon(Material.HOPPER,
                         messages.render("quest.editor-button-sort-order", player, Map.of("%value%", sortOrderValue())),

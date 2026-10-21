@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.profile.PlayerProfile;
 
 import java.net.MalformedURLException;
@@ -36,7 +37,8 @@ public final class GuiItems {
         ItemStack stack = base.clone();
         ItemMeta meta = stack.getItemMeta();
         meta.displayName(name.decoration(TextDecoration.ITALIC, false));
-        meta.lore(lore.stream().map(line -> line.decoration(TextDecoration.ITALIC, false)).toList());
+        int wrapWidth = JavaPlugin.getProvidingPlugin(GuiItems.class).getConfig().getInt("gui.lore-wrap-width", 40);
+        meta.lore(LoreWrap.wrap(lore, wrapWidth).stream().map(line -> line.decoration(TextDecoration.ITALIC, false)).toList());
         stack.setItemMeta(meta);
         return stack;
     }

@@ -152,15 +152,15 @@ public final class QuestService {
     }
 
     /**
-     * The first quest the player currently has {@code IN_PROGRESS}, across every loaded quest rather than
-     * one category — what {@code QuestCategoryGui}'s guide item highlights as "what to do next".
+     * The first of {@code quests} the player currently has {@code IN_PROGRESS} — what the guide item
+     * highlights as "what to do next".
      */
-    public Optional<Quest> currentActiveQuest(Player player) {
+    public Optional<Quest> currentActiveQuest(Player player, Collection<Quest> quests) {
         PlayerQuestData data = playerCache.get(player.getUniqueId());
         if (data == null) {
             return Optional.empty();
         }
-        for (Quest quest : questsById.values()) {
+        for (Quest quest : quests) {
             QuestProgress progress = data.progress(quest.id());
             if (progress != null && progress.status() == QuestStatus.IN_PROGRESS) {
                 return Optional.of(quest);
@@ -169,20 +169,20 @@ public final class QuestService {
         return Optional.empty();
     }
 
-    /** Turned-in count vs. total across every loaded quest — the guide item's overall completion line. */
+    /** Turned-in count vs. total across the given quests — the guide item's overall completion line. */
     public record OverallSummary(int turnedIn, int total) {
     }
 
-    public OverallSummary overallSummary(Player player) {
+    public OverallSummary overallSummary(Player player, Collection<Quest> quests) {
         PlayerQuestData data = playerCache.get(player.getUniqueId());
         int turnedIn = 0;
-        for (Quest quest : questsById.values()) {
+        for (Quest quest : quests) {
             QuestProgress progress = data == null ? null : data.progress(quest.id());
             if (progress != null && progress.status() == QuestStatus.TURNED_IN) {
                 turnedIn++;
             }
         }
-        return new OverallSummary(turnedIn, questsById.size());
+        return new OverallSummary(turnedIn, quests.size());
     }
 
     public enum AcceptResult {
@@ -304,7 +304,26 @@ public final class QuestService {
         QuestProgress fresh = new QuestProgress(quest.id(), QuestStatus.IN_PROGRESS,
                 new int[quest.objectives().size()], Instant.now(), null, timesCompleted);
         captureEarnMoneyBaselines(player, quest, fresh);
+        capturePlaceholderBaselines(player, quest, fresh);
         data.put(fresh);
+    }
+
+    /**
+     * Relative PLACEHOLDER_CHECK objectives count the placeholder's rise from its value right now, so that
+     * value is snapshotted once, at acceptance. Only touches PlaceholderAPI if the quest has such an objective.
+     */
+    private void capturePlaceholderBaselines(Player player, Quest quest, QuestProgress fresh) {
+        List<QuestObjective> objectives = quest.objectives();
+        for (int i = 0; i < objectives.size(); i++) {
+            QuestObjective objective = objectives.get(i);
+            if (!objective.relativePlaceholder()) {
+                continue;
+            }
+            Double value = PlaceholderMatcher.currentValue(objective, player);
+            if (value != null) {
+                fresh.baseline(i, value);
+            }
+        }
     }
 
     /**
@@ -499,7 +518,22 @@ public final class QuestService {
                 }
                 int previous = progress.objectiveProgress(i);
                 int current;
-                if (QuestObjective.placeholderCountTarget(objective.meta()) != null) {
+                if (objective.relativePlaceholder()) {
+                    Double value = PlaceholderMatcher.currentValue(objective, player);
+                    if (value == null) {
+                        continue;
+                    }
+                    Double baseline = progress.baseline(i);
+                    if (baseline == null) {
+                        // No baseline yet (PlaceholderAPI was missing or the value unreadable at accept time):
+                        // start counting from now rather than crediting the whole lifetime statistic.
+                        progress.baseline(i, value);
+                        changed = true;
+                        continue;
+                    }
+                    // A statistic only grows, so progress never goes back down (e.g. after a stat reset).
+                    current = Math.max(previous, PlaceholderMatcher.relativeProgress(objective, value, baseline));
+                } else if (QuestObjective.placeholderCountTarget(objective.meta()) != null) {
                     // Counting objective: mirror the placeholder's live number (can also go down, e.g. a balance).
                     Integer count = PlaceholderMatcher.countProgress(objective, player);
                     if (count == null) {

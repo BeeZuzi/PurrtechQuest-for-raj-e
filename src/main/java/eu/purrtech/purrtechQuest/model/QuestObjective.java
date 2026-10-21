@@ -35,13 +35,27 @@ public record QuestObjective(ObjectiveType type, String target, int amount, Map<
         meta = meta == null ? Map.of() : Map.copyOf(meta);
         choiceGroup = (choiceGroup == null || choiceGroup.isBlank()) ? null : choiceGroup;
         label = (label == null || label.isBlank()) ? target : label;
-        if (type == ObjectiveType.PLACEHOLDER_CHECK) {
+        if (type == ObjectiveType.PLACEHOLDER_CHECK && !isRelative(meta)) {
             // Derived rather than stored, so quests saved with the old fixed amount of 1 pick it up too.
             Integer countTarget = placeholderCountTarget(meta);
             if (countTarget != null) {
                 amount = countTarget;
             }
         }
+    }
+
+    /**
+     * {@code meta.mode: relative} — progress is the placeholder's rise since the player accepted the quest
+     * (its value then is the baseline, so a player already at 1000 starts at 0), counted up to {@code amount}.
+     * The operator/value in meta are ignored for such an objective.
+     */
+    public static boolean isRelative(Map<String, String> meta) {
+        return "relative".equalsIgnoreCase(meta.get("mode"));
+    }
+
+    /** True for a PLACEHOLDER_CHECK in {@link #isRelative relative} mode. */
+    public boolean relativePlaceholder() {
+        return type == ObjectiveType.PLACEHOLDER_CHECK && isRelative(meta);
     }
 
     /**

@@ -6,6 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import eu.purrtech.purrtechQuest.api.objective.ObjectiveHandlerRegistry;
+import eu.purrtech.purrtechQuest.config.CategoriesConfig;
 import eu.purrtech.purrtechQuest.config.MessagesConfig;
 import eu.purrtech.purrtechQuest.gui.ChatInputService;
 import eu.purrtech.purrtechQuest.gui.QuestCategoryEditorGui;
@@ -182,7 +183,9 @@ public final class QuestAdminCommand {
             player.sendMessage(messages.render("quest.editor-id-taken", player, Map.of("%id%", questId)));
             return 0;
         }
-        new QuestEditorGui(context, player, QuestDraft.blank(questId)).open(player);
+        QuestDraft draft = QuestDraft.blank(questId);
+        draft.category(CategoriesConfig.load().defaultId());
+        new QuestEditorGui(context, player, draft).open(player);
         return 1;
     }
 

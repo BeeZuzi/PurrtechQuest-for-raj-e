@@ -1,5 +1,6 @@
 package eu.purrtech.purrtechQuest.gui;
 
+import eu.purrtech.purrtechQuest.config.GuideConfig;
 import eu.purrtech.purrtechQuest.config.MessagesConfig;
 import eu.purrtech.purrtechQuest.model.PlayerQuestData;
 import eu.purrtech.purrtechQuest.model.Quest;
@@ -15,8 +16,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A list of quests — every known quest in one category ({@link QuestCategoryGui}, the normal way in), or a
@@ -79,7 +82,11 @@ public final class QuestLogGui extends Gui {
                             this::reopen).open(player));
         }
 
-        setItem(GUIDE_SLOT, GuideIcon.build(questService, playerCache, messages, player, false), null);
+        int configured = GuideConfig.load().listSlot();
+        if (configured >= 0) {
+            int guideSlot = CategoryMenu.validSlot(configured, 54, blockedSlots(), GUIDE_SLOT);
+            setItem(guideSlot, GuideIcon.build(questService, playerCache, messages, player, false), null);
+        }
 
         if (page > 0) {
             setItem(PREV_SLOT, GuiItems.icon(Material.ARROW,
@@ -136,6 +143,15 @@ public final class QuestLogGui extends Gui {
         lore.add(Component.empty());
         lore.add(messages.render("quest.gui-lore-quest-hint", player, Map.of()));
         return GuiItems.icon(material, name, lore);
+    }
+
+    /** Where the guide can't go: on a quest slot or a navigation button. */
+    private static Set<Integer> blockedSlots() {
+        Set<Integer> blocked = new HashSet<>(Set.of(PREV_SLOT, BACK_SLOT, CLOSE_SLOT, NEXT_SLOT));
+        for (int slot = FIRST_SLOT; slot <= LAST_SLOT; slot++) {
+            blocked.add(slot);
+        }
+        return blocked;
     }
 
     private void reopen() {

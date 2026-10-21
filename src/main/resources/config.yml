@@ -31,6 +31,11 @@ tracking:
   # How a player's /quest track'd objective is displayed: ACTION_BAR (default, unobtrusive) or BOSS_BAR.
   display: ACTION_BAR
 
+gui:
+  # Lore lines (quest descriptions, objectives...) longer than this many visible characters continue on the
+  # next line, broken between words — a word is never cut. 0 = no wrapping. Applies on /questadmin reload.
+  lore-wrap-width: 40
+
 # On join, lists the quests the player currently has in progress (accepted, not yet finished) in chat,
 # with each objective's progress. Nothing is sent if they have none. The message text lives in
 # lang/<locale>.yml under the quest.join-active-* keys; set a single line to "" to hide just that line.
@@ -40,5 +45,67 @@ join-summary:
   # Wait this many ticks (20 = 1 second) after the player's data loads, so the message isn't buried
   # under other plugins' join messages.
   delay-ticks: 40
+
+# The "guide" item: overall quest progress and the quest in progress. Applies on /questadmin reload.
+# Its lore is live data and comes from lang/<locale>.yml (guide-* keys).
+guide:
+  # Slot in the main menu and in the quest list (0-based). -1 = don't show the guide there. A slot outside
+  # the menu, or on a button or (in the list) a quest slot, falls back to 3 / 4.
+  main-slot: 3
+  list-slot: 4
+  material: SPYGLASS
+  # Empty = the guide-name text from lang/<locale>.yml. MiniMessage or &-codes otherwise.
+  name: ""
+  # Only quests in this category (and its subcategories) count towards the guide's progress and can be
+  # shown as the current quest; quests in any other category just stay in their own category. Must be an
+  # id from categories.list below; empty = every quest.
+  category: zacatek
+  # custom-model-data: 1
+  glow: false
+  # texture: <player-head skin texture hash, replaces material>
+
+# Quest categories. They are items in the /quest menu and in the editor's category picker.
+# Applies on /questadmin reload. A config.yml from before this section existed gets one "default" category.
+categories:
+  # Category new quests created with /questadmin create start in. Must be one of the ids under "list".
+  # zacatek = the category the guide follows, so a new quest is in the guide unless you pick another.
+  default: zacatek
+
+  # The main menu. title: MiniMessage (empty = the text from lang/<locale>.yml), rows: 2-6 (rows * 9 slots).
+  menu:
+    title: "<white>:offset_-8::ukoly:</white>"
+    rows: 3
+
+  # Each key under "list" is a category id (what a quest's "category:" refers to). Per category:
+  #   slot              position in its menu, 0-based, left to right, top to bottom. An unset, out-of-range or
+  #                     taken slot puts the item in the next free one. The guide item (slot 3) and the bottom
+  #                     row's buttons are not available.
+  #   material          item type (default BOOK)
+  #   name              MiniMessage or &-codes
+  #   lore              list of lines, same formatting
+  #   custom-model-data number, for resource pack models (optional)
+  #   glow              true = enchantment glint
+  #   texture           player-head skin texture hash (optional, replaces material)
+  #   menu              title / rows of the submenu this category opens (optional, defaults to the main menu's)
+  #   children          subcategories, same keys. A category with children opens a menu of them.
+  list:
+    zacatek:
+      slot: 10
+      material: COMPASS
+      name: "<green>Začátek</green>"
+      lore:
+        - "<gray>První kroky na serveru. Postup v nich ukazuje průvodce.</gray>"
+    mining:
+      slot: 16
+      material: IRON_PICKAXE
+      name: "<gold>Těžba</gold>"
+      lore:
+        - "<gray>Kopání, těžba a vše kolem ní.</gray>"
+      # Example of subcategories:
+      # children:
+      #   ores:
+      #     slot: 11
+      #     material: IRON_ORE
+      #     name: "<gray>Rudy</gray>"
 
 debug: false
