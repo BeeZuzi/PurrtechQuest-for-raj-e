@@ -33,6 +33,13 @@ quests-directory: quests
 # Applies on /questadmin reload. A config.yml from before this option existed behaves as true.
 tiny-font: true
 
+quest-list:
+  # Inventory slots the quest list menu puts quests in (0 = top-left, 53 = bottom-right of the 6-row menu).
+  # A range "9-35", single slots, or both comma-separated: "10-16, 19-25, 28-34". The guide (slot 4) and the
+  # navigation slots (45, 48, 50, 53) are always kept free. More quests than slots spill onto further pages.
+  # Applies on /questadmin reload.
+  slots: "9-35"
+
 tracking:
   # How a player's /quest track'd objective is displayed: ACTION_BAR (default, unobtrusive) or BOSS_BAR.
   display: ACTION_BAR
