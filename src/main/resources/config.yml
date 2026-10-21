@@ -71,8 +71,9 @@ guide:
   name: ""
   # Only quests in this category (and its subcategories) are in the guide: the quest list it opens, its
   # progress and its current quest. Quests in any other category stay in their own category only. A quest
-  # with no category (or one not defined below) belongs to categories.default. Must be an id from
-  # categories.list below; empty = every quest.
+  # with no category (or one not defined below) belongs to categories.default. Normally an id from
+  # categories.list below; one that isn't defined there still matches quests whose category: is exactly
+  # this id. Missing = zacatek; "" = every quest.
   category: zacatek
   # custom-model-data: 1
   glow: false

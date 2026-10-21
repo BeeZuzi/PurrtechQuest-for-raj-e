@@ -49,7 +49,7 @@ class GuideConfigTest {
     }
 
     @Test
-    void guideCoversOnlyItsCategoryAndFallsBackToEveryQuestWhenUnsetOrUnknown() throws Exception {
+    void guideCoversOnlyItsCategoryEvenWhenTheCategoryIsNotDefined() throws Exception {
         YamlConfiguration yaml = new YamlConfiguration();
         yaml.loadFromString("""
                 categories:
@@ -63,7 +63,16 @@ class GuideConfigTest {
 
         assertEquals(List.of("a"), ids(guide("zacatek").quests(categories, all)));
         assertEquals(List.of("a", "b", "c"), ids(guide("").quests(categories, all)));
-        assertEquals(List.of("a", "b", "c"), ids(guide("typo").quests(categories, all)));
+        assertEquals(List.of("c"), ids(guide("removed").quests(categories, all)));
+        assertEquals(List.of(), ids(guide("typo").quests(categories, all)));
+    }
+
+    @Test
+    void missingSectionFollowsZacatekEvenWithoutACategoriesSection() {
+        CategoriesConfig categories = CategoriesConfig.parse(null, w -> { });
+        List<Quest> all = List.of(quest("a", "zacatek"), quest("b", "default"), quest("c", "mining"));
+
+        assertEquals(List.of("a"), ids(GuideConfig.parse(null).quests(categories, all)));
     }
 
     private static GuideConfig guide(String category) throws Exception {
