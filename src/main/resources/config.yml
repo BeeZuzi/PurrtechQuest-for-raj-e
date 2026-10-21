@@ -69,9 +69,10 @@ guide:
   material: SPYGLASS
   # Empty = the guide-name text from lang/<locale>.yml. MiniMessage or &-codes otherwise.
   name: ""
-  # Only quests in this category (and its subcategories) count towards the guide's progress and can be
-  # shown as the current quest; quests in any other category just stay in their own category. Must be an
-  # id from categories.list below; empty = every quest.
+  # Only quests in this category (and its subcategories) are in the guide: the quest list it opens, its
+  # progress and its current quest. Quests in any other category stay in their own category only. A quest
+  # with no category (or one not defined below) belongs to categories.default. Must be an id from
+  # categories.list below; empty = every quest.
   category: zacatek
   # custom-model-data: 1
   glow: false
@@ -80,7 +81,8 @@ guide:
 # Quest categories. They are items in the /quest menu and in the editor's category picker.
 # Applies on /questadmin reload. A config.yml from before this section existed gets one "default" category.
 categories:
-  # Category new quests created with /questadmin create start in. Must be one of the ids under "list".
+  # Category new quests created with /questadmin create start in, and where a quest with no category (or a
+  # category not defined under "list") is listed. Must be one of the ids under "list".
   # zacatek = the category the guide follows, so a new quest is in the guide unless you pick another.
   default: zacatek
 

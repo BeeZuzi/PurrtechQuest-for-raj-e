@@ -17,9 +17,9 @@ import java.util.Set;
 
 /**
  * {@code /quest gui}'s landing page: the categories from {@code categories:} in {@code config.yml}, each at its
- * configured slot, plus (on the main menu only) the "guide" item ({@code guide:} in the config) — overall
- * turned-in/total across every quest and a breakdown of the quest in progress; clicking it opens
- * {@link QuestLogGui} with every quest. Clicking a category opens its subcategories (a menu of the same kind),
+ * configured slot, plus (on the main menu only) the "guide" item ({@code guide:} in the config) — turned-in/total
+ * across the guide's quests and a breakdown of the one in progress; clicking it opens {@link QuestLogGui} with
+ * just the guide's quests ({@link GuideConfig#quests}), so a quest in another category never shows up there. Clicking a category opens its subcategories (a menu of the same kind),
  * or its quest list when it has none. A submenu's bottom row also has a button for the category's own quests.
  */
 public final class QuestCategoryGui extends Gui {
@@ -77,7 +77,8 @@ public final class QuestCategoryGui extends Gui {
             if (guideSlot >= 0) {
                 setItem(guideSlot, GuideIcon.build(questService, playerCache, messages, player, true), event ->
                         new QuestLogGui(questService, playerCache, trackingService, messages, player,
-                                List.copyOf(questService.allQuests()), this::reopen).open(player));
+                                GuideConfig.load().quests(categories, questService.allQuests()), this::reopen)
+                                .open(player));
             }
         } else {
             setItem(row + 3, GuiItems.icon(Material.IRON_DOOR, messages.render("quest.gui-nav-back", player, Map.of()),
