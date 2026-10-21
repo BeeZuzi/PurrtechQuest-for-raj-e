@@ -86,16 +86,12 @@ public final class QuestLogGui extends Gui {
                             this::reopen).open(player));
         }
 
-        int configured = GuideConfig.load().listSlot();
-        if (configured >= 0) {
-            int guideSlot = CategoryMenu.validSlot(configured, 54, blockedSlots(), GUIDE_SLOT);
-            setItem(guideSlot, GuideIcon.build(questService, playerCache, messages, player, false), null);
-        }
+        setItem(GUIDE_SLOT, GuideIcon.build(questService, playerCache, messages, player, false), null);
 
         if (page > 0) {
             setItem(PREV_SLOT, GuiItems.icon(Material.ARROW,
-                    messages.render("quest.gui-button-prev-page", player, Map.of()),
-                    List.of(messages.render("quest.gui-button-prev-page-hint", player, Map.of()))),
+                            messages.render("quest.gui-button-prev-page", player, Map.of()),
+                            List.of(messages.render("quest.gui-button-prev-page-hint", player, Map.of()))),
                     event -> {
                         page--;
                         render();
@@ -103,8 +99,8 @@ public final class QuestLogGui extends Gui {
         }
         if (to < quests.size()) {
             setItem(NEXT_SLOT, GuiItems.icon(Material.ARROW,
-                    messages.render("quest.gui-button-next-page", player, Map.of()),
-                    List.of(messages.render("quest.gui-button-next-page-hint", player, Map.of()))),
+                            messages.render("quest.gui-button-next-page", player, Map.of()),
+                            List.of(messages.render("quest.gui-button-next-page-hint", player, Map.of()))),
                     event -> {
                         page++;
                         render();
@@ -161,14 +157,14 @@ public final class QuestLogGui extends Gui {
         return GuiItems.icon(material, name, lore);
     }
 
-    /** Where the guide can't go: on a quest slot or a navigation button. */
-    private static Set<Integer> blockedSlots() {
-        Set<Integer> blocked = new HashSet<>(Set.of(PREV_SLOT, BACK_SLOT, CLOSE_SLOT, NEXT_SLOT));
-        for (int slot = FIRST_SLOT; slot <= LAST_SLOT; slot++) {
-            blocked.add(slot);
-        }
-        return blocked;
-    }
+//    /** Where the guide can't go: on a quest slot or a navigation button. */
+//    private static Set<Integer> blockedSlots() {
+//        Set<Integer> blocked = new HashSet<>(Set.of(PREV_SLOT, BACK_SLOT, CLOSE_SLOT, NEXT_SLOT));
+//        for (int slot = FIRST_SLOT; slot <= LAST_SLOT; slot++) {
+//            blocked.add(slot);
+//        }
+//        return blocked;
+//    }
 
     private void reopen() {
         new QuestLogGui(questService, playerCache, trackingService, messages, player, quests, onBack).open(player);
