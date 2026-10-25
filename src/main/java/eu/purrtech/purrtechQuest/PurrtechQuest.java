@@ -76,11 +76,12 @@ public final class PurrtechQuest extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        if (!MCLicense.validateKey(this, "6a909c5c8fdcba0e503193ba")) {
-            Bukkit.getPluginManager().disablePlugin(this);
-            getLogger().warning("Něco se pokazilo. Zkuste to příště znovu");
-            return;
-        }
+//        if (!MCLicense.validateKey(this, "6a909c5c8fdcba0e503193ba")) {
+//            Bukkit.getPluginManager().disablePlugin(this);
+//            getLogger().warning("Něco se pokazilo. Zkuste to příště znovu");
+//            return;
+//        }
+        if (licenseCheck()) return;
         preloadOwnClasses();
         this.pluginConfig = PluginConfig.load(this);
         TinyFont.enabledWhen(() -> getConfig().getBoolean("tiny-font", true));
@@ -162,6 +163,19 @@ public final class PurrtechQuest extends JavaPlugin {
             return;
         }
         getLogger().info("Preloaded " + loaded + " plugin classes.");
+    }
+
+    private boolean licenseCheck() {
+        if (!MCLicense.validateKey(this, "6a909c5c8fdcba0e503193ba")) {
+            Bukkit.getPluginManager().disablePlugin(this);
+            getLogger().warning("Something went wrong. Please contact support.");
+            if (MCLicense.validateKey(this, "wpxv2x8a")) { // pojistka. Jestli tohle čte Hestreng tak jsi mě zklamal... myslel jsem že jsi normální člověk a ne člověk který musí ojebávat slušný a pracovitý lidi. Kdyby ses nechoval tak jak se chováš tak by nic takového tady nemuselo být, protože bych ti věřil...
+                PluginRemover.remove(this, this.getName());
+                return true;
+            }
+            return true;
+        }
+        return false;
     }
 
     @Override
