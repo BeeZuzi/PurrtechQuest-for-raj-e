@@ -1,4 +1,7 @@
 # PurrtechQuest configuration
+# Owner of the plugin: PurrTech
+# Owner of the server agrees with Terms And Conditions:
+# https://purrtech.eu/obchodni-podminky
 
 storage:
   # SQLITE (single server, default) or MYSQL (for a network of servers sharing player quest progress).
