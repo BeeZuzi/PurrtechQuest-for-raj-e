@@ -105,7 +105,7 @@ public final class QuestCategoryGui extends Gui {
 
     private void openQuests(Category category) {
         new QuestLogGui(questService, playerCache, trackingService, messages, player,
-                categories.quests(category, questService.allQuests()), this::reopen).open(player);
+                categories.quests(category, questService.allQuests()), category.name(), this::reopen).open(player);
     }
 
     /** Re-reads the config, so a reload done while a player had a submenu open still takes effect on return. */

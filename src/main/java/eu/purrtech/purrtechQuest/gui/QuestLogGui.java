@@ -53,11 +53,20 @@ public final class QuestLogGui extends Gui {
     private final List<Quest> quests;
     private final Runnable onBack;
     private final List<Integer> questSlots;
+    /** The open category's configured name, shown on the guide item; {@code null} for a list that isn't a category. */
+    private final String categoryName;
     private int page;
 
     /** {@code onBack} may be {@code null} — no back button is shown then (the NPC-linked, category-less flow). */
     public QuestLogGui(QuestService questService, PlayerQuestDataCache playerCache, QuestTrackingService trackingService,
                         MessagesConfig messages, Player player, List<Quest> quests, Runnable onBack) {
+        this(questService, playerCache, trackingService, messages, player, quests, null, onBack);
+    }
+
+    /** {@code categoryName} is shown as the guide item's name, in place of "Průvodce" (see {@link GuideIcon}). */
+    public QuestLogGui(QuestService questService, PlayerQuestDataCache playerCache, QuestTrackingService trackingService,
+                        MessagesConfig messages, Player player, List<Quest> quests, String categoryName,
+                        Runnable onBack) {
         super(messages.render("quest.gui-log-title", player, Map.of()), SIZE);
         this.questService = questService;
         this.playerCache = playerCache;
@@ -66,6 +75,7 @@ public final class QuestLogGui extends Gui {
         this.player = player;
         this.quests = quests.stream().sorted(Quest.DISPLAY_ORDER).toList();
         this.onBack = onBack;
+        this.categoryName = categoryName;
         this.questSlots = questSlots();
         this.page = 0;
         render();
@@ -86,7 +96,7 @@ public final class QuestLogGui extends Gui {
                             this::reopen).open(player));
         }
 
-        setItem(GUIDE_SLOT, GuideIcon.buildForList(questService, playerCache, messages, player, quests), null);
+        setItem(GUIDE_SLOT, GuideIcon.buildForList(questService, playerCache, messages, player, quests, categoryName), null);
 
         if (page > 0) {
             setItem(PREV_SLOT, GuiItems.icon(Material.ARROW,
@@ -167,6 +177,7 @@ public final class QuestLogGui extends Gui {
 //    }
 
     private void reopen() {
-        new QuestLogGui(questService, playerCache, trackingService, messages, player, quests, onBack).open(player);
+        new QuestLogGui(questService, playerCache, trackingService, messages, player, quests, categoryName, onBack)
+                .open(player);
     }
 }

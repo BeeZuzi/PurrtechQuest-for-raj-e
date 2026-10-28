@@ -43,21 +43,31 @@ final class GuideIcon {
                            Player player, boolean clickable) {
         GuideConfig guide = GuideConfig.load();
         List<Quest> covered = guide.quests(CategoriesConfig.load(), questService.allQuests());
-        return render(questService, playerCache, messages, player, guide, covered, clickable);
+        return render(questService, playerCache, messages, player, guide, covered, null, clickable);
     }
 
-    /** The guide inside a quest list: covers exactly the quests that list shows (the open category's), not the server guide's. */
+    /**
+     * The guide inside a quest list: covers exactly the quests that list shows (the open category's), not the
+     * server guide's. {@code categoryName} (the category's configured name) replaces "Průvodce" as the item's
+     * name; {@code null}/blank — a list that isn't a category, like an NPC's — keeps the guide's own name.
+     */
     static ItemStack buildForList(QuestService questService, PlayerQuestDataCache playerCache,
-                                  MessagesConfig messages, Player player, Collection<Quest> listed) {
-        return render(questService, playerCache, messages, player, GuideConfig.load(), listed, false);
+                                  MessagesConfig messages, Player player, Collection<Quest> listed,
+                                  String categoryName) {
+        return render(questService, playerCache, messages, player, GuideConfig.load(), listed, categoryName, false);
     }
 
     private static ItemStack render(QuestService questService, PlayerQuestDataCache playerCache,
                                     MessagesConfig messages, Player player, GuideConfig guide,
-                                    Collection<Quest> covered, boolean clickable) {
-        Component name = guide.name() == null
-                ? messages.render("quest.guide-name", player, Map.of())
-                : DisplayText.component(guide.name(), NamedTextColor.WHITE);
+                                    Collection<Quest> covered, String categoryName, boolean clickable) {
+        Component name;
+        if (categoryName != null && !categoryName.isBlank()) {
+            name = DisplayText.component(categoryName, NamedTextColor.WHITE);
+        } else if (guide.name() == null) {
+            name = messages.render("quest.guide-name", player, Map.of());
+        } else {
+            name = DisplayText.component(guide.name(), NamedTextColor.WHITE);
+        }
         List<Component> lore = new ArrayList<>();
         lore.add(messages.render("quest.guide-intro", player, Map.of()));
 
