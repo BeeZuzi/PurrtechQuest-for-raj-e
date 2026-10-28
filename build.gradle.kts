@@ -107,6 +107,20 @@ tasks {
         // a known limitation of shading sqlite-jdbc; leaving it unrelocated is the standard workaround.
     }
 
+    jar {
+        // The thin jar (no HikariCP, sqlite, org.json... inside) used to get the very same file name as the
+        // shadowJar below, so whichever of the two ran last decided what was in build/libs/PurrtechQuest-<version>.jar.
+        // A thin one fails on the server with NoClassDefFoundError as soon as the plugin touches a bundled
+        // library (the first one it hits is org.json, in the license check). Giving it its own name means the
+        // jar to deploy can only ever be the shaded one.
+        archiveClassifier.set("plain")
+    }
+
+    // Anything that assembles the plugin (an IDE "build", `assemble`) now produces the shaded jar too.
+    assemble {
+        dependsOn(shadowJar)
+    }
+
     build {
         dependsOn(shadowJar)
     }
