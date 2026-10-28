@@ -18,33 +18,49 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * The "guide" item shown in the quest menus: overall turned-in/total across every quest, then a breakdown of
- * whichever quest the player currently has in progress (first match, same as
- * {@link QuestService#currentActiveQuest}) — its name, description, and live objective progress. Shared by
- * the landing page ({@link QuestCategoryGui}, where clicking it opens the quest list) and the quest list
- * itself ({@link QuestLogGui}, where it is display-only).
+ * The "guide" item shown in the quest menus: turned-in/total across the quests it covers, then a breakdown of
+ * whichever of them the player currently has in progress (first match, same as
+ * {@link QuestService#currentActiveQuest}) — its name, description, and live objective progress.
+ * <p>
+ * On the landing page ({@link QuestCategoryGui}, where clicking it opens the quest list) it covers the server
+ * guide's own quests ({@link GuideConfig#quests}). Inside a quest list ({@link QuestLogGui}, where it is
+ * display-only) it covers the quests of the list that is open instead, so inside a category it counts that
+ * category's quests and never the server guide's.
  */
 final class GuideIcon {
 
     private GuideIcon() {
     }
 
-    /** {@code clickable} adds the "click to see every quest" hint line; leave it off where clicking does nothing. */
+    /** The server guide: covers the quests {@code guide:} in the config names. {@code clickable} adds the "click to see every quest" hint line. */
     static ItemStack build(QuestService questService, PlayerQuestDataCache playerCache, MessagesConfig messages,
                            Player player, boolean clickable) {
         GuideConfig guide = GuideConfig.load();
+        List<Quest> covered = guide.quests(CategoriesConfig.load(), questService.allQuests());
+        return render(questService, playerCache, messages, player, guide, covered, clickable);
+    }
+
+    /** The guide inside a quest list: covers exactly the quests that list shows (the open category's), not the server guide's. */
+    static ItemStack buildForList(QuestService questService, PlayerQuestDataCache playerCache,
+                                  MessagesConfig messages, Player player, Collection<Quest> listed) {
+        return render(questService, playerCache, messages, player, GuideConfig.load(), listed, false);
+    }
+
+    private static ItemStack render(QuestService questService, PlayerQuestDataCache playerCache,
+                                    MessagesConfig messages, Player player, GuideConfig guide,
+                                    Collection<Quest> covered, boolean clickable) {
         Component name = guide.name() == null
                 ? messages.render("quest.guide-name", player, Map.of())
                 : DisplayText.component(guide.name(), NamedTextColor.WHITE);
         List<Component> lore = new ArrayList<>();
         lore.add(messages.render("quest.guide-intro", player, Map.of()));
 
-        List<Quest> covered = guide.quests(CategoriesConfig.load(), questService.allQuests());
         QuestService.OverallSummary overall = questService.overallSummary(player, covered);
         lore.add(messages.render("quest.guide-completed", player, Map.of(
                 "%done%", String.valueOf(overall.turnedIn()), "%total%", String.valueOf(overall.total()))));

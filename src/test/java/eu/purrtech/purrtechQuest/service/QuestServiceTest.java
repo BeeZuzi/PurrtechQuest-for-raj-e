@@ -368,6 +368,30 @@ class QuestServiceTest {
     }
 
     @Test
+    void overallSummaryCountsOnlyTheQuestsItIsGiven() {
+        // The guide inside an opened category is handed just that category's quests: "X of Y done" must be
+        // about those, never about the quests of some other category the player also finished.
+        questService.acceptQuest(player, "mine_iron");
+        questService.updateProgress(player, ObjectiveType.COLLECT_ITEM, "RAW_IRON", 10);
+        assertEquals(QuestStatus.TURNED_IN, playerCache.get(playerId).progress("mine_iron").status());
+
+        var mining = questService.questsInCategory("mining");
+        var combat = questService.questsInCategory("combat");
+
+        QuestService.OverallSummary inMining = questService.overallSummary(player, mining);
+        assertEquals(1, inMining.turnedIn());
+        assertEquals(mining.size(), inMining.total());
+
+        QuestService.OverallSummary inCombat = questService.overallSummary(player, combat);
+        assertEquals(0, inCombat.turnedIn());
+        assertEquals(combat.size(), inCombat.total());
+
+        QuestService.OverallSummary nothing = questService.overallSummary(player, java.util.List.of());
+        assertEquals(0, nothing.turnedIn());
+        assertEquals(0, nothing.total());
+    }
+
+    @Test
     void cancellingAcceptEventBlocksAcceptance() {
         QuestService cancellingService = new QuestService(questRepository, playerCache,
                 new RewardService(Logger.getAnonymousLogger()), messages, event -> {

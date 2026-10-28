@@ -86,7 +86,7 @@ public final class QuestLogGui extends Gui {
                             this::reopen).open(player));
         }
 
-        setItem(GUIDE_SLOT, GuideIcon.build(questService, playerCache, messages, player, false), null);
+        setItem(GUIDE_SLOT, GuideIcon.buildForList(questService, playerCache, messages, player, quests), null);
 
         if (page > 0) {
             setItem(PREV_SLOT, GuiItems.icon(Material.ARROW,
