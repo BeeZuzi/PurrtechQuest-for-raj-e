@@ -8,6 +8,7 @@ import eu.purrtech.purrtechQuest.model.QuestObjective;
 import eu.purrtech.purrtechQuest.model.QuestProgress;
 import eu.purrtech.purrtechQuest.player.PlayerQuestDataCache;
 import eu.purrtech.purrtechQuest.service.QuestService;
+import eu.purrtech.purrtechQuest.util.LoreWrap;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -26,6 +27,11 @@ import java.util.Set;
  * itself ({@link QuestLogGui}, where it is display-only).
  */
 final class GuideIcon {
+
+    /** Lined up under the text after a "● " bullet. */
+    private static final String BULLET_INDENT = "  ";
+    /** Lined up under the text after the " -  " of a progress line. */
+    private static final String PROGRESS_INDENT = "    ";
 
     private GuideIcon() {
     }
@@ -47,10 +53,11 @@ final class GuideIcon {
         if (active == null) {
             lore.add(messages.render("quest.guide-no-active-quest", player, Map.of()));
         } else {
-            lore.add(messages.render("quest.guide-current-quest-name", player, Map.of("%quest%", active.displayName())));
+            lore.addAll(LoreWrap.wrap(messages.render("quest.guide-current-quest-name", player,
+                    Map.of("%quest%", active.displayName())), BULLET_INDENT));
             if (!active.description().isBlank()) {
-                lore.add(messages.render("quest.guide-current-quest-description", player,
-                        Map.of("%description%", active.description())));
+                lore.addAll(LoreWrap.wrap(messages.render("quest.guide-current-quest-description", player,
+                        Map.of("%description%", active.description())), BULLET_INDENT));
             }
             lore.add(Component.empty());
             lore.add(messages.render("quest.guide-progress-header", player, Map.of()));
@@ -81,10 +88,10 @@ final class GuideIcon {
             if (objective.choiceGroup() != null && !satisfied && satisfiedGroups.contains(objective.choiceGroup())) {
                 continue;
             }
-            lines.add(messages.render("quest.guide-progress-line", player, Map.of(
+            lines.addAll(LoreWrap.wrap(messages.render("quest.guide-progress-line", player, Map.of(
                     "%label%", objective.label(),
                     "%progress%", String.valueOf(current),
-                    "%amount%", String.valueOf(objective.amount()))));
+                    "%amount%", String.valueOf(objective.amount()))), PROGRESS_INDENT));
         }
         return lines;
     }

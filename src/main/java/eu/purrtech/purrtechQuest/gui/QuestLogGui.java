@@ -8,6 +8,7 @@ import eu.purrtech.purrtechQuest.model.QuestStatus;
 import eu.purrtech.purrtechQuest.player.PlayerQuestDataCache;
 import eu.purrtech.purrtechQuest.service.QuestService;
 import eu.purrtech.purrtechQuest.service.QuestTrackingService;
+import eu.purrtech.purrtechQuest.util.LoreWrap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
@@ -130,7 +131,7 @@ public final class QuestLogGui extends Gui {
             lore.add(Component.empty());
             lore.add(messages.render("quest.gui-lore-quest-reward-header", player, Map.of()));
             for (var reward : quest.rewards()) {
-                lore.add(QuestIcons.questListRewardLine(reward, messages, player));
+                lore.addAll(LoreWrap.wrap(QuestIcons.questListRewardLine(reward, messages, player), "   "));
             }
         }
         lore.add(Component.empty());

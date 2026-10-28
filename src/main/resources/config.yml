@@ -27,6 +27,12 @@ quests-directory: quests
 # Applies on /questadmin reload. A config.yml from before this option existed behaves as true.
 tiny-font: true
 
+# Longest line, in characters, of quest text in item lore (quest descriptions, objective labels, reward names)
+# before it wraps onto the next line. The client draws letters at different widths, so this is approximate -
+# lower it if lines still run off the edge. 0 turns wrapping off. Applies on /questadmin reload. A config.yml
+# from before this option existed behaves as 40.
+lore-wrap-width: 40
+
 tracking:
   # How a player's /quest track'd objective is displayed: ACTION_BAR (default, unobtrusive) or BOSS_BAR.
   display: ACTION_BAR

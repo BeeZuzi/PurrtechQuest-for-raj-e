@@ -2,8 +2,8 @@ package eu.purrtech.purrtechQuest.gui;
 
 import eu.purrtech.purrtechQuest.model.QuestReward;
 import net.kyori.adventure.text.Component;
+import eu.purrtech.purrtechQuest.util.DisplayText;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -126,13 +126,14 @@ public final class QuestEditorRewardsGui extends Gui {
             }
         }
 
-        // Escaped: the name is admin-typed free text going into a MiniMessage template, and a stray "<" in it
-        // would otherwise throw while rendering this very icon.
-        String shownName = reward.name() == null
-                ? messages.get("quest.editor-reward-name-none", player.locale().getLanguage())
-                : MiniMessage.miniMessage().escapeTags(reward.name());
+        // Built as a real component (not string-substituted into a MiniMessage template) so the admin's own
+        // color codes in the name actually render here too, instead of showing up as literal "&#RRGGBB" text.
+        Component shownName = reward.name() == null
+                ? messages.render("quest.editor-reward-name-none", player, Map.of())
+                : DisplayText.component(reward.name(), NamedTextColor.WHITE);
+        Component nameLine = messages.render("quest.editor-reward-line-name", player, Map.of()).append(shownName);
         List<Component> lore = List.of(
-                messages.render("quest.editor-reward-line-name", player, Map.of("%value%", shownName)),
+                nameLine,
                 messages.render(labelKey, player, placeholders),
                 messages.render("quest.editor-rename-hint", player, Map.of()),
                 messages.render("quest.editor-remove-hint", player, Map.of()));

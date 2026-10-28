@@ -13,6 +13,7 @@ import eu.purrtech.purrtechQuest.service.QuestFeedback;
 import eu.purrtech.purrtechQuest.service.QuestService;
 import eu.purrtech.purrtechQuest.service.QuestTrackingService;
 import eu.purrtech.purrtechQuest.util.DurationFormat;
+import eu.purrtech.purrtechQuest.util.LoreWrap;
 import eu.purrtech.purrtechQuest.util.TinyFont;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -37,6 +38,8 @@ import java.util.Set;
  */
 public final class QuestDetailGui extends Gui {
 
+    /** Lined up under the text after a " - " bullet. */
+    private static final String BULLET_INDENT = "   ";
     private static final int SIZE = 45;
     private static final int INFO_SLOT = 4;
     private static final int REWARDS_SLOT = 20;
@@ -187,7 +190,7 @@ public final class QuestDetailGui extends Gui {
 
         List<Component> lore = new ArrayList<>();
         if (!quest.description().isBlank()) {
-            lore.add(Component.text(TinyFont.convert(quest.description()), NamedTextColor.GRAY));
+            lore.addAll(LoreWrap.wrap(Component.text(TinyFont.convert(quest.description()), NamedTextColor.GRAY)));
             lore.add(Component.empty());
         }
         String statusText = messages.get(questService.statusKey(player, quest), player.locale().getLanguage());
@@ -202,8 +205,8 @@ public final class QuestDetailGui extends Gui {
             int current = progress == null ? 0 : progress.objectiveProgress(i);
             boolean satisfied = current >= objective.amount();
             if (objective.choiceGroup() != null && !satisfied && satisfiedGroups.contains(objective.choiceGroup())) {
-                lore.add(messages.render("quest.gui-lore-objective-locked", player, Map.of(
-                        "%label%", objective.label())));
+                lore.addAll(LoreWrap.wrap(messages.render("quest.gui-lore-objective-locked", player, Map.of(
+                        "%label%", objective.label())), BULLET_INDENT));
                 continue;
             }
             Map<String, String> placeholders = Map.of(
@@ -213,7 +216,7 @@ public final class QuestDetailGui extends Gui {
             String lineKey = objective.choiceGroup() != null
                     ? "quest.gui-lore-objective-choice-line"
                     : "quest.gui-lore-objective-line";
-            lore.add(messages.render(lineKey, player, placeholders));
+            lore.addAll(LoreWrap.wrap(messages.render(lineKey, player, placeholders), BULLET_INDENT));
         }
 
         return GuiItems.icon(material, name, lore);
@@ -231,12 +234,12 @@ public final class QuestDetailGui extends Gui {
         lore.add(messages.render("quest.gui-lore-rewards-header", player, Map.of()));
 
         List<Component> lines = new ArrayList<>();
-        quest.rewards().forEach(reward -> lines.add(QuestIcons.questListRewardLine(reward, messages, player)));
+        quest.rewards().forEach(reward -> lines.addAll(LoreWrap.wrap(QuestIcons.questListRewardLine(reward, messages, player), BULLET_INDENT)));
         for (QuestRewardTier tier : quest.rewardTiers()) {
             if (!player.hasPermission(tier.permission())) {
                 continue;
             }
-            tier.rewards().forEach(reward -> lines.add(QuestIcons.questListRewardLine(reward, messages, player)));
+            tier.rewards().forEach(reward -> lines.addAll(LoreWrap.wrap(QuestIcons.questListRewardLine(reward, messages, player), BULLET_INDENT)));
         }
 
         if (lines.isEmpty()) {

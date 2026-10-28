@@ -67,6 +67,14 @@ class TinyFontTest {
     }
 
     @Test
+    void neverChangesTheNumberOfCharacters() {
+        String longText = ("Vytěž 20,000 bloků v magma mineblocku, zúčastni se zabití Trojhlavého spalovače "
+                + "a zajdi za PÁNEM žhavého pekla; Řekni ŠÍLENÉMU Čaroději, že Ďábel má %player% & <red>barvu</red>. ").repeat(20);
+        assertEquals(longText.length(), TinyFont.convert(longText).length());
+        assertEquals(longText.length(), TinyFont.untiny(TinyFont.convert(longText)).length());
+    }
+
+    @Test
     void nullAndEmptyPassThrough() {
         assertEquals(null, TinyFont.convert((String) null));
         assertEquals("", TinyFont.convert(""));
