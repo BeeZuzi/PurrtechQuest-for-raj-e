@@ -35,6 +35,54 @@ public record QuestObjective(ObjectiveType type, String target, int amount, Map<
         meta = meta == null ? Map.of() : Map.copyOf(meta);
         choiceGroup = (choiceGroup == null || choiceGroup.isBlank()) ? null : choiceGroup;
         label = (label == null || label.isBlank()) ? target : label;
+        if (type == ObjectiveType.PLACEHOLDER_CHECK && !isRelative(meta)) {
+            // Derived rather than stored, so quests saved with the old fixed amount of 1 pick it up too.
+            Integer countTarget = placeholderCountTarget(meta);
+            if (countTarget != null) {
+                amount = countTarget;
+            }
+        }
+    }
+
+    /**
+     * {@code meta.mode: relative} — progress is the placeholder's rise since the player accepted the quest
+     * (its value then is the baseline, so a player already at 1000 starts at 0), counted up to {@code amount}.
+     * The operator/value in meta are ignored for such an objective.
+     */
+    public static boolean isRelative(Map<String, String> meta) {
+        return "relative".equalsIgnoreCase(meta.get("mode"));
+    }
+
+    /** True for a PLACEHOLDER_CHECK in {@link #isRelative relative} mode. */
+    public boolean relativePlaceholder() {
+        return type == ObjectiveType.PLACEHOLDER_CHECK && isRelative(meta);
+    }
+
+    public boolean labelIsRawPlaceholder() {
+        return type == ObjectiveType.PLACEHOLDER_CHECK && label.equals(target);
+    }
+    /**
+     * For a PLACEHOLDER_CHECK that counts up to a number ({@code %fish_caught% >= 50}), that number — the
+     * objective then shows real {@code 23/50} progress instead of {@code 0/1}. {@code null} for anything that
+     * can only be satisfied/not-satisfied: other operators, non-numeric values, or a target below 2.
+     */
+    public static Integer placeholderCountTarget(Map<String, String> meta) {
+        String operator = meta.getOrDefault("operator", "=");
+        double value;
+        try {
+            value = Double.parseDouble(meta.getOrDefault("value", "").trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+        double target = switch (operator) {
+            case ">=" -> Math.ceil(value);
+            case ">" -> Math.floor(value) + 1;
+            default -> Double.NaN;
+        };
+        if (Double.isNaN(target) || target < 2 || target > Integer.MAX_VALUE) {
+            return null;
+        }
+        return (int) target;
     }
 
     public QuestObjective(ObjectiveType type, String target, int amount) {

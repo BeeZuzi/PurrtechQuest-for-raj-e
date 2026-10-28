@@ -53,7 +53,7 @@ public final class QuestEditorObjectiveEditGui extends Gui {
                 event -> chatInput.prompt(player, "quest.editor-prompt-objective-label", raw -> {
                     String label = raw.trim();
                     if (label.isEmpty()) {
-                        player.sendMessage(messages.render("quest.editor-invalid-label", player, Map.of()));
+                        player.sendMessage(messages.chat("quest.editor-invalid-label", player, Map.of()));
                         reopen();
                         return;
                     }
@@ -77,7 +77,7 @@ public final class QuestEditorObjectiveEditGui extends Gui {
                             List.of(messages.render("quest.editor-objective-edit-amount-hint", player, Map.of()))),
                     event -> chatInput.promptInt(player, "quest.editor-prompt-amount", value -> {
                         if (value <= 0) {
-                            player.sendMessage(messages.render("quest.editor-invalid-number", player, Map.of()));
+                            player.sendMessage(messages.chat("quest.editor-invalid-number", player, Map.of()));
                             reopen();
                             return;
                         }

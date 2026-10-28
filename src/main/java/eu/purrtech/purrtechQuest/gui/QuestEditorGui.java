@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -62,10 +63,14 @@ public final class QuestEditorGui extends Gui {
                     reopen();
                 }, this::reopen));
 
+        List<Component> descriptionLore = new ArrayList<>();
+        for (String line : Quest.descriptionLines(draft.description())) {
+            descriptionLore.add(Component.text(line, NamedTextColor.GRAY));
+        }
+        descriptionLore.add(messages.render("quest.editor-button-description-hint", player, Map.of()));
         setItem(DESCRIPTION_SLOT, GuiItems.icon(Material.WRITTEN_BOOK,
                         messages.render("quest.editor-button-description", player, Map.of()),
-                        List.of(Component.text(draft.description(), NamedTextColor.GRAY),
-                                messages.render("quest.editor-button-description-hint", player, Map.of()))),
+                        descriptionLore),
                 event -> chatInput.prompt(player, "quest.editor-prompt-description", value -> {
                     draft.description(value);
                     reopen();
@@ -74,10 +79,10 @@ public final class QuestEditorGui extends Gui {
         setItem(CATEGORY_SLOT, GuiItems.icon(Material.ITEM_FRAME,
                         messages.render("quest.editor-button-category", player, Map.of("%value%", draft.category())),
                         List.of(messages.render("quest.editor-button-category-hint", player, Map.of()))),
-                event -> chatInput.prompt(player, "quest.editor-prompt-category", value -> {
-                    draft.category(value);
+                event -> new CategoryPickerGui(messages, player, id -> {
+                    draft.category(id);
                     reopen();
-                }, this::reopen));
+                }, this::reopen).open(player));
 
         setItem(SORT_ORDER_SLOT, GuiItems.icon(Material.HOPPER,
                         messages.render("quest.editor-button-sort-order", player, Map.of("%value%", sortOrderValue())),
@@ -92,7 +97,7 @@ public final class QuestEditorGui extends Gui {
                     try {
                         draft.sortOrder(Integer.parseInt(typed));
                     } catch (NumberFormatException e) {
-                        player.sendMessage(messages.render("quest.editor-invalid-number", player, Map.of()));
+                        player.sendMessage(messages.chat("quest.editor-invalid-number", player, Map.of()));
                     }
                     reopen();
                 }, this::reopen));
@@ -145,7 +150,7 @@ public final class QuestEditorGui extends Gui {
         setItem(NPC_SLOT, GuiItems.icon(Material.VILLAGER_SPAWN_EGG,
                         messages.render("quest.editor-button-npc", player, Map.of("%value%", npcValue())),
                         List.of(messages.render("quest.editor-npc-hint", player, Map.of()))),
-                event -> player.sendMessage(messages.render("quest.editor-npc-hint", player, Map.of())));
+                event -> player.sendMessage(messages.chat("quest.editor-npc-hint", player, Map.of())));
 
         setItem(PERMISSION_SLOT, GuiItems.icon(Material.TRIPWIRE_HOOK,
                         messages.render("quest.editor-button-permission", player, Map.of("%value%", permissionValue())),
@@ -199,14 +204,14 @@ public final class QuestEditorGui extends Gui {
         try {
             quest = draft.toQuest();
         } catch (IllegalArgumentException e) {
-            player.sendMessage(messages.render("quest.editor-save-failed", player, Map.of("%reason%", String.valueOf(e.getMessage()))));
+            player.sendMessage(messages.chat("quest.editor-save-failed", player, Map.of("%reason%", String.valueOf(e.getMessage()))));
             return;
         }
         context.questRepository().save(quest);
         context.questService().reload();
         context.trackerRegistrationManager().refresh();
         context.questPermissionRegistrar().refresh();
-        player.sendMessage(messages.render("quest.editor-saved", player, Map.of("%quest%", quest.displayName())));
+        player.sendMessage(messages.chat("quest.editor-saved", player, Map.of("%quest%", quest.displayName())));
         player.closeInventory();
     }
 

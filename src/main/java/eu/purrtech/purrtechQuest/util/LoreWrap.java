@@ -17,7 +17,7 @@ import java.util.function.IntSupplier;
  * on whichever line it lands on. Lines break at spaces (a single word longer than a whole line is split in
  * the middle), and a {@code \n} in the text forces a break. The width is measured in characters — an
  * approximation, since the client draws letters at different widths — and is read live from the
- * {@code lore-wrap-width} setting in {@code config.yml} ({@link #widthWhen}); {@code 0} turns wrapping off.
+ * {@code gui.lore-wrap-width} setting in {@code config.yml} ({@link #widthWhen}); {@code 0} turns wrapping off.
  */
 public final class LoreWrap {
 
@@ -38,6 +38,31 @@ public final class LoreWrap {
 
     public static List<Component> wrap(Component line) {
         return wrap(line, "");
+    }
+
+    /**
+     * Wraps every line of an item's lore. A line that starts with a bullet (" - ", "● ", "• ", "* ") continues
+     * on its following lines indented by as much as the bullet took, so the text stays aligned under itself.
+     */
+    public static List<Component> wrapAll(List<Component> lore) {
+        if (width() <= 0) {
+            return lore;
+        }
+        List<Component> out = new ArrayList<>(lore.size());
+        for (Component line : lore) {
+            out.addAll(wrap(line, bulletIndent(line)));
+        }
+        return out;
+    }
+
+    private static String bulletIndent(Component line) {
+        String text = PlainTextComponentSerializer.plainText().serialize(line);
+        int length = 0;
+        while (length < text.length() && " -•*●".indexOf(text.charAt(length)) >= 0) {
+            length++;
+        }
+        // An indent wider than half the line would leave next to no room for the text itself.
+        return length > 0 && length <= width() / 2 ? " ".repeat(length) : "";
     }
 
     /**

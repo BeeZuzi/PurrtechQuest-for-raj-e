@@ -1,5 +1,6 @@
 package eu.purrtech.purrtechQuest.gui;
 
+import eu.purrtech.purrtechQuest.util.LoreWrap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -36,7 +37,7 @@ public final class GuiItems {
         ItemStack stack = base.clone();
         ItemMeta meta = stack.getItemMeta();
         meta.displayName(name.decoration(TextDecoration.ITALIC, false));
-        meta.lore(lore.stream().map(line -> line.decoration(TextDecoration.ITALIC, false)).toList());
+        meta.lore(LoreWrap.wrapAll(lore).stream().map(line -> line.decoration(TextDecoration.ITALIC, false)).toList());
         stack.setItemMeta(meta);
         return stack;
     }

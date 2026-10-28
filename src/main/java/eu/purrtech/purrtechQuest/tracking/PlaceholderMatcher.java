@@ -37,6 +37,46 @@ public final class PlaceholderMatcher {
         return compare(resolved, operator, expected);
     }
 
+    /** The placeholder's current value as a number, or {@code null} if PlaceholderAPI is missing or it isn't numeric. */
+    public static Double currentValue(QuestObjective objective, Player player) {
+        if (!isPresent()) {
+            return null;
+        }
+        return tryParse(PlaceholderAPI.setPlaceholders(player, objective.target()));
+    }
+
+    /**
+     * Progress of a relative objective: how far {@code current} has risen above {@code baseline}, whole units
+     * only, kept between 0 and {@code amount}. Package-visible for the unit test (the rest needs a live server).
+     */
+    static int relativeProgress(double current, double baseline, int amount) {
+        return (int) Math.max(0, Math.min(Math.floor(current - baseline), amount));
+    }
+
+    public static int relativeProgress(QuestObjective objective, double current, double baseline) {
+        return relativeProgress(current, baseline, objective.amount());
+    }
+
+    /**
+     * Progress to show for a counting PLACEHOLDER_CHECK (see {@link QuestObjective#placeholderCountTarget}):
+     * the placeholder's current number, capped just below {@code amount} until {@link #matches} agrees it's
+     * done — so a fractional value like 49.7 against {@code >= 49.5} still completes, and a value that
+     * rounds up to the amount can't show as finished early. {@code null} when the placeholder isn't numeric.
+     */
+    public static Integer countProgress(QuestObjective objective, Player player) {
+        if (!isPresent()) {
+            return null;
+        }
+        if (matches(objective, player)) {
+            return objective.amount();
+        }
+        Double current = tryParse(PlaceholderAPI.setPlaceholders(player, objective.target()));
+        if (current == null) {
+            return null;
+        }
+        return (int) Math.max(0, Math.min(Math.floor(current), objective.amount() - 1));
+    }
+
     /**
      * Package-visible so {@code PlaceholderMatcherTest} can exercise the comparison logic directly —
      * {@link #matches} needs a live PlaceholderAPI/Bukkit instance that plain JUnit doesn't have, but this

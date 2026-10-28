@@ -44,6 +44,43 @@ class QuestTest {
         assertEquals(List.of(apple, zebra), sorted);
     }
 
+    @Test
+    void descriptionSplitsOnPipeAndTrimsAroundIt() {
+        assertEquals(List.of("Vytěž železo", "a odnes ho kováři"),
+                Quest.descriptionLines("Vytěž železo | a odnes ho kováři"));
+    }
+
+    @Test
+    void doublePipeKeepsABlankLine() {
+        assertEquals(List.of("a", "", "b"), Quest.descriptionLines("a||b"));
+    }
+
+    @Test
+    void blankDescriptionHasNoLines() {
+        assertEquals(List.of(), Quest.descriptionLines(""));
+        assertEquals(List.of(), Quest.descriptionLines(null));
+    }
+
+    @Test
+    void countingPlaceholderCheckTakesItsNumberAsAmount() {
+        assertEquals(50, placeholderObjective(">=", "50").amount());
+        assertEquals(50, placeholderObjective(">", "49").amount());
+        assertEquals(50, placeholderObjective(">=", "49.5").amount());
+    }
+
+    @Test
+    void nonCountingPlaceholderCheckStaysSatisfiedOrNot() {
+        assertEquals(1, placeholderObjective("=", "50").amount());
+        assertEquals(1, placeholderObjective("<", "50").amount());
+        assertEquals(1, placeholderObjective(">=", "vip").amount());
+        assertEquals(1, placeholderObjective(">=", "1").amount());
+    }
+
+    private static QuestObjective placeholderObjective(String operator, String value) {
+        return new QuestObjective(ObjectiveType.PLACEHOLDER_CHECK, "%fish_caught%", 1,
+                java.util.Map.of("operator", operator, "value", value));
+    }
+
     private static Quest quest(String id, String displayName, Integer sortOrder) {
         return new Quest(id, displayName, "", "default",
                 List.of(new QuestObjective(ObjectiveType.BREAK_BLOCK, "STONE", 1)),

@@ -152,15 +152,15 @@ public final class QuestService {
     }
 
     /**
-     * The first quest the player currently has {@code IN_PROGRESS}, across every loaded quest rather than
-     * one category — what {@code QuestCategoryGui}'s guide item highlights as "what to do next".
+     * The first of {@code quests} the player currently has {@code IN_PROGRESS} — what the guide item
+     * highlights as "what to do next".
      */
-    public Optional<Quest> currentActiveQuest(Player player) {
+    public Optional<Quest> currentActiveQuest(Player player, Collection<Quest> quests) {
         PlayerQuestData data = playerCache.get(player.getUniqueId());
         if (data == null) {
             return Optional.empty();
         }
-        for (Quest quest : questsById.values()) {
+        for (Quest quest : quests) {
             QuestProgress progress = data.progress(quest.id());
             if (progress != null && progress.status() == QuestStatus.IN_PROGRESS) {
                 return Optional.of(quest);
@@ -169,20 +169,20 @@ public final class QuestService {
         return Optional.empty();
     }
 
-    /** Turned-in count vs. total across every loaded quest — the guide item's overall completion line. */
+    /** Turned-in count vs. total across the given quests — the guide item's overall completion line. */
     public record OverallSummary(int turnedIn, int total) {
     }
 
-    public OverallSummary overallSummary(Player player) {
+    public OverallSummary overallSummary(Player player, Collection<Quest> quests) {
         PlayerQuestData data = playerCache.get(player.getUniqueId());
         int turnedIn = 0;
-        for (Quest quest : questsById.values()) {
+        for (Quest quest : quests) {
             QuestProgress progress = data == null ? null : data.progress(quest.id());
             if (progress != null && progress.status() == QuestStatus.TURNED_IN) {
                 turnedIn++;
             }
         }
-        return new OverallSummary(turnedIn, questsById.size());
+        return new OverallSummary(turnedIn, quests.size());
     }
 
     public enum AcceptResult {
@@ -244,7 +244,9 @@ public final class QuestService {
 
         startFreshProgress(player, data, quest, timesCompleted);
         Component message = messages.render("quest.accepted", player, Map.of("%quest%", quest.displayName()));
-        player.sendMessage(message);
+        player.sendMessage(messages.withPrefix(message, player.locale().getLanguage()));
+        sendObjectiveLines(player, quest, data.progress(questId), "quest.accepted-objectives-header",
+                "quest.accepted-objective", "quest.accepted-objective-choice");
         notify(player, message, SOUND_ACCEPTED);
         return AcceptResult.ACCEPTED;
     }
@@ -302,7 +304,26 @@ public final class QuestService {
         QuestProgress fresh = new QuestProgress(quest.id(), QuestStatus.IN_PROGRESS,
                 new int[quest.objectives().size()], Instant.now(), null, timesCompleted);
         captureEarnMoneyBaselines(player, quest, fresh);
+        capturePlaceholderBaselines(player, quest, fresh);
         data.put(fresh);
+    }
+
+    /**
+     * Relative PLACEHOLDER_CHECK objectives count the placeholder's rise from its value right now, so that
+     * value is snapshotted once, at acceptance. Only touches PlaceholderAPI if the quest has such an objective.
+     */
+    private void capturePlaceholderBaselines(Player player, Quest quest, QuestProgress fresh) {
+        List<QuestObjective> objectives = quest.objectives();
+        for (int i = 0; i < objectives.size(); i++) {
+            QuestObjective objective = objectives.get(i);
+            if (!objective.relativePlaceholder()) {
+                continue;
+            }
+            Double value = PlaceholderMatcher.currentValue(objective, player);
+            if (value != null) {
+                fresh.baseline(i, value);
+            }
+        }
     }
 
     /**
@@ -339,7 +360,7 @@ public final class QuestService {
                 new int[progress.objectiveProgress().length], null, null, progress.timesCompleted()));
         Quest quest = questsById.get(questId);
         String displayName = quest != null ? quest.displayName() : questId;
-        player.sendMessage(messages.render("quest.abandoned", player, Map.of("%quest%", displayName)));
+        player.sendMessage(messages.chat("quest.abandoned", player, Map.of("%quest%", displayName)));
         if (quest != null) {
             eventPublisher.publish(new QuestAbandonEvent(player, quest));
         }
@@ -379,7 +400,7 @@ public final class QuestService {
             progress.completedAt(Instant.now());
         }
         data.markDirty();
-        player.sendMessage(messages.render("quest.turned-in", player, Map.of("%quest%", quest.displayName())));
+        player.sendMessage(messages.chat("quest.turned-in", player, Map.of("%quest%", quest.displayName())));
         player.playSound(player.getLocation(), SOUND_TURNED_IN, 1f, 1f);
 
         // Turning this quest in may have just satisfied another quest's required-quests prerequisite — if
@@ -495,12 +516,39 @@ public final class QuestService {
                 if (isChoiceLockedOut(quest, progress, i)) {
                     continue;
                 }
-                if (PlaceholderMatcher.matches(objective, player)) {
-                    int previous = progress.objectiveProgress(i);
-                    progress.incrementObjective(i, objective.amount() - previous);
+                int previous = progress.objectiveProgress(i);
+                int current;
+                if (objective.relativePlaceholder()) {
+                    Double value = PlaceholderMatcher.currentValue(objective, player);
+                    if (value == null) {
+                        continue;
+                    }
+                    Double baseline = progress.baseline(i);
+                    if (baseline == null) {
+                        // No baseline yet (PlaceholderAPI was missing or the value unreadable at accept time):
+                        // start counting from now rather than crediting the whole lifetime statistic.
+                        progress.baseline(i, value);
+                        changed = true;
+                        continue;
+                    }
+                    // A statistic only grows, so progress never goes back down (e.g. after a stat reset).
+                    current = Math.max(previous, PlaceholderMatcher.relativeProgress(objective, value, baseline));
+                } else if (QuestObjective.placeholderCountTarget(objective.meta()) != null) {
+                    // Counting objective: mirror the placeholder's live number (can also go down, e.g. a balance).
+                    Integer count = PlaceholderMatcher.countProgress(objective, player);
+                    if (count == null) {
+                        continue;
+                    }
+                    current = count;
+                } else if (PlaceholderMatcher.matches(objective, player)) {
+                    current = objective.amount();
+                } else {
+                    continue;
+                }
+                if (current != previous) {
+                    progress.incrementObjective(i, current - previous);
                     changed = true;
-                    eventPublisher.publish(
-                            new QuestObjectiveProgressEvent(player, quest, i, previous, progress.objectiveProgress(i)));
+                    eventPublisher.publish(new QuestObjectiveProgressEvent(player, quest, i, previous, current));
                 }
             }
             if (changed) {
@@ -638,6 +686,69 @@ public final class QuestService {
         }
     }
 
+    /**
+     * Chat overview of every quest the player currently has {@code IN_PROGRESS}, with each objective's
+     * progress — sent on join when {@code join-summary.enabled} is on. Sends nothing if there are none.
+     */
+    public void sendActiveQuestsSummary(Player player) {
+        PlayerQuestData data = playerCache.get(player.getUniqueId());
+        if (data == null) {
+            return;
+        }
+        List<Quest> active = questsById.values().stream()
+                .filter(quest -> {
+                    QuestProgress progress = data.progress(quest.id());
+                    return progress != null && progress.status() == QuestStatus.IN_PROGRESS;
+                })
+                .toList();
+        if (active.isEmpty()) {
+            return;
+        }
+        sendIfSet(player, "quest.join-active-header", Map.of(), true);
+        player.sendMessage(Component.empty());
+        for (Quest quest : active) {
+            sendObjectiveLines(player, quest, data.progress(quest.id()), "quest.join-active-quest",
+                    "quest.join-active-objective", "quest.join-active-objective-choice");
+            player.sendMessage(Component.empty());
+        }
+    }
+
+    /**
+     * A header line followed by one line per objective, skipping choice alternatives already locked out
+     * (same rule as {@code /quest info}). Shared by the accept message and the join summary.
+     */
+    private void sendObjectiveLines(Player player, Quest quest, QuestProgress progress, String headerKey,
+                                    String objectiveKey, String choiceKey) {
+        sendIfSet(player, headerKey, Map.of("%quest%", quest.displayName()), false);
+        List<QuestObjective> objectives = quest.objectives();
+        Set<String> satisfiedGroups = ChoiceGroups.satisfiedGroups(quest, progress);
+        for (int i = 0; i < objectives.size(); i++) {
+            QuestObjective objective = objectives.get(i);
+            int current = progress.objectiveProgress(i);
+            if (objective.choiceGroup() != null && current < objective.amount()
+                    && satisfiedGroups.contains(objective.choiceGroup())) {
+                continue;
+            }
+            Map<String, String> placeholders = new LinkedHashMap<>();
+            placeholders.put("%quest%", quest.displayName());
+            placeholders.put("%label%", messages.objectiveLabel(objective, player));
+            placeholders.put("%progress%", String.valueOf(current));
+            placeholders.put("%amount%", String.valueOf(objective.amount()));
+            sendIfSet(player, objective.choiceGroup() != null ? choiceKey : objectiveKey, placeholders, false);
+        }
+    }
+
+    /**
+     * An admin blanking a lang line ({@code ""}) turns just that line off instead of sending an empty one.
+     * {@code prefixed} is for the first line of a block; the lines under it go without the chat prefix.
+     */
+    private void sendIfSet(Player player, String key, Map<String, String> placeholders, boolean prefixed) {
+        if (messages.get(key, player.locale().getLanguage()).isBlank()) {
+            return;
+        }
+        player.sendMessage(prefixed ? messages.chat(key, player, placeholders) : messages.render(key, player, placeholders));
+    }
+
     private boolean applyProgress(Player player, QuestProgress progress, Quest quest, ObjectiveType type, String target, int amount) {
         boolean changed = false;
         List<QuestObjective> objectives = quest.objectives();
@@ -677,7 +788,7 @@ public final class QuestService {
         progress.status(QuestStatus.COMPLETED);
         progress.completedAt(Instant.now());
         Component message = messages.render("quest.completed", player, Map.of("%quest%", quest.displayName()));
-        player.sendMessage(message);
+        player.sendMessage(messages.withPrefix(message, player.locale().getLanguage()));
         notify(player, message, SOUND_COMPLETED);
         eventPublisher.publish(new QuestCompleteEvent(player, quest));
         if (quest.autoTurnIn()) {

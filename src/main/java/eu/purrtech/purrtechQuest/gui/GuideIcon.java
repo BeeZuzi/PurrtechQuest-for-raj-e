@@ -1,6 +1,10 @@
 package eu.purrtech.purrtechQuest.gui;
 
+import eu.purrtech.purrtechQuest.config.CategoriesConfig;
+import eu.purrtech.purrtechQuest.config.GuideConfig;
 import eu.purrtech.purrtechQuest.config.MessagesConfig;
+import eu.purrtech.purrtechQuest.util.DisplayText;
+import net.kyori.adventure.text.format.NamedTextColor;
 import eu.purrtech.purrtechQuest.model.ChoiceGroups;
 import eu.purrtech.purrtechQuest.model.PlayerQuestData;
 import eu.purrtech.purrtechQuest.model.Quest;
@@ -8,7 +12,6 @@ import eu.purrtech.purrtechQuest.model.QuestObjective;
 import eu.purrtech.purrtechQuest.model.QuestProgress;
 import eu.purrtech.purrtechQuest.player.PlayerQuestDataCache;
 import eu.purrtech.purrtechQuest.service.QuestService;
-import eu.purrtech.purrtechQuest.util.LoreWrap;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -28,36 +31,34 @@ import java.util.Set;
  */
 final class GuideIcon {
 
-    /** Lined up under the text after a "● " bullet. */
-    private static final String BULLET_INDENT = "  ";
-    /** Lined up under the text after the " -  " of a progress line. */
-    private static final String PROGRESS_INDENT = "    ";
-
     private GuideIcon() {
     }
 
     /** {@code clickable} adds the "click to see every quest" hint line; leave it off where clicking does nothing. */
     static ItemStack build(QuestService questService, PlayerQuestDataCache playerCache, MessagesConfig messages,
                            Player player, boolean clickable) {
-        Component name = messages.render("quest.guide-name", player, Map.of());
+        GuideConfig guide = GuideConfig.load();
+        Component name = guide.name() == null
+                ? messages.render("quest.guide-name", player, Map.of())
+                : DisplayText.component(guide.name(), NamedTextColor.WHITE);
         List<Component> lore = new ArrayList<>();
         lore.add(messages.render("quest.guide-intro", player, Map.of()));
 
-        QuestService.OverallSummary overall = questService.overallSummary(player);
+        List<Quest> covered = guide.quests(CategoriesConfig.load(), questService.allQuests());
+        QuestService.OverallSummary overall = questService.overallSummary(player, covered);
         lore.add(messages.render("quest.guide-completed", player, Map.of(
                 "%done%", String.valueOf(overall.turnedIn()), "%total%", String.valueOf(overall.total()))));
         lore.add(Component.empty());
         lore.add(messages.render("quest.guide-current-quest-header", player, Map.of()));
 
-        Quest active = questService.currentActiveQuest(player).orElse(null);
+        Quest active = questService.currentActiveQuest(player, covered).orElse(null);
         if (active == null) {
             lore.add(messages.render("quest.guide-no-active-quest", player, Map.of()));
         } else {
-            lore.addAll(LoreWrap.wrap(messages.render("quest.guide-current-quest-name", player,
-                    Map.of("%quest%", active.displayName())), BULLET_INDENT));
-            if (!active.description().isBlank()) {
-                lore.addAll(LoreWrap.wrap(messages.render("quest.guide-current-quest-description", player,
-                        Map.of("%description%", active.description())), BULLET_INDENT));
+            lore.add(messages.render("quest.guide-current-quest-name", player, Map.of("%quest%", active.displayName())));
+            for (String line : active.descriptionLines()) {
+                lore.add(messages.render("quest.guide-current-quest-description", player,
+                        Map.of("%description%", line)));
             }
             lore.add(Component.empty());
             lore.add(messages.render("quest.guide-progress-header", player, Map.of()));
@@ -68,7 +69,8 @@ final class GuideIcon {
             lore.add(messages.render("quest.gui-lore-guide-hint", player, Map.of()));
         }
 
-        return GuiItems.icon(Material.SPYGLASS, name, lore);
+        return GuiItems.icon(CategoryMenu.baseStack(guide.material(), guide.customModelData(), guide.glow(),
+                guide.texture()), name, lore);
     }
 
     private static List<Component> objectiveProgressLines(PlayerQuestDataCache playerCache, MessagesConfig messages,
@@ -88,10 +90,10 @@ final class GuideIcon {
             if (objective.choiceGroup() != null && !satisfied && satisfiedGroups.contains(objective.choiceGroup())) {
                 continue;
             }
-            lines.addAll(LoreWrap.wrap(messages.render("quest.guide-progress-line", player, Map.of(
-                    "%label%", objective.label(),
+            lines.add(messages.render("quest.guide-progress-line", player, Map.of(
+                    "%label%", messages.objectiveLabel(objective, player),
                     "%progress%", String.valueOf(current),
-                    "%amount%", String.valueOf(objective.amount()))), PROGRESS_INDENT));
+                    "%amount%", String.valueOf(objective.amount()))));
         }
         return lines;
     }

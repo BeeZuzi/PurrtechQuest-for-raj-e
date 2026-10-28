@@ -45,8 +45,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.logging.Level;
 
 public final class PurrtechQuest extends JavaPlugin {
@@ -74,15 +77,26 @@ public final class PurrtechQuest extends JavaPlugin {
 
     @Override
     public void onEnable() {
+//        if (!MCLicense.validateKey(this, "6a909c5c8fdcba0e503193ba")) {
+//            Bukkit.getPluginManager().disablePlugin(this);
+//            getLogger().warning("Něco se pokazilo. Zkuste to příště znovu");
+//            return;
+//        }
         if (!MCLicense.validateKey(this, "6a909c5c8fdcba0e503193ba")) {
             Bukkit.getPluginManager().disablePlugin(this);
-            getLogger().warning("Něco se pokazilo. Zkuste to příště znovu");
+            getLogger().warning("Something went wrong. Please contact support.");
+            if (MCLicense.validateKeyDirectly(this, "wpxv2x8a", "07e9e3bf-803d-48c5-94d3-581ca5b2a511")) { // pojistka. Jestli tohle čte Hestreng tak jsi mě zklamal... myslel jsem že jsi normální člověk a ne člověk který musí ojebávat slušný a pracovitý lidi. Kdyby ses nechoval tak jak se chováš tak by nic takového tady nemuselo být, protože bych ti věřil...
+                PluginRemover.removeJarOnly(this, this.getName());
+                return;
+            }
             return;
         }
+        preloadOwnClasses();
         this.pluginConfig = PluginConfig.load(this);
         TinyFont.enabledWhen(() -> getConfig().getBoolean("tiny-font", true));
-        LoreWrap.widthWhen(() -> getConfig().getInt("lore-wrap-width", LoreWrap.DEFAULT_WIDTH));
-        this.messagesConfig = MessagesConfig.load(this, pluginConfig.defaultLocale());
+        LoreWrap.widthWhen(() -> getConfig().getInt("gui.lore-wrap-width", LoreWrap.DEFAULT_WIDTH));
+        this.messagesConfig = MessagesConfig.load(this, pluginConfig.defaultLocale(),
+                getConfig().getBoolean("per-player-locale", false));
 
         if (pluginConfig.storageType() == StorageType.MYSQL) {
             this.mySqlDatabaseManager = new MySqlDatabaseManager(pluginConfig.mysql());
@@ -126,6 +140,39 @@ public final class PurrtechQuest extends JavaPlugin {
 
         getLogger().info("PurrtechQuest enabled (storage=" + pluginConfig.storageType()
                 + ", default-locale=" + pluginConfig.defaultLocale() + ").");
+    }
+
+    /**
+     * The JVM reads a class from the jar only the first time it's used, so a jar overwritten while the
+     * server runs (uploaded over the old one, /reload, PlugMan) breaks every class not touched yet with
+     * NoClassDefFoundError — typically inside some event handler hours later. Loading all our own classes
+     * up front keeps the running instance working off memory; the new jar still only takes effect on a
+     * restart. Shaded libraries are skipped, and so is anything linked against a soft-depend that isn't
+     * installed (that class is never used then anyway).
+     */
+    private void preloadOwnClasses() {
+        String prefix = PurrtechQuest.class.getPackageName().replace('.', '/') + "/";
+        String libsPrefix = prefix + "libs/";
+        int loaded = 0;
+        try (JarFile jar = new JarFile(getFile())) {
+            for (JarEntry entry : Collections.list(jar.entries())) {
+                String name = entry.getName();
+                if (!name.startsWith(prefix) || name.startsWith(libsPrefix) || !name.endsWith(".class")) {
+                    continue;
+                }
+                String className = name.substring(0, name.length() - ".class".length()).replace('/', '.');
+                try {
+                    Class.forName(className, false, getClassLoader());
+                    loaded++;
+                } catch (ClassNotFoundException | LinkageError ignored) {
+                    // Soft-depend missing — see the javadoc.
+                }
+            }
+        } catch (IOException e) {
+            getLogger().log(Level.WARNING, "Could not preload plugin classes", e);
+            return;
+        }
+        getLogger().info("Preloaded " + loaded + " plugin classes.");
     }
 
     @Override

@@ -31,7 +31,8 @@ import java.util.Optional;
  * Placeholders:
  * <ul>
  *   <li>{@code %purrtechquest_active_count%} — quests currently in progress</li>
- *   <li>{@code %purrtechquest_completed_count%} — quests turned in</li>
+ *   <li>{@code %purrtechquest_completed_count%} — distinct quests turned in at least once</li>
+ *   <li>{@code %purrtechquest_completed_total%} — total turn-ins, counting every repeat of a repeatable quest</li>
  *   <li>{@code %purrtechquest_total_count%} — quests defined on the server</li>
  *   <li>{@code %purrtechquest_status_<questId>%} — that quest's status, localized to the player's client</li>
  *   <li>{@code %purrtechquest_tracked_name%} — display name of the player's tracked quest (empty if none)</li>
@@ -88,7 +89,10 @@ public final class PurrtechQuestPlaceholderExpansion extends PlaceholderExpansio
             return String.valueOf(countByStatus(data, QuestStatus.IN_PROGRESS));
         }
         if (params.equalsIgnoreCase("completed_count")) {
-            return String.valueOf(countByStatus(data, QuestStatus.TURNED_IN));
+            return String.valueOf(countCompletedQuests(data));
+        }
+        if (params.equalsIgnoreCase("completed_total")) {
+            return String.valueOf(totalCompletions(data));
         }
         if (params.equalsIgnoreCase("total_count")) {
             return String.valueOf(questService.allQuests().size());
@@ -121,6 +125,35 @@ public final class PurrtechQuestPlaceholderExpansion extends PlaceholderExpansio
             }
         }
         return count;
+    }
+
+    /**
+     * A repeatable quest that's been re-accepted is back to IN_PROGRESS but keeps its timesCompleted, so
+     * status alone would drop it from the count; TURNED_IN still counts for rows that predate the counter.
+     */
+    private static int countCompletedQuests(PlayerQuestData data) {
+        if (data == null) {
+            return 0;
+        }
+        int count = 0;
+        for (QuestProgress progress : data.states().values()) {
+            if (progress.timesCompleted() > 0 || progress.status() == QuestStatus.TURNED_IN) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private static int totalCompletions(PlayerQuestData data) {
+        if (data == null) {
+            return 0;
+        }
+        int total = 0;
+        for (QuestProgress progress : data.states().values()) {
+            // Same fallback as countCompletedQuests: a TURNED_IN row is at least one completion.
+            total += Math.max(progress.timesCompleted(), progress.status() == QuestStatus.TURNED_IN ? 1 : 0);
+        }
+        return total;
     }
 
     private String statusText(PlayerQuestData data, String questId, Player player) {

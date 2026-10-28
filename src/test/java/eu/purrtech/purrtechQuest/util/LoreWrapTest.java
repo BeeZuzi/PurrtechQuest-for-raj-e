@@ -106,6 +106,35 @@ class LoreWrapTest {
         assertEquals(1, LoreWrap.wrap(line).size());
     }
 
+    @Test
+    void wrapAllIndentsAContinuationUnderTheTextOfADashBullet() {
+        LoreWrap.widthWhen(() -> 10);
+        assertEquals(List.of(" - aaa bbb", "   ccc", "   ddddddd", "   ddddd"),
+                plain(LoreWrap.wrapAll(List.of(Component.text(" - aaa bbb ccc dddddddddddd")))));
+    }
+
+    @Test
+    void wrapAllIndentsUnderADotBulletToo() {
+        LoreWrap.widthWhen(() -> 20);
+        List<String> lines = plain(LoreWrap.wrapAll(List.of(Component.text("● ")
+                .append(Component.text("zajdi za rybářem yakarim a prozkoumej jeho možnosti")))));
+        assertTrue(lines.size() > 1);
+        assertEquals("  ", lines.get(1).substring(0, 2));
+        assertFalse(lines.get(1).startsWith("   "));
+    }
+
+    @Test
+    void wrapAllLeavesShortLinesAndBlankLinesAlone() {
+        List<Component> lore = List.of(Component.text("abc"), Component.empty());
+        assertEquals(lore, LoreWrap.wrapAll(lore));
+    }
+
+    @Test
+    void wrapAllBreaksBetweenWords() {
+        assertEquals(List.of("Pokacej 100 dubovych", "klad a vyrob prkna"),
+                plain(LoreWrap.wrapAll(List.of(Component.text("Pokacej 100 dubovych klad a vyrob prkna")))));
+    }
+
     private static TextColor colorOf(Component node, String word) {
         return find(node, word, null);
     }
