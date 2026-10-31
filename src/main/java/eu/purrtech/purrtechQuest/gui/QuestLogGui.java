@@ -1,6 +1,7 @@
 package eu.purrtech.purrtechQuest.gui;
 
 import eu.purrtech.purrtechQuest.config.GuideConfig;
+import eu.purrtech.purrtechQuest.config.CategoriesConfig.Category;
 import eu.purrtech.purrtechQuest.config.MessagesConfig;
 import eu.purrtech.purrtechQuest.model.PlayerQuestData;
 import eu.purrtech.purrtechQuest.model.Quest;
@@ -53,8 +54,8 @@ public final class QuestLogGui extends Gui {
     private final List<Quest> quests;
     private final Runnable onBack;
     private final List<Integer> questSlots;
-    /** The open category's configured name, shown on the guide item; {@code null} for a list that isn't a category. */
-    private final String categoryName;
+    /** The open category, shown in place of the guide item; {@code null} for a list that isn't a category. */
+    private final Category category;
     private int page;
 
     /** {@code onBack} may be {@code null} — no back button is shown then (the NPC-linked, category-less flow). */
@@ -63,9 +64,9 @@ public final class QuestLogGui extends Gui {
         this(questService, playerCache, trackingService, messages, player, quests, null, onBack);
     }
 
-    /** {@code categoryName} is shown as the guide item's name, in place of "Průvodce" (see {@link GuideIcon}). */
+    /** {@code category} replaces the guide item with that category's own item and progress (see {@link GuideIcon}). */
     public QuestLogGui(QuestService questService, PlayerQuestDataCache playerCache, QuestTrackingService trackingService,
-                        MessagesConfig messages, Player player, List<Quest> quests, String categoryName,
+                        MessagesConfig messages, Player player, List<Quest> quests, Category category,
                         Runnable onBack) {
         super(messages.render("quest.gui-log-title", player, Map.of()), SIZE);
         this.questService = questService;
@@ -75,7 +76,7 @@ public final class QuestLogGui extends Gui {
         this.player = player;
         this.quests = quests.stream().sorted(Quest.DISPLAY_ORDER).toList();
         this.onBack = onBack;
-        this.categoryName = categoryName;
+        this.category = category;
         this.questSlots = questSlots();
         this.page = 0;
         render();
@@ -96,7 +97,7 @@ public final class QuestLogGui extends Gui {
                             this::reopen).open(player));
         }
 
-        setItem(GUIDE_SLOT, GuideIcon.buildForList(questService, playerCache, messages, player, quests, categoryName), null);
+        setItem(GUIDE_SLOT, GuideIcon.buildForCategory(questService, playerCache, messages, player, quests, category), null);
 
         if (page > 0) {
             setItem(PREV_SLOT, GuiItems.icon(Material.ARROW,
@@ -177,7 +178,7 @@ public final class QuestLogGui extends Gui {
 //    }
 
     private void reopen() {
-        new QuestLogGui(questService, playerCache, trackingService, messages, player, quests, categoryName, onBack)
+        new QuestLogGui(questService, playerCache, trackingService, messages, player, quests, category, onBack)
                 .open(player);
     }
 }

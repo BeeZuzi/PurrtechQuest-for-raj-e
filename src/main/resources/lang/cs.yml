@@ -41,8 +41,6 @@ quest:
   category-hint-open: "<dark_gray>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴢᴏʙʀᴀᴢᴇɴí ǫᴜᴇsᴛů</dark_gray>"
   category-hint-sub: "<dark_gray>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴘᴏᴅᴋᴀᴛᴇɢᴏʀɪᴇ</dark_gray>"
   category-hint-pick: "<dark_gray>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴠýʙěʀ</dark_gray>"
-  category-open-own: "<gold>ǫᴜᴇsᴛʏ ᴛéᴛᴏ ᴋᴀᴛᴇɢᴏʀɪᴇ</gold>"
-  category-open-own-hint: "<gray>Zobrazí questy této kategorie i jejích podkategorií.</gray>"
   category-pick-this: "<green>Vybrat tuto kategorii</green>"
   category-pick-this-hint: "<gray>Nastaví questu tuto kategorii (ne podkategorii).</gray>"
   accepted-objectives-header: "<gray>Co musíš splnit:</gray>"

@@ -41,8 +41,6 @@ quest:
   category-hint-open: "<dark_gray>Click to view the quests</dark_gray>"
   category-hint-sub: "<dark_gray>Click for subcategories</dark_gray>"
   category-hint-pick: "<dark_gray>Click to select</dark_gray>"
-  category-open-own: "<gold>This category's quests</gold>"
-  category-open-own-hint: "<gray>Shows the quests of this category and its subcategories.</gray>"
   category-pick-this: "<green>Select this category</green>"
   category-pick-this-hint: "<gray>Sets this category for the quest (not a subcategory).</gray>"
   accepted-objectives-header: "<gray>What you need to do:</gray>"

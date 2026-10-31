@@ -1,5 +1,6 @@
 package eu.purrtech.purrtechQuest.npc;
 
+import eu.purrtech.purrtechQuest.config.CategoriesConfig;
 import eu.purrtech.purrtechQuest.config.MessagesConfig;
 import eu.purrtech.purrtechQuest.gui.QuestLogGui;
 import eu.purrtech.purrtechQuest.model.Quest;
@@ -29,6 +30,6 @@ final class QuestGiverInteraction {
         if (quests.isEmpty()) {
             return;
         }
-        new QuestLogGui(questService, playerCache, trackingService, messages, player, quests, null).open(player);
+        new QuestLogGui(questService, playerCache, trackingService, messages, player, quests, (CategoriesConfig.Category) null, null).open(player);
     }
 }

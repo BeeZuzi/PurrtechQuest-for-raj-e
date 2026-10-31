@@ -29,9 +29,9 @@ import java.util.Set;
  * {@link QuestService#currentActiveQuest}) — its name, description, and live objective progress.
  * <p>
  * On the landing page ({@link QuestCategoryGui}, where clicking it opens the quest list) it covers the server
- * guide's own quests ({@link GuideConfig#quests}). Inside a quest list ({@link QuestLogGui}, where it is
- * display-only) it covers the quests of the list that is open instead, so inside a category it counts that
- * category's quests and never the server guide's.
+ * guide's own quests ({@link GuideConfig#quests}). Inside a category's quest list ({@link QuestLogGui}, where it
+ * is display-only) it is not the guide at all: it is that category's own item (its name and look from
+ * {@code categories:}) with the category's completed count and the quest in progress there.
  */
 final class GuideIcon {
 
@@ -47,21 +47,23 @@ final class GuideIcon {
     }
 
     /**
-     * The guide inside a quest list: covers exactly the quests that list shows (the open category's), not the
-     * server guide's. {@code categoryName} (the category's configured name) replaces "Průvodce" as the item's
-     * name; {@code null}/blank — a list that isn't a category, like an NPC's — keeps the guide's own name.
+     * The item at the top of a quest list: for an open category, that category's own item (its configured
+     * name, or its id if it has none, and its look) with no guide intro line, covering exactly the quests the
+     * list shows. A list that isn't a category (an NPC's) has none to show and keeps the plain guide item.
      */
-    static ItemStack buildForList(QuestService questService, PlayerQuestDataCache playerCache,
-                                  MessagesConfig messages, Player player, Collection<Quest> listed,
-                                  String categoryName) {
-        return render(questService, playerCache, messages, player, GuideConfig.load(), listed, categoryName, false);
+    static ItemStack buildForCategory(QuestService questService, PlayerQuestDataCache playerCache,
+                                      MessagesConfig messages, Player player, Collection<Quest> listed,
+                                      CategoriesConfig.Category category) {
+        return render(questService, playerCache, messages, player, GuideConfig.load(), listed, category, false);
     }
 
     private static ItemStack render(QuestService questService, PlayerQuestDataCache playerCache,
                                     MessagesConfig messages, Player player, GuideConfig guide,
-                                    Collection<Quest> covered, String categoryName, boolean clickable) {
+                                    Collection<Quest> covered, CategoriesConfig.Category category,
+                                    boolean clickable) {
         Component name;
-        if (categoryName != null && !categoryName.isBlank()) {
+        if (category != null) {
+            String categoryName = category.name() == null || category.name().isBlank() ? category.id() : category.name();
             name = DisplayText.component(categoryName, NamedTextColor.WHITE);
         } else if (guide.name() == null) {
             name = messages.render("quest.guide-name", player, Map.of());
@@ -69,7 +71,9 @@ final class GuideIcon {
             name = DisplayText.component(guide.name(), NamedTextColor.WHITE);
         }
         List<Component> lore = new ArrayList<>();
-        lore.add(messages.render("quest.guide-intro", player, Map.of()));
+        if (category == null) {
+            lore.add(messages.render("quest.guide-intro", player, Map.of()));
+        }
 
         QuestService.OverallSummary overall = questService.overallSummary(player, covered);
         lore.add(messages.render("quest.guide-completed", player, Map.of(
@@ -95,8 +99,11 @@ final class GuideIcon {
             lore.add(messages.render("quest.gui-lore-guide-hint", player, Map.of()));
         }
 
-        return GuiItems.icon(CategoryMenu.baseStack(guide.material(), guide.customModelData(), guide.glow(),
-                guide.texture()), name, lore);
+        ItemStack base = category == null
+                ? CategoryMenu.baseStack(guide.material(), guide.customModelData(), guide.glow(), guide.texture())
+                : CategoryMenu.baseStack(category.material(), category.customModelData(), category.glow(),
+                        category.texture());
+        return GuiItems.icon(base, name, lore);
     }
 
     private static List<Component> objectiveProgressLines(PlayerQuestDataCache playerCache, MessagesConfig messages,

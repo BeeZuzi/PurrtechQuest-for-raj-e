@@ -20,7 +20,7 @@ import java.util.Set;
  * configured slot, plus (on the main menu only) the "guide" item ({@code guide:} in the config) — turned-in/total
  * across the guide's quests and a breakdown of the one in progress; clicking it opens {@link QuestLogGui} with
  * just the guide's quests ({@link GuideConfig#quests}), so a quest in another category never shows up there. Clicking a category opens its subcategories (a menu of the same kind),
- * or its quest list when it has none. A submenu's bottom row also has a button for the category's own quests.
+ * or its quest list when it has none.
  */
 public final class QuestCategoryGui extends Gui {
 
@@ -84,10 +84,6 @@ public final class QuestCategoryGui extends Gui {
             setItem(row + 3, GuiItems.icon(Material.IRON_DOOR, messages.render("quest.gui-nav-back", player, Map.of()),
                             List.of(messages.render("quest.gui-nav-back-hint", player, Map.of()))),
                     event -> onBack.run());
-            setItem(row + 5, GuiItems.icon(Material.BOOKSHELF,
-                            messages.render("quest.category-open-own", player, Map.of()),
-                            List.of(messages.render("quest.category-open-own-hint", player, Map.of()))),
-                    event -> openQuests(parent));
         }
         setItem(row + 4, GuiItems.closeButton(messages.render("quest.gui-nav-close", player, Map.of()),
                         List.of(messages.render("quest.gui-nav-close-hint", player, Map.of()))),
@@ -105,7 +101,7 @@ public final class QuestCategoryGui extends Gui {
 
     private void openQuests(Category category) {
         new QuestLogGui(questService, playerCache, trackingService, messages, player,
-                categories.quests(category, questService.allQuests()), category.name(), this::reopen).open(player);
+                categories.quests(category, questService.allQuests()), category, this::reopen).open(player);
     }
 
     /** Re-reads the config, so a reload done while a player had a submenu open still takes effect on return. */
