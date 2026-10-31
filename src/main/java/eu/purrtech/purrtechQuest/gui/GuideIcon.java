@@ -13,6 +13,8 @@ import eu.purrtech.purrtechQuest.model.QuestProgress;
 import eu.purrtech.purrtechQuest.player.PlayerQuestDataCache;
 import eu.purrtech.purrtechQuest.service.QuestService;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -64,7 +66,12 @@ final class GuideIcon {
         Component name;
         if (category != null) {
             String categoryName = category.name() == null || category.name().isBlank() ? category.id() : category.name();
-            name = DisplayText.component(categoryName, NamedTextColor.WHITE);
+            // Only the words of the configured name: the guide's own color and boldness (lang guide-category-name)
+            // replace whatever colors the config gave it, so the item reads as one piece with its lore below.
+            String plain = PlainTextComponentSerializer.plainText()
+                    .serialize(DisplayText.component(categoryName, NamedTextColor.WHITE));
+            name = messages.render("quest.guide-category-name", player,
+                    Map.of("%name%", MiniMessage.miniMessage().escapeTags(plain)));
         } else if (guide.name() == null) {
             name = messages.render("quest.guide-name", player, Map.of());
         } else {

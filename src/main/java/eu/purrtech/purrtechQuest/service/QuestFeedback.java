@@ -27,6 +27,8 @@ public final class QuestFeedback {
             case ALREADY_COMPLETED -> fail(player, messages, "quest.already-completed", Map.of());
             case PREREQUISITES_NOT_MET -> fail(player, messages, "quest.prerequisites-not-met", Map.of());
             case MISSING_PERMISSION -> fail(player, messages, "quest.missing-permission", Map.of());
+            case ACTIVE_LIMIT_REACHED -> fail(player, messages, "quest.active-limit-reached",
+                    Map.of("%limit%", String.valueOf(questService.activeQuestLimit(player))));
             case DATA_NOT_LOADED -> fail(player, messages, "quest.data-not-loaded", Map.of());
             case ON_COOLDOWN -> {
                 String time = questService.cooldownReadyAt(player, questId)

@@ -4,6 +4,7 @@ import eu.purrtech.purrtechQuest.api.event.QuestAcceptEvent;
 import eu.purrtech.purrtechQuest.api.event.QuestCompleteEvent;
 import eu.purrtech.purrtechQuest.api.event.QuestObjectiveProgressEvent;
 import eu.purrtech.purrtechQuest.api.event.QuestTurnInEvent;
+import eu.purrtech.purrtechQuest.config.ActiveQuestLimits;
 import eu.purrtech.purrtechQuest.config.MessagesConfig;
 import eu.purrtech.purrtechQuest.model.ObjectiveType;
 import eu.purrtech.purrtechQuest.model.Quest;
@@ -151,6 +152,35 @@ class QuestServiceTest {
                 List.of(new QuestObjective(ObjectiveType.BREAK_BLOCK, "GOLD_BLOCK", 1)),
                 List.of(new QuestReward.Experience(1)), List.of(),
                 List.of(), false, 0, false, false, null, "purrtechquest.quest.vip"));
+    }
+
+    @Test
+    void activeQuestLimitStopsAcceptingMoreQuests() {
+        questService.activeQuestLimits(() -> new ActiveQuestLimits(2, "group.%rank%", Map.of()));
+
+        assertEquals(QuestService.AcceptResult.ACCEPTED, questService.acceptQuest(player, "mine_iron"));
+        assertEquals(QuestService.AcceptResult.ACCEPTED, questService.acceptQuest(player, "break_stone"));
+        assertEquals(QuestService.AcceptResult.ACTIVE_LIMIT_REACHED, questService.acceptQuest(player, "choose_path"));
+    }
+
+    @Test
+    void abandoningFreesASlotUnderTheActiveQuestLimit() {
+        questService.activeQuestLimits(() -> new ActiveQuestLimits(1, "group.%rank%", Map.of()));
+
+        assertEquals(QuestService.AcceptResult.ACCEPTED, questService.acceptQuest(player, "break_stone"));
+        assertEquals(QuestService.AcceptResult.ACTIVE_LIMIT_REACHED, questService.acceptQuest(player, "choose_path"));
+        questService.abandonQuest(player, "break_stone");
+        assertEquals(QuestService.AcceptResult.ACCEPTED, questService.acceptQuest(player, "choose_path"));
+    }
+
+    @Test
+    void aHigherRankRaisesTheActiveQuestLimit() {
+        questService.activeQuestLimits(() -> new ActiveQuestLimits(1, "group.%rank%", Map.of("king", 2)));
+        when(player.hasPermission("group.king")).thenReturn(true);
+
+        assertEquals(QuestService.AcceptResult.ACCEPTED, questService.acceptQuest(player, "break_stone"));
+        assertEquals(QuestService.AcceptResult.ACCEPTED, questService.acceptQuest(player, "choose_path"));
+        assertEquals(QuestService.AcceptResult.ACTIVE_LIMIT_REACHED, questService.acceptQuest(player, "mine_iron"));
     }
 
     @Test

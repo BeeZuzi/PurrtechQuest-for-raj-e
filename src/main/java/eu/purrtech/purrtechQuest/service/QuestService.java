@@ -1,6 +1,7 @@
 package eu.purrtech.purrtechQuest.service;
 
 import eu.purrtech.purrtechQuest.api.event.QuestAbandonEvent;
+import eu.purrtech.purrtechQuest.config.ActiveQuestLimits;
 import eu.purrtech.purrtechQuest.api.event.QuestAcceptEvent;
 import eu.purrtech.purrtechQuest.api.event.QuestCompleteEvent;
 import eu.purrtech.purrtechQuest.api.event.QuestObjectiveProgressEvent;
@@ -36,6 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Supplier;
 
 /**
  * Core business logic: quest acceptance, objective progress, prerequisites/cooldowns, completion and
@@ -69,6 +71,8 @@ public final class QuestService {
     private static final String SOUND_TURNED_IN = "ui.toast.challenge_complete";
 
     private volatile Map<String, Quest> questsById = Map.of();
+
+    private Supplier<ActiveQuestLimits> activeQuestLimits = ActiveQuestLimits::unlimited;
 
     public QuestService(QuestDefinitionRepository questRepository, PlayerQuestDataCache playerCache,
                          RewardService rewardService, MessagesConfig messages, EventPublisher eventPublisher) {
@@ -187,7 +191,7 @@ public final class QuestService {
 
     public enum AcceptResult {
         ACCEPTED, NOT_FOUND, ALREADY_IN_PROGRESS, ALREADY_COMPLETED, PREREQUISITES_NOT_MET, ON_COOLDOWN,
-        MISSING_PERMISSION, DATA_NOT_LOADED, CANCELLED
+        MISSING_PERMISSION, ACTIVE_LIMIT_REACHED, DATA_NOT_LOADED, CANCELLED
     }
 
     public enum AbandonResult {
@@ -236,6 +240,10 @@ public final class QuestService {
             return AcceptResult.PREREQUISITES_NOT_MET;
         }
 
+        if (activeCount(data) >= activeQuestLimit(player)) {
+            return AcceptResult.ACTIVE_LIMIT_REACHED;
+        }
+
         QuestAcceptEvent acceptEvent = new QuestAcceptEvent(player, quest);
         eventPublisher.publish(acceptEvent);
         if (acceptEvent.isCancelled()) {
@@ -249,6 +257,27 @@ public final class QuestService {
                 "quest.accepted-objective", "quest.accepted-objective-choice");
         notify(player, message, SOUND_ACCEPTED);
         return AcceptResult.ACCEPTED;
+    }
+
+    /** Where {@link #activeQuestLimit} reads {@code active-quest-limit:} from; read live, so a reload applies. */
+    public void activeQuestLimits(Supplier<ActiveQuestLimits> limits) {
+        this.activeQuestLimits = limits;
+    }
+
+    /** How many quests this player may have in progress at once (their rank's limit from the config). */
+    public int activeQuestLimit(Player player) {
+        return activeQuestLimits.get().limitFor(player::hasPermission);
+    }
+
+    /** Quests the player has in progress right now (finished ones awaiting turn-in no longer count). */
+    public int activeCount(PlayerQuestData data) {
+        int count = 0;
+        for (QuestProgress progress : data.states().values()) {
+            if (progress.status() == QuestStatus.IN_PROGRESS) {
+                count++;
+            }
+        }
+        return count;
     }
 
     /**

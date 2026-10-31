@@ -6,6 +6,7 @@ import eu.purrtech.purrtechQuest.api.objective.ObjectiveHandlerRegistry;
 import eu.purrtech.purrtechQuest.api.objective.ObjectiveHandlerRegistryImpl;
 import eu.purrtech.purrtechQuest.command.QuestAdminCommand;
 import eu.purrtech.purrtechQuest.command.QuestCommand;
+import eu.purrtech.purrtechQuest.config.ActiveQuestLimits;
 import eu.purrtech.purrtechQuest.config.MessagesConfig;
 import eu.purrtech.purrtechQuest.config.PluginConfig;
 import eu.purrtech.purrtechQuest.config.StorageType;
@@ -117,6 +118,8 @@ public final class PurrtechQuest extends JavaPlugin {
         RewardService rewardService = new RewardService(getLogger());
         this.questService = new QuestService(questDefinitionRepository, playerQuestDataCache, rewardService,
                 messagesConfig, getServer().getPluginManager()::callEvent);
+        questService.activeQuestLimits(
+                () -> ActiveQuestLimits.parse(getConfig().getConfigurationSection("active-quest-limit")));
         this.questTrackingService = new QuestTrackingService(questService, playerQuestDataCache, messagesConfig,
                 pluginConfig.trackingDisplay());
         this.chatInputService = new ChatInputService(this, messagesConfig);
