@@ -33,7 +33,8 @@ import java.util.Set;
  * On the landing page ({@link QuestCategoryGui}, where clicking it opens the quest list) it covers the server
  * guide's own quests ({@link GuideConfig#quests}). Inside a category's quest list ({@link QuestLogGui}, where it
  * is display-only) it is not the guide at all: it is that category's own item (its name and look from
- * {@code categories:}) with the category's completed count and the quest in progress there.
+ * {@code categories:}) with the category's completed count and the quest in progress there. The category
+ * items in the {@code /quest} menu itself use the same layout ({@link #buildCategoryCard}).
  */
 final class GuideIcon {
 
@@ -45,7 +46,8 @@ final class GuideIcon {
                            Player player, boolean clickable) {
         GuideConfig guide = GuideConfig.load();
         List<Quest> covered = guide.quests(CategoriesConfig.load(), questService.allQuests());
-        return render(questService, playerCache, messages, player, guide, covered, null, clickable);
+        return render(questService, playerCache, messages, player, guide, covered, null, false,
+                clickable ? "quest.gui-lore-guide-hint" : null);
     }
 
     /**
@@ -56,13 +58,25 @@ final class GuideIcon {
     static ItemStack buildForCategory(QuestService questService, PlayerQuestDataCache playerCache,
                                       MessagesConfig messages, Player player, Collection<Quest> listed,
                                       CategoriesConfig.Category category) {
-        return render(questService, playerCache, messages, player, GuideConfig.load(), listed, category, false);
+        return render(questService, playerCache, messages, player, GuideConfig.load(), listed, category, false, null);
+    }
+
+    /**
+     * A category's item in the {@code /quest} menu, laid out like the guide: the category's name, its own lore
+     * as the intro, completed/total across its quests and subcategories, the quest in progress there with its
+     * progress, and a click hint ({@code hintKey}, a lang key).
+     */
+    static ItemStack buildCategoryCard(QuestService questService, PlayerQuestDataCache playerCache,
+                                       MessagesConfig messages, Player player, Collection<Quest> covered,
+                                       CategoriesConfig.Category category, String hintKey) {
+        return render(questService, playerCache, messages, player, GuideConfig.load(), covered, category, true,
+                hintKey);
     }
 
     private static ItemStack render(QuestService questService, PlayerQuestDataCache playerCache,
                                     MessagesConfig messages, Player player, GuideConfig guide,
                                     Collection<Quest> covered, CategoriesConfig.Category category,
-                                    boolean clickable) {
+                                    boolean card, String hintKey) {
         Component name;
         if (category != null) {
             String categoryName = category.name() == null || category.name().isBlank() ? category.id() : category.name();
@@ -80,6 +94,10 @@ final class GuideIcon {
         List<Component> lore = new ArrayList<>();
         if (category == null) {
             lore.add(messages.render("quest.guide-intro", player, Map.of()));
+        } else if (card) {
+            for (String line : category.lore()) {
+                lore.add(DisplayText.component(line, NamedTextColor.GRAY));
+            }
         }
 
         QuestService.OverallSummary overall = questService.overallSummary(player, covered);
@@ -101,9 +119,9 @@ final class GuideIcon {
             lore.add(messages.render("quest.guide-progress-header", player, Map.of()));
             lore.addAll(objectiveProgressLines(playerCache, messages, player, active));
         }
-        if (clickable) {
+        if (hintKey != null) {
             lore.add(Component.empty());
-            lore.add(messages.render("quest.gui-lore-guide-hint", player, Map.of()));
+            lore.add(messages.render(hintKey, player, Map.of()));
         }
 
         ItemStack base = category == null

@@ -20,8 +20,9 @@ storage:
 # How many quests a player can have in progress at once, by rank. Applies on /questadmin reload.
 # A rank is held when the player has the permission below with %rank% replaced by the rank id (with
 # LuckPerms, "group.%rank%" is the player's group, inherited groups included). A player holding several
-# ranks gets the highest limit; one holding none gets "default". -1 = unlimited. Remove this whole section
-# to allow any number. Quests that are finished and only wait to be turned in don't count.
+# ranks gets the highest limit; one holding none gets "default". -1 = unlimited (e.g. "default: -1" and no
+# ranks for no limit at all). If this section is missing from an older config.yml, the values below are used.
+# Quests that are finished and only wait to be turned in don't count.
 active-quest-limit:
   default: 3
   permission: "group.%rank%"

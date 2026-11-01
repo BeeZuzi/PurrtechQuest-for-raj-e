@@ -69,8 +69,10 @@ public final class QuestCategoryGui extends Gui {
         List<Category> items = parent == null ? categories.roots() : parent.children();
         CategoriesConfig.layout(items, size, reserved).forEach((slot, category) -> {
             boolean hasChildren = !category.children().isEmpty();
-            var hint = messages.render(hasChildren ? "quest.category-hint-sub" : "quest.category-hint-open", player, Map.of());
-            setItem(slot, CategoryMenu.icon(category, List.of(hint)), event -> open(category));
+            setItem(slot, GuideIcon.buildCategoryCard(questService, playerCache, messages, player,
+                            categories.quests(category, questService.allQuests()), category,
+                            hasChildren ? "quest.gui-lore-category-sub-hint" : "quest.gui-lore-guide-hint"),
+                    event -> open(category));
         });
 
         if (parent == null) {

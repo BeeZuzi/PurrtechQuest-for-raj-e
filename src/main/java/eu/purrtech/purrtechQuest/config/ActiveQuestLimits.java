@@ -11,8 +11,9 @@ import java.util.function.Predicate;
  * at once, depending on their rank. A rank is held when the player has the permission {@code permission} with
  * {@code %rank%} replaced by the rank's id ({@code group.%rank%} matches a LuckPerms group, inherited ones
  * included); the highest limit among the ranks held applies, and {@code defaultLimit} when they hold none.
- * A negative limit means unlimited. A config with no such section at all means unlimited too, so a server
- * that updates the plugin without touching its config.yml keeps behaving as before.
+ * A negative limit means unlimited. A config with no such section at all (a server's existing config.yml from
+ * before this option existed is never rewritten by the plugin) gets {@link #standard()}, the same values the
+ * bundled config.yml ships, so dropping in a new jar is enough for the limits to apply.
  */
 public record ActiveQuestLimits(int defaultLimit, String permission, Map<String, Integer> ranks) {
 
@@ -27,10 +28,21 @@ public record ActiveQuestLimits(int defaultLimit, String permission, Map<String,
         return new ActiveQuestLimits(UNLIMITED, DEFAULT_PERMISSION, Map.of());
     }
 
-    /** {@code section} may be null (config from before this option existed): no limit. */
+    /** The limits bundled config.yml ships; used when the server's config.yml has no such section. */
+    public static ActiveQuestLimits standard() {
+        Map<String, Integer> ranks = new LinkedHashMap<>();
+        ranks.put("hrac", 3);
+        ranks.put("rajce", 4);
+        ranks.put("ninja", 5);
+        ranks.put("king", 6);
+        ranks.put("sky", 6);
+        return new ActiveQuestLimits(3, DEFAULT_PERMISSION, ranks);
+    }
+
+    /** {@code section} may be null (config from before this option existed): {@link #standard()}. */
     public static ActiveQuestLimits parse(ConfigurationSection section) {
         if (section == null) {
-            return unlimited();
+            return standard();
         }
         Map<String, Integer> ranks = new LinkedHashMap<>();
         ConfigurationSection rankSection = section.getConfigurationSection("ranks");

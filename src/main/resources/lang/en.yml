@@ -194,6 +194,7 @@ quest:
   gui-button-next-page-hint: "<gray>ᴢᴏʙʀᴀᴢí ᴅᴀʟší sᴛʀáɴᴋᴜ.</gray>"
   gui-lore-quest-hint: "<#9863E7><underlined>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴅᴇᴛᴀɪʟʏ ǫᴜᴇsᴛᴜ</underlined></#9863E7>"
   gui-lore-category-hint: "<dark_gray>Click to see this category's quests.</dark_gray>"
+  gui-lore-category-sub-hint: "<#F69B45><gray><underlined>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴢᴏʙʀᴀᴢᴇɴí ᴘᴏᴅᴋᴀᴛᴇɢᴏʀɪí</underlined></gray>"
   gui-lore-guide-hint: "<#F69B45><gray><underlined>ᴋʟɪᴋɴɪ ᴘʀᴏ ᴢᴏʙʀᴀᴢᴇɴí ǫᴜᴇsᴛů</underlined></gray>"
   guide-name: "<#F69B45><b>ᴘʀůᴠᴏᴅᴄᴇ</b></#F69B45>"
   guide-category-name: "<#F69B45><b>%name%</b></#F69B45>"

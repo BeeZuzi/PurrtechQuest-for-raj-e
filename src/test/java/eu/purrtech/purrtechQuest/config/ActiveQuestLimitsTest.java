@@ -28,8 +28,23 @@ class ActiveQuestLimitsTest {
             """;
 
     @Test
-    void missingSectionMeansUnlimited() {
-        assertEquals(ActiveQuestLimits.UNLIMITED, ActiveQuestLimits.parse(null).limitFor(p -> false));
+    void missingSectionGetsTheBundledLimits() throws Exception {
+        ActiveQuestLimits limits = ActiveQuestLimits.parse(null);
+
+        assertEquals(parse(RANKS), limits);
+        assertEquals(3, limits.limitFor(p -> false));
+        assertEquals(6, limits.limitFor(Set.of("group.sky")::contains));
+    }
+
+    @Test
+    void bundledConfigMatchesTheBuiltInLimits() throws Exception {
+        try (var in = ActiveQuestLimitsTest.class.getClassLoader().getResourceAsStream("config.yml")) {
+            YamlConfiguration config = YamlConfiguration.loadConfiguration(
+                    new java.io.InputStreamReader(in, java.nio.charset.StandardCharsets.UTF_8));
+
+            assertEquals(ActiveQuestLimits.standard(),
+                    ActiveQuestLimits.parse(config.getConfigurationSection("active-quest-limit")));
+        }
     }
 
     @Test

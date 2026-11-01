@@ -3,6 +3,12 @@ package eu.purrtech.purrtechQuest.config;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.util.List;
+
 public final class PluginConfig {
 
     private final StorageType storageType;
@@ -24,8 +30,12 @@ public final class PluginConfig {
         this.debug = debug;
     }
 
+    /** Sections added to config.yml after its first release; written into an older file that lacks them. */
+    private static final List<String> LATER_SECTIONS = List.of("active-quest-limit");
+
     public static PluginConfig load(JavaPlugin plugin) {
         plugin.saveDefaultConfig();
+        addMissingSections(plugin);
         plugin.reloadConfig();
         FileConfiguration config = plugin.getConfig();
 
@@ -48,6 +58,28 @@ public final class PluginConfig {
 
         return new PluginConfig(storageType, sqliteFileName, mysql, defaultLocale, questsDirectoryName,
                 trackingDisplay, debug);
+    }
+
+    /**
+     * An existing config.yml is never replaced by the bundled one, so an option added later wouldn't show up in
+     * it. Writes the bundled text of each such section (with its comments) at the end of the server's file, so
+     * the admin sees it there and can edit it; if that fails, the section's built-in defaults still apply.
+     */
+    private static void addMissingSections(JavaPlugin plugin) {
+        try (InputStream in = plugin.getResource("config.yml")) {
+            if (in == null) {
+                return;
+            }
+            String bundled = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+            Path file = plugin.getDataFolder().toPath().resolve("config.yml");
+            for (String section : LATER_SECTIONS) {
+                if (ConfigSections.appendIfMissing(file, bundled, section)) {
+                    plugin.getLogger().info("Added the new \"" + section + "\" section to config.yml.");
+                }
+            }
+        } catch (IOException e) {
+            plugin.getLogger().warning("Could not add new sections to config.yml: " + e.getMessage());
+        }
     }
 
     public StorageType storageType() {
