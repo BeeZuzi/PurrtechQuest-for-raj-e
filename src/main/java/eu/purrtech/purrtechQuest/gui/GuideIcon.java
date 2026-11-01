@@ -96,6 +96,13 @@ final class GuideIcon {
         if (category != null) {
             java.util.Set<String> ids = category.ids();
             covered = covered.stream().filter(quest -> ids.contains(quest.category())).toList();
+            // The server guide's own quests never count towards a profession: a category that isn't the guide's
+            // (or inside it) leaves every quest the guide covers out, whatever category it was filed under.
+            if (!guide.category().isEmpty() && !ids.contains(guide.category())) {
+                java.util.Set<String> guideQuestIds = guide.quests(CategoriesConfig.load(), questService.allQuests())
+                        .stream().map(Quest::id).collect(java.util.stream.Collectors.toSet());
+                covered = covered.stream().filter(quest -> !guideQuestIds.contains(quest.id())).toList();
+            }
         }
         List<Component> lore = new ArrayList<>();
         if (category == null) {
