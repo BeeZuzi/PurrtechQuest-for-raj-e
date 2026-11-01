@@ -91,6 +91,12 @@ final class GuideIcon {
         } else {
             name = DisplayText.component(guide.name(), NamedTextColor.WHITE);
         }
+        // A category's item counts only quests filed under that category (or its subcategories) themselves —
+        // not the quests whose category isn't defined, which the quest list files under the default category.
+        if (category != null) {
+            java.util.Set<String> ids = category.ids();
+            covered = covered.stream().filter(quest -> ids.contains(quest.category())).toList();
+        }
         List<Component> lore = new ArrayList<>();
         if (category == null) {
             lore.add(messages.render("quest.guide-intro", player, Map.of()));
@@ -104,12 +110,20 @@ final class GuideIcon {
         lore.add(messages.render("quest.guide-completed", player, Map.of(
                 "%done%", String.valueOf(overall.turnedIn()), "%total%", String.valueOf(overall.total()))));
         lore.add(Component.empty());
-        lore.add(messages.render("quest.guide-current-quest-header", player, Map.of()));
-
-        Quest active = questService.currentActiveQuest(player, covered).orElse(null);
-        if (active == null) {
+        // The server guide highlights the one quest to do next; a category lists every quest in progress in it.
+        List<Quest> actives = category == null
+                ? questService.currentActiveQuest(player, covered).map(List::of).orElse(List.of())
+                : questService.activeQuests(player, covered);
+        lore.add(messages.render(category == null ? "quest.guide-current-quest-header"
+                : "quest.guide-active-quests-header", player, Map.of()));
+        if (actives.isEmpty()) {
             lore.add(messages.render("quest.guide-no-active-quest", player, Map.of()));
-        } else {
+        }
+        for (int i = 0; i < actives.size(); i++) {
+            Quest active = actives.get(i);
+            if (i > 0) {
+                lore.add(Component.empty());
+            }
             lore.add(messages.render("quest.guide-current-quest-name", player, Map.of("%quest%", active.displayName())));
             for (String line : active.descriptionLines()) {
                 lore.add(messages.render("quest.guide-current-quest-description", player,

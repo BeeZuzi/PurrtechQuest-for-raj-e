@@ -29,6 +29,7 @@ import org.bukkit.entity.Player;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
@@ -171,6 +172,22 @@ public final class QuestService {
             }
         }
         return Optional.empty();
+    }
+
+    /** Every one of {@code quests} the player currently has {@code IN_PROGRESS}, in the order given. */
+    public List<Quest> activeQuests(Player player, Collection<Quest> quests) {
+        PlayerQuestData data = playerCache.get(player.getUniqueId());
+        if (data == null) {
+            return List.of();
+        }
+        List<Quest> active = new ArrayList<>();
+        for (Quest quest : quests) {
+            QuestProgress progress = data.progress(quest.id());
+            if (progress != null && progress.status() == QuestStatus.IN_PROGRESS) {
+                active.add(quest);
+            }
+        }
+        return active;
     }
 
     /** Turned-in count vs. total across the given quests — the guide item's overall completion line. */

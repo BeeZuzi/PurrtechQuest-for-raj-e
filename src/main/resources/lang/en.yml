@@ -200,6 +200,7 @@ quest:
   guide-category-name: "<#F69B45><b>%name%</b></#F69B45>"
   guide-intro: "<gray><i>ᴘʀᴏᴠᴇᴅᴇ ᴛě ᴘᴏꜱᴛᴜᴘɴě ꜱᴇʀᴠᴇʀᴇᴍ</i></gray>"
   guide-completed: "<#F69B45><b>●</b></#F69B45> <white>ꜱᴘʟɴěɴýᴄʜ Qᴜᴇꜱᴛů: <#F8AF69>%done%</#F8AF69><dark_gray>/</dark_gray><#F69B45>%total%</#F69B45></white>"
+  guide-active-quests-header: "<#F69B45><b>ᴀᴋᴛᴜáʟɴí úᴋᴏʟʏ:</b></#F69B45>"
   guide-current-quest-header: "<#F69B45><b>ᴀᴋᴛᴜáʟɴí úᴋᴏʟ:</b></#F69B45>"
   guide-current-quest-name: "<#F69B45><b>●</b></#F69B45> <white>%quest%</white>"
   guide-current-quest-description: "<dark_gray> -</dark_gray> <white>%description%</white>"

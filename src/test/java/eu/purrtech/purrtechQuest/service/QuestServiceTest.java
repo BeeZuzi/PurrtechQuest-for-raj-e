@@ -184,6 +184,20 @@ class QuestServiceTest {
     }
 
     @Test
+    void activeQuestsListsEveryQuestInProgressInTheGivenSet() {
+        assertEquals(QuestService.AcceptResult.ACCEPTED, questService.acceptQuest(player, "mine_iron"));
+        assertEquals(QuestService.AcceptResult.ACCEPTED, questService.acceptQuest(player, "break_stone"));
+        assertEquals(QuestService.AcceptResult.ACCEPTED, questService.acceptQuest(player, "choose_path"));
+
+        var inSet = questService.allQuests().stream()
+                .filter(q -> q.category().equals("test")).toList();
+
+        assertEquals(java.util.Set.of("break_stone", "choose_path"),
+                questService.activeQuests(player, inSet).stream().map(Quest::id)
+                        .collect(java.util.stream.Collectors.toSet()));
+    }
+
+    @Test
     void cannotAcceptQuestWithUnmetPrerequisites() {
         assertEquals(QuestService.AcceptResult.PREREQUISITES_NOT_MET, questService.acceptQuest(player, "kill_zombie"));
     }
