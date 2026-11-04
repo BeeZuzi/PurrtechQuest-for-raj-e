@@ -84,6 +84,38 @@ class CategoriesConfigTest {
     }
 
     @Test
+    void aSubmenuCanSetItsOwnTitleAndRowsAtAnyDepthAndOtherwiseInheritsTheMainMenusTitle() throws Exception {
+        CategoriesConfig categories = parse("""
+                categories:
+                  menu: {title: "<white>main", rows: 3}
+                  list:
+                    profese:
+                      menu: {title: "<gold>Profese", rows: 4}
+                      children:
+                        farmar:
+                          menu: {title: "<green>Farmář", rows: 5}
+                          children:
+                            pole: {}
+                        hornik:
+                          children:
+                            rudy: {}
+                    bez_menu:
+                      children:
+                        x: {}
+                """);
+
+        assertEquals("<white>main", categories.menuFor(null).title());
+        assertEquals("<gold>Profese", categories.menuFor(categories.find("profese")).title());
+        assertEquals(4, categories.menuFor(categories.find("profese")).rows());
+        assertEquals("<green>Farmář", categories.menuFor(categories.find("farmar")).title());
+        assertEquals(5, categories.menuFor(categories.find("farmar")).rows());
+        // Nothing set: both the title and the rows come from the main menu.
+        assertEquals("<white>main", categories.menuFor(categories.find("hornik")).title());
+        assertEquals(3, categories.menuFor(categories.find("hornik")).rows());
+        assertEquals("<white>main", categories.menuFor(categories.find("bez_menu")).title());
+    }
+
+    @Test
     void rowsAreClampedAndUnknownDefaultFallsBackToFirst() throws Exception {
         CategoriesConfig categories = parse("""
                 categories:

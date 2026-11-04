@@ -123,7 +123,9 @@ categories:
   #   custom-model-data number, for resource pack models (optional)
   #   glow              true = enchantment glint
   #   texture           player-head skin texture hash (optional, replaces material)
-  #   menu              title / rows of the submenu this category opens (optional, defaults to the main menu's)
+  #   menu              title / rows of the submenu this category opens (optional, defaults to the main menu's).
+  #                     A category without children opens its quest list instead: its menu.title is that list's
+  #                     title (blank = the usual quest list title; rows don't apply to the list).
   #   children          subcategories, same keys. A category with children opens a menu of them.
   list:
     zacatek:

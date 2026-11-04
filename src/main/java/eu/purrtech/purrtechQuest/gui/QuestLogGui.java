@@ -13,6 +13,7 @@ import eu.purrtech.purrtechQuest.service.QuestTrackingService;
 import eu.purrtech.purrtechQuest.util.SlotRanges;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -68,7 +69,7 @@ public final class QuestLogGui extends Gui {
     public QuestLogGui(QuestService questService, PlayerQuestDataCache playerCache, QuestTrackingService trackingService,
                         MessagesConfig messages, Player player, List<Quest> quests, Category category,
                         Runnable onBack) {
-        super(messages.render("quest.gui-log-title", player, Map.of()), SIZE);
+        super(title(messages, player, category), SIZE);
         this.questService = questService;
         this.playerCache = playerCache;
         this.trackingService = trackingService;
@@ -125,6 +126,17 @@ public final class QuestLogGui extends Gui {
         setItem(CLOSE_SLOT, GuiItems.closeButton(messages.render("quest.gui-nav-close", player, Map.of()),
                         List.of(messages.render("quest.gui-nav-close-hint", player, Map.of()))),
                 event -> player.closeInventory());
+    }
+
+    /**
+     * A category's own {@code menu: title:} from config.yml (MiniMessage) when it sets one; otherwise — and for
+     * a list that isn't a category — the usual quest list title from the lang file.
+     */
+    private static Component title(MessagesConfig messages, Player player, Category category) {
+        if (category != null && !category.menu().title().isBlank()) {
+            return MiniMessage.miniMessage().deserialize(category.menu().title());
+        }
+        return messages.render("quest.gui-log-title", player, Map.of());
     }
 
     /**
