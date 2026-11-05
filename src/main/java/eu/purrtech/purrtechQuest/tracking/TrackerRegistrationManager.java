@@ -35,7 +35,7 @@ public final class TrackerRegistrationManager {
                 ObjectiveType.BREAK_BLOCK, new BreakBlockListener(questService),
                 ObjectiveType.PLACE_BLOCK, new PlaceBlockListener(questService),
                 ObjectiveType.COLLECT_ITEM, new CollectItemListener(questService),
-                ObjectiveType.CRAFT_ITEM, new CraftItemListener(questService),
+                ObjectiveType.CRAFT_ITEM, new CraftItemListener(plugin, questService),
                 ObjectiveType.FISH, new FishListener(questService),
                 ObjectiveType.REACH_LOCATION, new ReachLocationListener(questService));
     }
