@@ -30,6 +30,14 @@ final class CategoryMenu {
         return size - 9;
     }
 
+    /**
+     * Where a close/back button goes: the configured slot when it is inside the menu, else the bottom-row
+     * {@code fallback} — so a slot typed wrongly in the config never puts a button outside the inventory.
+     */
+    static int controlSlot(int configured, int size, int fallback) {
+        return configured >= 0 && configured < size ? configured : fallback;
+    }
+
     static Set<Integer> bottomControls(int size) {
         int row = bottomRow(size);
         return Set.of(row + 3, row + 4, row + 5);

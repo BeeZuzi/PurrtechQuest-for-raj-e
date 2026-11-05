@@ -59,7 +59,19 @@ public final class QuestCategoryGui extends Gui {
         clear();
         int row = CategoryMenu.bottomRow(size);
 
-        Set<Integer> reserved = new HashSet<>(CategoryMenu.bottomControls(size));
+        // The close and back buttons sit where this menu's (or, failing that, the main menu's) config puts them,
+        // in the middle of the bottom row otherwise; nothing else is placed on top of them.
+        CategoriesConfig.Menu menu = categories.menuFor(parent);
+        int closeSlot = CategoryMenu.controlSlot(menu.closeSlot(), size, row + 4);
+        int backSlot = CategoryMenu.controlSlot(menu.backSlot(), size, row + 3);
+        if (backSlot == closeSlot) {
+            backSlot = closeSlot == row + 3 ? row + 2 : row + 3;
+        }
+        Set<Integer> reserved = new HashSet<>();
+        reserved.add(closeSlot);
+        if (parent != null) {
+            reserved.add(backSlot);
+        }
         // A negative slot in the config hides the guide altogether.
         int configured = GuideConfig.load().mainSlot();
         int guideSlot = configured < 0 ? -1 : CategoryMenu.validSlot(configured, size, reserved, 3);
@@ -83,11 +95,11 @@ public final class QuestCategoryGui extends Gui {
                                 .open(player));
             }
         } else {
-            setItem(row + 3, GuiItems.icon(Material.IRON_DOOR, messages.render("quest.gui-nav-back", player, Map.of()),
+            setItem(backSlot, GuiItems.icon(Material.IRON_DOOR, messages.render("quest.gui-nav-back", player, Map.of()),
                             List.of(messages.render("quest.gui-nav-back-hint", player, Map.of()))),
                     event -> onBack.run());
         }
-        setItem(row + 4, GuiItems.closeButton(messages.render("quest.gui-nav-close", player, Map.of()),
+        setItem(closeSlot, GuiItems.closeButton(messages.render("quest.gui-nav-close", player, Map.of()),
                         List.of(messages.render("quest.gui-nav-close-hint", player, Map.of()))),
                 event -> player.closeInventory());
     }

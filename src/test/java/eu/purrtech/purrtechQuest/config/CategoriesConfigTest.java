@@ -116,6 +116,47 @@ class CategoriesConfigTest {
     }
 
     @Test
+    void closeAndBackSlotsAreSetPerMenuAndOtherwiseInheritTheMainMenus() throws Exception {
+        CategoriesConfig categories = parse("""
+                categories:
+                  menu: {rows: 4, close-slot: 31, back-slot: 30}
+                  list:
+                    own:
+                      menu: {close-slot: 13}
+                      children: {a: {}}
+                    inherits:
+                      children: {b: {}}
+                    both:
+                      menu: {close-slot: 35, back-slot: 27}
+                      children: {c: {}}
+                """);
+
+        assertEquals(31, categories.menuFor(null).closeSlot());
+        assertEquals(30, categories.menuFor(null).backSlot());
+        // Own close slot, back slot inherited.
+        assertEquals(13, categories.menuFor(categories.find("own")).closeSlot());
+        assertEquals(30, categories.menuFor(categories.find("own")).backSlot());
+        // Nothing set: both inherited.
+        assertEquals(31, categories.menuFor(categories.find("inherits")).closeSlot());
+        assertEquals(30, categories.menuFor(categories.find("inherits")).backSlot());
+        assertEquals(35, categories.menuFor(categories.find("both")).closeSlot());
+        assertEquals(27, categories.menuFor(categories.find("both")).backSlot());
+    }
+
+    @Test
+    void unsetCloseAndBackSlotsStayAtTheDefaultPositionMarker() throws Exception {
+        CategoriesConfig categories = parse("""
+                categories:
+                  list:
+                    a:
+                      children: {b: {}}
+                """);
+
+        assertEquals(-1, categories.menuFor(null).closeSlot());
+        assertEquals(-1, categories.menuFor(categories.find("a")).backSlot());
+    }
+
+    @Test
     void rowsAreClampedAndUnknownDefaultFallsBackToFirst() throws Exception {
         CategoriesConfig categories = parse("""
                 categories:

@@ -28,7 +28,12 @@ public final class CategoriesConfig {
     private static final int DEFAULT_ROWS = 3;
 
     /** {@code title} may be blank (fall back to the lang text); {@code rows} is 0 in a category's own menu when not overridden. */
-    public record Menu(String title, int rows) {
+    public record Menu(String title, int rows, int closeSlot, int backSlot) {
+
+        /** A menu that leaves the close and back buttons where they default to ({@code -1}). */
+        public Menu(String title, int rows) {
+            this(title, rows, -1, -1);
+        }
     }
 
     /** One category item. {@code slot} is -1 when unset. {@code customModelData} / {@code texture} may be null. */
@@ -81,7 +86,9 @@ public final class CategoriesConfig {
         }
 
         int rows = section == null ? DEFAULT_ROWS : clampRows(section.getInt("menu.rows", DEFAULT_ROWS));
-        Menu rootMenu = new Menu(section == null ? "" : section.getString("menu.title", ""), rows);
+        Menu rootMenu = new Menu(section == null ? "" : section.getString("menu.title", ""), rows,
+                section == null ? -1 : section.getInt("menu.close-slot", -1),
+                section == null ? -1 : section.getInt("menu.back-slot", -1));
 
         String defaultId = section == null ? "default" : section.getString("default", "default");
         if (!byId.containsKey(defaultId) && !roots.isEmpty()) {
@@ -110,7 +117,8 @@ public final class CategoriesConfig {
             if (childSection != null) {
                 parseInto(childSection, children, byId, warn);
             }
-            Menu menu = new Menu(s.getString("menu.title", ""), s.getInt("menu.rows", 0));
+            Menu menu = new Menu(s.getString("menu.title", ""), s.getInt("menu.rows", 0),
+                    s.getInt("menu.close-slot", -1), s.getInt("menu.back-slot", -1));
             Category category = new Category(id, s.getInt("slot", -1), s.getString("material", "BOOK"),
                     s.getString("name", id), s.getStringList("lore"),
                     s.isInt("custom-model-data") ? s.getInt("custom-model-data") : null,
@@ -151,7 +159,9 @@ public final class CategoriesConfig {
         }
         int rows = parent.menu().rows() > 0 ? clampRows(parent.menu().rows()) : rootMenu.rows();
         String title = parent.menu().title().isBlank() ? rootMenu.title() : parent.menu().title();
-        return new Menu(title, rows);
+        int closeSlot = parent.menu().closeSlot() >= 0 ? parent.menu().closeSlot() : rootMenu.closeSlot();
+        int backSlot = parent.menu().backSlot() >= 0 ? parent.menu().backSlot() : rootMenu.backSlot();
+        return new Menu(title, rows, closeSlot, backSlot);
     }
 
     /**

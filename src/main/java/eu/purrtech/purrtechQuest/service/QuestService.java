@@ -73,7 +73,14 @@ public final class QuestService {
 
     private volatile Map<String, Quest> questsById = Map.of();
 
+    /**
+     * Key offset, in a progress's baseline map, of an EARN_MONEY objective's "balance at the last check" — the
+     * plain index holds its balance at acceptance. Far above any real objective index.
+     */
+    private static final int EARN_LAST_SEEN = 1_000_000;
+
     private Supplier<ActiveQuestLimits> activeQuestLimits = ActiveQuestLimits::unlimited;
+    private java.util.function.Consumer<String> debugLog = message -> { };
 
     public QuestService(QuestDefinitionRepository questRepository, PlayerQuestDataCache playerCache,
                          RewardService rewardService, MessagesConfig messages, EventPublisher eventPublisher) {
@@ -276,6 +283,11 @@ public final class QuestService {
         return AcceptResult.ACCEPTED;
     }
 
+    /** Where debug messages go; the plugin only forwards them while {@code debug: true} is set in config.yml. */
+    public void debugLog(java.util.function.Consumer<String> debugLog) {
+        this.debugLog = debugLog;
+    }
+
     /** Where {@link #activeQuestLimit} reads {@code active-quest-limit:} from; read live, so a reload applies. */
     public void activeQuestLimits(Supplier<ActiveQuestLimits> limits) {
         this.activeQuestLimits = limits;
@@ -389,6 +401,7 @@ public final class QuestService {
         for (int i = 0; i < objectives.size(); i++) {
             if (objectives.get(i).type() == ObjectiveType.EARN_MONEY) {
                 fresh.baseline(i, balance);
+                fresh.baseline(EARN_LAST_SEEN + i, balance);
             }
         }
     }
@@ -658,10 +671,9 @@ public final class QuestService {
      * Called on a timer (see {@code PurrtechQuest.registerEarnMoneyCheckTask}) to evaluate EARN_MONEY
      * objectives against the player's live Vault balance — like PLACEHOLDER_CHECK, a balance can change for
      * any reason (rewards, other plugins, other players trading with them), so there's no single event to
-     * hook and this polls instead. Progress is the gain over each objective's baseline (the balance at
-     * acceptance, captured by {@link #captureEarnMoneyBaselines}), and unlike every other objective type it
-     * can move *backwards*: spending money back below the target gain while still in progress genuinely
-     * means less progress, not a bug — see {@link EarnMoneyMatcher}.
+     * hook and this polls instead. Progress is the highest gain reached over each objective's baseline (the
+     * balance at acceptance, captured by {@link #captureEarnMoneyBaselines}); it never goes back down when the
+     * player spends the money afterwards — see {@link EarnMoneyMatcher}.
      */
     public void checkEarnMoneyObjectives(Player player) {
         if (!EarnMoneyMatcher.isPresent()) {
@@ -669,6 +681,9 @@ public final class QuestService {
         }
         PlayerQuestData data = playerCache.get(player.getUniqueId());
         if (data == null) {
+            return;
+        }
+        if (!hasEarnMoneyInProgress(data)) {
             return;
         }
         double balance = EarnMoneyMatcher.balanceOf(player);
@@ -681,6 +696,7 @@ public final class QuestService {
                 continue;
             }
             boolean changed = false;
+            boolean stateChanged = false;
             List<QuestObjective> objectives = quest.objectives();
             for (int i = 0; i < objectives.size(); i++) {
                 QuestObjective objective = objectives.get(i);
@@ -691,20 +707,44 @@ public final class QuestService {
                     continue;
                 }
                 double baseline = progress.baseline(i) == null ? 0.0 : progress.baseline(i);
+                Double lastSeen = progress.baseline(EARN_LAST_SEEN + i);
                 int previous = progress.objectiveProgress(i);
-                int current = EarnMoneyMatcher.clampedProgress(balance, baseline, objective.amount());
-                if (current == previous) {
+                EarnMoneyMatcher.Step step = EarnMoneyMatcher.step(previous, balance, lastSeen, baseline, objective.amount());
+                debugLog.accept("EARN_MONEY " + player.getName() + " " + quest.id() + "#" + i + ": balance=" + balance
+                        + " lastSeen=" + lastSeen + " baseline=" + progress.baseline(i) + " amount=" + objective.amount()
+                        + " progress " + previous + " -> " + step.progress());
+                if (lastSeen == null || step.lastSeen() != lastSeen) {
+                    progress.baseline(EARN_LAST_SEEN + i, step.lastSeen());
+                    stateChanged = true;
+                }
+                if (step.progress() == previous) {
                     continue;
                 }
-                progress.incrementObjective(i, current - previous);
+                progress.incrementObjective(i, step.progress() - previous);
                 changed = true;
-                eventPublisher.publish(new QuestObjectiveProgressEvent(player, quest, i, previous, current));
+                eventPublisher.publish(new QuestObjectiveProgressEvent(player, quest, i, previous, step.progress()));
+            }
+            if (changed || stateChanged) {
+                data.markDirty();
             }
             if (changed) {
-                data.markDirty();
                 handlePotentialCompletion(player, quest, progress);
             }
         }
+    }
+
+    /** Whether any quest the player has in progress has an EARN_MONEY objective — no balance lookup otherwise. */
+    private boolean hasEarnMoneyInProgress(PlayerQuestData data) {
+        for (QuestProgress progress : data.states().values()) {
+            if (progress.status() != QuestStatus.IN_PROGRESS) {
+                continue;
+            }
+            Quest quest = questsById.get(progress.questId());
+            if (quest != null && quest.objectives().stream().anyMatch(o -> o.type() == ObjectiveType.EARN_MONEY)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

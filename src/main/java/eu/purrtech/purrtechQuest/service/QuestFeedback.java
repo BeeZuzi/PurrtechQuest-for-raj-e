@@ -1,8 +1,10 @@
 package eu.purrtech.purrtechQuest.service;
 
 import eu.purrtech.purrtechQuest.config.MessagesConfig;
+import eu.purrtech.purrtechQuest.config.PermissionMessages;
 import eu.purrtech.purrtechQuest.util.DurationFormat;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -26,7 +28,7 @@ public final class QuestFeedback {
             case ALREADY_IN_PROGRESS -> fail(player, messages, "quest.already-in-progress", Map.of());
             case ALREADY_COMPLETED -> fail(player, messages, "quest.already-completed", Map.of());
             case PREREQUISITES_NOT_MET -> fail(player, messages, "quest.prerequisites-not-met", Map.of());
-            case MISSING_PERMISSION -> fail(player, messages, "quest.missing-permission", Map.of());
+            case MISSING_PERMISSION -> missingPermission(player, questId, questService, messages);
             case ACTIVE_LIMIT_REACHED -> fail(player, messages, "quest.active-limit-reached",
                     Map.of("%limit%", String.valueOf(questService.activeQuestLimit(player))));
             case DATA_NOT_LOADED -> fail(player, messages, "quest.data-not-loaded", Map.of());
@@ -58,6 +60,22 @@ public final class QuestFeedback {
             case DATA_NOT_LOADED -> fail(player, messages, "quest.data-not-loaded", Map.of());
             case CANCELLED -> fail(player, messages, "quest.action-cancelled", Map.of());
         };
+    }
+
+    /**
+     * A quest locked behind a {@code required-permission} says why, in the server's own words, when config.yml's
+     * {@code permission-messages} has an entry for that permission; otherwise the generic text.
+     */
+    private static boolean missingPermission(Player player, String questId, QuestService questService,
+                                             MessagesConfig messages) {
+        String node = questService.quest(questId).map(quest -> quest.requiredPermission()).orElse(null);
+        String custom = PermissionMessages.forPermission(
+                JavaPlugin.getProvidingPlugin(QuestFeedback.class).getConfig(), node);
+        if (custom == null) {
+            return fail(player, messages, "quest.missing-permission", Map.of());
+        }
+        player.sendMessage(messages.chatText(custom, player));
+        return false;
     }
 
     private static boolean fail(Player player, MessagesConfig messages, String key, Map<String, String> placeholders) {

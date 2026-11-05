@@ -33,6 +33,13 @@ active-quest-limit:
     king: 6
     sky: 6
 
+# What a player is told when they try to accept a quest that needs a "required-permission" they don't have,
+# per permission. MiniMessage. A permission with no entry here gets the generic "no permission" text from
+# lang/<locale>.yml. Applies on /questadmin reload.
+permission-messages:
+  - permission: "skyblock.premium"
+    message: "<red>Tyto questy máš uzavřené.</red> <gray>Odemkneš je zakoupením <gold>prémiového skyblocku</gold>.</gray>"
+
 # The language of every quest text (lang/<locale>.yml).
 default-locale: cs
 
@@ -109,9 +116,13 @@ categories:
   default: zacatek
 
   # The main menu. title: MiniMessage (empty = the text from lang/<locale>.yml), rows: 2-6 (rows * 9 slots).
+  # close-slot / back-slot (optional, 0-based): where the close and back buttons go in every menu that doesn't set
+  # its own; unset = the middle of the bottom row (back left of close). The main menu has no back button.
   menu:
     title: "<white>:offset_-8::ukoly:</white>"
     rows: 3
+    # close-slot: 22
+    # back-slot: 21
 
   # Each key under "list" is a category id (what a quest's "category:" refers to). Per category:
   #   slot              position in its menu, 0-based, left to right, top to bottom. An unset, out-of-range or
@@ -123,7 +134,8 @@ categories:
   #   custom-model-data number, for resource pack models (optional)
   #   glow              true = enchantment glint
   #   texture           player-head skin texture hash (optional, replaces material)
-  #   menu              title / rows of the submenu this category opens (optional, defaults to the main menu's).
+  #   menu              title / rows / close-slot / back-slot of the submenu this category opens (each optional,
+  #                     defaults to the main menu's).
   #                     A category without children opens its quest list instead: its menu.title is that list's
   #                     title (blank = the usual quest list title; rows don't apply to the list).
   #   children          subcategories, same keys. A category with children opens a menu of them.
@@ -147,4 +159,6 @@ categories:
       #     material: IRON_ORE
       #     name: "<gray>Rudy</gray>"
 
+# true = the console logs how "earn money" objectives are evaluated (balance, starting balance, progress),
+# to find out why one doesn't count. Turn it off again afterwards, it logs every few seconds. Applies on /questadmin reload.
 debug: false

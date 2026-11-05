@@ -87,4 +87,23 @@ class ConfigSectionsTest {
         assertFalse(after.contains("# The language"), "must not drag in neighbouring sections");
         assertEquals(after.indexOf("sky: 6") + "sky: 6\n".length(), after.length());
     }
+
+    @Test
+    void appendsTheRealPermissionMessagesListFromTheBundledConfig(@TempDir Path dir) throws IOException {
+        String bundled;
+        try (var in = ConfigSectionsTest.class.getClassLoader().getResourceAsStream("config.yml")) {
+            bundled = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+        }
+        Path file = dir.resolve("config.yml");
+        Files.writeString(file, "default-locale: cs\n", StandardCharsets.UTF_8);
+
+        assertTrue(ConfigSections.appendIfMissing(file, bundled, "permission-messages"));
+
+        String after = Files.readString(file, StandardCharsets.UTF_8);
+        assertTrue(after.contains("permission-messages:\n  - permission: \"skyblock.premium\"\n    message: "));
+        assertFalse(after.contains("# The language"), "must not drag in neighbouring sections");
+
+        var config = org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(file.toFile());
+        assertEquals(1, config.getMapList("permission-messages").size());
+    }
 }

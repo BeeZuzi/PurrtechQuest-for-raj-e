@@ -31,7 +31,7 @@ public final class PluginConfig {
     }
 
     /** Sections added to config.yml after its first release; written into an older file that lacks them. */
-    private static final List<String> LATER_SECTIONS = List.of("active-quest-limit");
+    private static final List<String> LATER_SECTIONS = List.of("active-quest-limit", "permission-messages");
 
     public static PluginConfig load(JavaPlugin plugin) {
         plugin.saveDefaultConfig();

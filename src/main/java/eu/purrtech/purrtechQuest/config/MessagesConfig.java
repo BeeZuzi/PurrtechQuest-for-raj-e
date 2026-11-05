@@ -418,6 +418,11 @@ public final class MessagesConfig {
         return withPrefix(render(key, player, placeholders), player.locale().getLanguage());
     }
 
+    /** A message text taken straight from config.yml (MiniMessage), with the chat prefix in front. */
+    public Component chatText(String text, Player player) {
+        return withPrefix(renderRaw(text, Map.of()), player.locale().getLanguage());
+    }
+
     /** Same as {@link #chat(String, Player, Map)} for callers with no player (console senders). */
     public Component chat(String key, Map<String, String> placeholders) {
         return withPrefix(render(key, placeholders), null);

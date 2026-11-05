@@ -58,7 +58,8 @@ public final class PurrtechQuest extends JavaPlugin {
     private static final long AUTOSAVE_PERIOD_TICKS = 20L * 60 * 5;
     private static final long TRACKING_TICK_PERIOD_TICKS = 20L;
     private static final long PLACEHOLDER_CHECK_PERIOD_TICKS = 20L * 5;
-    private static final long EARN_MONEY_CHECK_PERIOD_TICKS = 20L * 5;
+    // Once a second: money earned and spent within one check window nets out, so the window is kept short.
+    private static final long EARN_MONEY_CHECK_PERIOD_TICKS = 20L;
 
     private PluginConfig pluginConfig;
     private MessagesConfig messagesConfig;
@@ -118,6 +119,11 @@ public final class PurrtechQuest extends JavaPlugin {
         RewardService rewardService = new RewardService(getLogger());
         this.questService = new QuestService(questDefinitionRepository, playerQuestDataCache, rewardService,
                 messagesConfig, getServer().getPluginManager()::callEvent);
+        questService.debugLog(message -> {
+            if (getConfig().getBoolean("debug", false)) {
+                getLogger().info("[debug] " + message);
+            }
+        });
         questService.activeQuestLimits(
                 () -> ActiveQuestLimits.parse(getConfig().getConfigurationSection("active-quest-limit")));
         this.questTrackingService = new QuestTrackingService(questService, playerQuestDataCache, messagesConfig,
